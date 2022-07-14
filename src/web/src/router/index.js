@@ -7,6 +7,8 @@ import Form from "../components/Form";
 import Grid from "../components/Grid";
 import Login from "../components/Login";
 import LoginComplete from "../components/LoginComplete";
+import HistoricPlacesGrid from "../components/HistoricPlacesGrid";
+import PlacesForm from "../components/HistoricPlacesGrid/PlacesForm";
 import Profile from "../components/Profile";
 import store from "../store";
 
@@ -57,6 +59,19 @@ const routes = [
       requiresAuth: true
     }
   },
+  {
+		path: "/historic-places",
+		name: "HistoricPlacesGrid",
+		component: HistoricPlacesGrid,
+		// meta: { requiresAuth: true },
+	},
+  {
+		path: "/places/view/:name",
+		name: "placeView",
+		component: PlacesForm,
+		props: true,
+		// meta: { requiresAuth: true },
+	},
   {
     path: "*",
     name: "Not Found",
