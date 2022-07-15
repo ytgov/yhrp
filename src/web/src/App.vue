@@ -59,7 +59,7 @@
         hide-details
       ></v-select> -->
 
-      <div v-if="isAuthenticated">
+      <!-- <div v-if="isAuthenticated">
         <span>{{ username }}</span>
         <v-menu bottom left class="ml-0">
           <template v-slot:activator="{ on, attrs }">
@@ -87,7 +87,7 @@
       </div>
       <div v-else>
         <router-link to="/sign-in">Sign in</router-link>
-      </div>
+      </div> -->
 
       <!-- <v-app-bar-nav-icon @click.stop="drawerRight = !drawerRight"></v-app-bar-nav-icon> -->
     </v-app-bar>
@@ -110,19 +110,19 @@ import router from "./router";
 //import { mapState } from "vuex";
 import store from "./store";
 import * as config from "./config";
-import { mapState } from "vuex";
+// import { mapState } from "vuex";
 
 export default {
   name: "App",
   components: {},
   computed: {
-    ...mapState("isAuthenticated"),
-    username() {
-      return store.getters.fullName;
-    },
-    isAuthenticated() {
-      return store.getters.isAuthenticated;
-    }
+    // ...mapState("isAuthenticated"),
+    // username() {
+    //   return store.getters.fullName;
+    // },
+    // isAuthenticated() {
+    //   return store.getters.isAuthenticated;
+    // }
   },
   data: () => ({
     dialog: false,
