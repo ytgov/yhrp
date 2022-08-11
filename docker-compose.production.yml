@@ -5,6 +5,6 @@ services:
     build: .
     restart: unless-stopped
     environment:
-      - 'NODE_ENV=production'
+      - 'NODE_ENV=development'
     ports:
       - '${HOST_PORT:-27640}:3000'
