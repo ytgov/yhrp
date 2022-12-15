@@ -1,5 +1,5 @@
 import axios from "axios";
-import { AUTH_CHECK_URL, LOGOUT_URL } from "../urls";
+import { LOGOUT_URL } from "../urls";
 
 const state = {
     user: null,
@@ -10,13 +10,13 @@ const getters = {
     fullName: state => { return state.fullName },
 };
 const actions = {
-    async checkAuthentication({ commit }) {
-        await axios.get(AUTH_CHECK_URL)
-            .then(resp => {
-                commit("setUser", resp.data);
-            }).catch(() => {
-                commit("clearUser");
-            });
+    async checkAuthentication() {
+        // await axios.get(AUTH_CHECK_URL)
+        //     .then(resp => {
+        //         commit("setUser", resp.data);
+        //     }).catch(() => {
+        //         commit("clearUser");
+        //     });
     },
     async signOut({ commit }) {
         await axios.get(LOGOUT_URL)
