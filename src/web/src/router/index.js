@@ -11,6 +11,7 @@ import HistoricPlacesGrid from "../components/HistoricPlacesGrid";
 import PlacesForm from "../components/HistoricPlacesGrid/PlacesForm";
 import Profile from "../components/Profile";
 import store from "../store";
+import map from "@/modules/router";
 
 Vue.use(VueRouter);
 
@@ -18,71 +19,71 @@ const routes = [
   {
     path: "/",
     name: "Home",
-    component: Home
+    component: Home,
   },
   {
     path: "/dashboard",
     name: "Dashboard",
-    component: Dashboard
+    component: Dashboard,
   },
   {
     path: "/form",
     name: "Basic Form",
     component: Form,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: "/grid",
     name: "Data grid",
     component: Grid,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: "/sign-in",
     name: "Login",
-    component: Login
+    component: Login,
   },
   {
     path: "/login-complete",
     name: "LoginComplete",
-    component: LoginComplete
+    component: LoginComplete,
   },
   {
     path: "/profile",
     name: "Profile",
     component: Profile,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
-		path: "/historic-places",
-		name: "HistoricPlacesGrid",
-		component: HistoricPlacesGrid,
-		// meta: { requiresAuth: true },
-	},
+    path: "/historic-places",
+    name: "HistoricPlacesGrid",
+    component: HistoricPlacesGrid,
+    // meta: { requiresAuth: true },
+  },
   {
-		path: "/places/view/:name",
-		name: "placeView",
-		component: PlacesForm,
-		props: true,
-		// meta: { requiresAuth: true },
-	},
+    path: "/places/view/:name",
+    name: "placeView",
+    component: PlacesForm,
+    props: true,
+    // meta: { requiresAuth: true },
+  },
   {
     path: "*",
     name: "Not Found",
-    component: NotFound
-  }
+    component: NotFound,
+  },
 ];
 
 const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
-  routes
+  routes,
 });
 
 router.beforeEach(async (to, from, next) => {
@@ -96,7 +97,7 @@ router.beforeEach(async (to, from, next) => {
   var isAuthenticated = store.getters.isAuthenticated;
 
   if (requiresAuth && !isAuthenticated) {
-    console.log("You aren't authenticatd, redirecting to sign-in")
+    console.log("You aren't authenticatd, redirecting to sign-in");
     next("/sign-in");
     return;
   }
