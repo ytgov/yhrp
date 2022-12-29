@@ -1,4 +1,3 @@
-
 import * as config from "./config";
 
 export const LOGIN_URL = `${config.apiBaseUrl}/api/auth/login`;
@@ -18,4 +17,6 @@ export const PHOTO_BATCH_URL = `${config.apiBaseUrl}/api/photobatch`;
 export const YTPLACE_URL = `${config.apiBaseUrl}/api/ytplace`;
 
 export const USER_URL = `${config.apiBaseUrl}/api/user`;
-export const MAPS_URL = `${config.apiBaseUrl}/api/maps`;
+
+// export const MAPS_URL = `${config.apiBaseUrl}/api/maps`;
+export const MAPS_URL = `http://localhost:3001/api/maps`;
