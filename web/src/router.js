@@ -1,5 +1,6 @@
 import { createRouter } from "vue-router";
 import homeRoutes from "@/modules/home/router";
+import mapRoutes from "@/modules/map/router";
 
 // To protect a route, import import { authGuard } from "@auth0/auth0-vue";
 // and then add the following to the route object:
@@ -12,6 +13,7 @@ const routes = [
     component: () => import("@/layouts/Blank.vue"),
     children: [
       ...homeRoutes,
+      ...mapRoutes,
       // {
       //   path: "dashboard",
       //   component: () => import("@/components/HelloWorld.vue"),

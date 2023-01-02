@@ -239,6 +239,11 @@
     "@esbuild/win32-ia32" "0.16.9"
     "@esbuild/win32-x64" "0.16.9"
 
+"esri-loader@^3.7.0":
+  "integrity" "sha512-cB1Sw9EQjtW4mtT7eFBjn/6VaaIWNTjmTd2asnnEyuZk1xVSFRMCfLZSBSjZM7ZarDcVu5WIjOP0t0MYVu4hVQ=="
+  "resolved" "https://registry.npmjs.org/esri-loader/-/esri-loader-3.7.0.tgz"
+  "version" "3.7.0"
+
 "estree-walker@^2.0.2":
   "integrity" "sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w=="
   "resolved" "https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz"
