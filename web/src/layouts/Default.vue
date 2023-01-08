@@ -23,43 +23,29 @@
     </v-toolbar-title>
     <v-spacer></v-spacer>
 
-    <div v-if="isAuthenticated">
-      <v-btn
-        variant="text"
-        size="large"
-        color="primary"
-        class="mr-1"
-        to="/dashboard"
-        ><v-icon>mdi-home</v-icon></v-btn
-      >
-
+    <div>
       <v-divider class="mr-5" vertical inset></v-divider>
-      <span> {{ username }} </span>
-      <span class="pl-3" @click="toggleAdmin()">
-        <v-chip v-if="isAdmin" color="yg_moss"> Admin </v-chip>
-        <v-chip v-else color="yg_twilight"> User </v-chip>
-      </span>
 
       <v-btn variant="text" size="large" color="primary">
         <v-icon>mdi-dots-vertical</v-icon>
 
         <v-menu activator="parent" offset-y class="ml-0">
-          <v-list dense style="min-width: 200px">
-            <v-list-item to="/profile">
+          <v-list style="min-width: 300px">
+            <v-list-item to="/map">
               <template v-slot:prepend>
-                <v-icon>mdi-account</v-icon>
+                <v-icon>mdi-map-outline</v-icon>
               </template>
               <!-- <v-list-item-icon>
                 <v-icon>mdi-account</v-icon>
               </v-list-item-icon> -->
-              <v-list-item-title>My profile</v-list-item-title>
+              <v-list-item-title>Map</v-list-item-title>
             </v-list-item>
 
             <v-list-item @click="blip">
               <template v-slot:prepend>
                 <v-icon>mdi-information-outline</v-icon>
               </template>
-              <v-list-item-title>Show API Message</v-list-item-title>
+              <v-list-item-title>Register</v-list-item-title>
             </v-list-item>
             <!-- <v-list-item to="/administration" v-if="isAdmin">
               <template v-slot:prepend>
@@ -68,21 +54,18 @@
               <v-list-item-title>Administration</v-list-item-title>
             </v-list-item> -->
             <v-divider />
-            <v-list-item @click="$auth0.logout({ returnTo })">
+            <v-list-item>
               <template v-slot:prepend>
-                <v-icon>mdi-exit-run</v-icon>
+                <v-icon>mdi-email</v-icon>
               </template>
               <!-- <v-list-item-icon>
                 <v-icon>mdi-exit-run</v-icon>
               </v-list-item-icon> -->
-              <v-list-item-title>Sign out</v-list-item-title>
+              <v-list-item-title>Contact Us </v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
       </v-btn>
-    </div>
-    <div v-else>
-      <login-button />
     </div>
   </v-app-bar>
 
@@ -112,7 +95,7 @@ import { useNotificationStore } from "@/stores/NotificationStore";
 
 import { mapState, mapActions, mapWritableState } from "pinia";
 // import { mapActions, mapState } from "vuex";
-// import { applicationName } from "@/config";
+import { applicationName } from "@/config";
 // import { getInstance } from "@/auth/auth0-plugin";
 // const auth = getInstance();
 export default {
@@ -131,8 +114,7 @@ export default {
     ...mapState(useUserStore, ["user", "isAdmin"]),
 
     title() {
-      return "Cool Vue 3 Application";
-      // return applicationName;
+      return applicationName;
     },
     username() {
       return this.authUser.name;
@@ -154,9 +136,16 @@ export default {
     this.showOverlay = false;
   },
   methods: {
+    ...mapActions(useNotificationStore, ["notify"]),
     ...mapActions(useUserStore, ["initialize", "toggleAdmin"]),
     blip: function () {
-      this.showNotification = true;
+      let message = {
+        status_code: 0,
+        text: "Register not implemented yet",
+        icon: "mdi-information",
+        variant: "primary",
+      };
+      this.notify(message);
     },
   },
 };
