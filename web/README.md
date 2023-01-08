@@ -1,5 +1,12 @@
 # Vue 3 Front End Template for YG Projects
 
+## Map Migration Tasks:
+
+- [x] migrate store defintion from vuex to pinia
+- [x] migrate map component to use pinia stores
+- [] remove auth guards from router
+- [] wire to YHRP API vs ArcGIS Online
+
 ## Important Differences from Vue 2
 
 ### Vue Migration
