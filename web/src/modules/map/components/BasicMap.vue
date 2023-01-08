@@ -6,7 +6,7 @@
       v-model="sidebarVisible"
       width="400"
     >
-      <v-tabs v-model="tab" background-color="#fff2d5" color="primary">
+      <v-tabs v-model="tab" bg-color="#fff2d5" color="primary">
         <v-tab key="0">Communities</v-tab>
         <v-tab key="1">Basemap</v-tab>
         <v-tab key="2">Legend</v-tab>
