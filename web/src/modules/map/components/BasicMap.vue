@@ -31,6 +31,9 @@
 
 <script>
 import { loadModules } from "esri-loader";
+import { MAPS_URL } from "@/urls";
+import { mapActions, mapState } from "pinia";
+import { useMapStore } from "../stores/MapStore";
 export default {
   name: "web-map",
   data: () => ({
@@ -49,6 +52,7 @@ export default {
     layerList: {},
   }),
   methods: {
+    ...mapActions(useMapStore, ["loadToken"]),
     showSidebar() {
       this.sidebarVisible = true;
     },
@@ -56,13 +60,19 @@ export default {
       this.sidebarVisible = false;
     },
   },
+  computed: {
+    ...mapState(useMapStore, ["bookmarksSorted"]),
+  },
   mounted() {
     let parent = this;
-    // lazy load the required ArcGIS API for JavaScript modules and CSS
+    let resp = {};
+    resp.token = this.loadToken;
 
+    // lazy load the required ArcGIS API for JavaScript modules and CSS
     loadModules(
       [
         "esri/Map",
+        "esri/identity/IdentityManager",
         "esri/views/MapView",
         "esri/widgets/Search",
         "esri/widgets/Legend",
@@ -71,11 +81,13 @@ export default {
         "esri/widgets/BasemapGallery",
         "esri/widgets/Bookmarks",
         "esri/webmap/Bookmark",
+        "esri/config",
       ],
       { css: true }
     ).then(
       ([
         ArcGISMap,
+        IdentityManager,
         MapView,
         Search,
         Legend,
@@ -84,16 +96,32 @@ export default {
         BasemapGallery,
         Bookmarks,
         Bookmark,
+        config,
       ]) => {
         const map = new ArcGISMap({
           basemap: "topo-vector",
+        });
+        IdentityManager.registerToken({
+          server: "https://yukon.maps.arcgis.com",
+          token: resp.access_token,
+        });
+        IdentityManager.registerToken({
+          server: `${MAPS_URL}/sites`,
+          token: resp.access_token,
+        });
+
+        config.request.interceptors.push({
+          urls: `${MAPS_URL}/sites`,
+          before: function (params) {
+            params.requestOptions.withCredentials = true;
+          },
         });
 
         const view = new MapView({
           container: this.$el,
           map: map,
           center: [-135.5, 60.45],
-          zoom: 5,
+          zoom: 6,
           popup: {
             dockEnabled: true,
             buttonEnabled: false,
@@ -174,6 +202,8 @@ export default {
         };
         var sites = new FeatureLayer({
           url: "https://mapservices.gov.yk.ca/arcgis/rest/services/GeoYukon/GY_CultureHeritage/MapServer/0",
+          // url: "http://localhost:3001/api/maps/sites",
+          // url: `${MAPS_URL}/sites/0`,
           popupTemplate: YHSIpopup,
           outFields: ["YHSI_ID"],
         });
@@ -190,57 +220,14 @@ export default {
           view: view,
           container: "gallery",
         });
+
+        const bookmarks = parent.bookmarksSorted.map((x) => new Bookmark(x));
+
         new Bookmarks({
           view: view,
           container: "bookmarks",
           editingEnabled: false,
-          bookmarks: [
-            new Bookmark({
-              name: "Whitehorse",
-              viewpoint: {
-                targetGeometry: {
-                  type: "extent",
-                  spatialReference: {
-                    wkid: 4326,
-                  },
-                  xmin: -135.5,
-                  ymin: 60.0,
-                  xmax: -130.0,
-                  ymax: 65.0,
-                },
-              },
-            }),
-            new Bookmark({
-              name: "Teslin",
-              viewpoint: {
-                targetGeometry: {
-                  type: "extent",
-                  spatialReference: {
-                    wkid: 4326,
-                  },
-                  xmin: -135.5,
-                  ymin: 60.0,
-                  xmax: -130.0,
-                  ymax: 65.0,
-                },
-              },
-            }),
-            new Bookmark({
-              name: "Mayo",
-              viewpoint: {
-                targetGeometry: {
-                  type: "extent",
-                  spatialReference: {
-                    wkid: 4326,
-                  },
-                  xmin: -135.9031,
-                  ymin: 63.5896,
-                  xmax: -135.88834,
-                  ymax: 63.5971,
-                },
-              },
-            }),
-          ],
+          bookmarks: bookmarks,
         });
 
         searchWidget.sources.push({

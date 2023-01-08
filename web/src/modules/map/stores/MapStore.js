@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import axios from "axios";
-import { SITES } from "./sites-data";
 import { MAPS_URL } from "@/urls";
+import { communityBookmarks } from "./data/communityBookmarks";
 
 //This might need to be a secure API call in which case
 //import AuthStore from "@/modules/auth/stores/AuthStore";
@@ -10,8 +10,22 @@ import { MAPS_URL } from "@/urls";
 export const useMapStore = defineStore("maps", {
   state: () => ({
     maps: [],
+    bookmarksJSON: communityBookmarks,
   }),
-  getters: {},
+  getters: {
+    //sort bookmarks by name
+    bookmarksSorted(state) {
+      return state.bookmarksJSON.sort((a, b) => {
+        if (a.name < b.name) {
+          return -1;
+        }
+        if (a.name > b.name) {
+          return 1;
+        }
+        return 0;
+      });
+    },
+  },
   actions: {
     loadToken() {
       // return axios
