@@ -34,7 +34,7 @@ export const apiBaseUrl =
 export const applicationUrl =
   process.env.VUE_APP_FRONTEND_URL || "http://localhost:8080";
 
-export const applicationName = "Vue 3 Template";
+export const applicationName = "Yukon Register of Historic Places";
 export const applicationIcon = "mdi-leaf";
 export const hasSidebar = true;
 export const hasSidebarClosable = false;
