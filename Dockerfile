@@ -2,7 +2,7 @@ FROM node:18-alpine
 
 RUN mkdir /home/node/app && chown -R node:node /home/node/app
 
-COPY --chown=node:node web/package*.json /home/node/web/
+COPY --chown=node:node web/package*.json /home/node/app/web/
 COPY --chown=node:node src/api/package*.json /home/node/app/
 
 USER node
