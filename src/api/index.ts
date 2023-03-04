@@ -14,7 +14,11 @@ app.use(express.urlencoded({ extended: true })); // for parsing application/x-ww
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
-      "default-src": ["'self'", "https://test.heritage.ynet.gov.yk.ca"],
+      "default-src": [
+        "'self'",
+        "https://test.heritage.ynet.gov.yk.ca",
+        "https://yhrp-dev.seekingtangents.com/",
+      ], //<- this is temporary, figure our why the URLs are not relational
       "base-uri": ["'self'"],
       "block-all-mixed-content": [],
       "font-src": ["'self'", "https:", "data:"],
