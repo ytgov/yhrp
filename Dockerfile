@@ -18,7 +18,7 @@ RUN npm install && npm cache clean --force --loglevel=error
 COPY --chown=node:node src/api /home/node/app/
 COPY --chown=node:node src/web /home/node/web/
 
-RUN npm run build:docker
+RUN npm run build
 
 EXPOSE 3000
 
