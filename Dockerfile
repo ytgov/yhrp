@@ -20,10 +20,12 @@ COPY --chown=node:node web /home/node/web/
 
 RUN npm run build
 
-EXPOSE 3000
 
 WORKDIR /home/node/app
 
 ENV NODE_ENV=production
 RUN npm run build:api
+COPY ../web ./dist/
+
+EXPOSE 3000
 CMD [ "node", "./dist/index.js" ]
