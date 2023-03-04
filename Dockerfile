@@ -10,7 +10,7 @@ USER node
 
 WORKDIR /home/node/app
 RUN npm install && npm cache clean --force --loglevel=error
-COPY --chown=node:node src/api/.env* ./
+# COPY --chown=node:node src/api/.env* ./
 
 WORKDIR /home/node/web
 RUN npm install && npm cache clean --force --loglevel=error
