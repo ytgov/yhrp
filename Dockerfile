@@ -1,7 +1,6 @@
 FROM node:18-alpine
 
 RUN mkdir /home/node/app && chown -R node:node /home/node/app
-RUN mkdir /home/node/app/web && chown -R node:node /home/node/web
 
 COPY --chown=node:node web/package*.json /home/node/web/
 COPY --chown=node:node src/api/package*.json /home/node/app/
@@ -12,7 +11,7 @@ WORKDIR /home/node/app
 RUN npm install && npm cache clean --force --loglevel=error
 # COPY --chown=node:node src/api/.env* ./
 
-WORKDIR /home/node/app/app/web
+WORKDIR /home/node/app/web
 RUN npm install && npm cache clean --force --loglevel=error
 
 COPY --chown=node:node src/api /home/node/app/
