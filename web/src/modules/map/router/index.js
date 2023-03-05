@@ -3,8 +3,10 @@ import BasicMap from "../components/BasicMap.vue";
 
 export default [
   {
-    path: "map",
-    component: import("@/layouts/Default.vue"),
+    path: "/map",
+    // component: BasicMap,
+    // component: () => import("../../../layouts/Default.vue"),
+    component: () => import("@/layouts/Default.vue"),
     children: [
       // {
       //   path: "/maps",
