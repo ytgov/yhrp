@@ -77,3 +77,81 @@ export default {
   data: () => ({}),
 };
 </script>
+
+<style scoped>
+.loading {
+  font-size: 18px;
+  color: #979797 !important;
+  margin: auto;
+  margin-top: 5%;
+}
+</style>
+
+<style scoped>
+/* Custom CSS for the query builder */
+.vqb-group-heading {
+  display: none;
+}
+.vqb-custom-component-wrap {
+  display: inline-block;
+}
+.vue-query-builder .vqb-group-body.card-body {
+  padding-top: 0;
+  padding-right: 1.25rem;
+  padding-left: 1.25rem;
+  padding-bottom: 1.25rem;
+}
+.vue-query-builder select.form-control {
+  padding: 9px 8px;
+  border: 1px solid grey;
+  background-color: white;
+  color: rgba(0, 0, 0, 0.87);
+  border-radius: 4px;
+  cursor: pointer;
+  appearance: button;
+}
+.vue-query-builder select.form-control:hover {
+  border: 1px solid black;
+}
+.vue-query-builder input.form-control {
+  padding: 9px 8px;
+  border: 1px solid grey;
+  background-color: white;
+  color: rgba(0, 0, 0, 0.87);
+  border-radius: 4px;
+  line-height: 19px;
+}
+.vue-query-builder button.btn {
+  height: 36px;
+  min-width: 64px;
+  padding: 0 16px;
+  background-color: #2196f3;
+  border: 1px #2196f3 solid;
+  border-radius: 4px;
+  color: white;
+  letter-spacing: 1.42857px;
+  margin-right: 5px;
+}
+.vue-query-builder button.btn:hover {
+  background-color: #42a5f3;
+  border: 1px #42a5f3 solid;
+}
+.vqb-rule {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  background-color: #fff9ea;
+  border-color: #ddd;
+  padding: 9px 18px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.vue-query-builder .close {
+  color: #969696;
+  font-size: 1.5rem;
+  font-weight: 700;
+  padding: 0 13px;
+}
+.vue-query-builder .close:hover {
+  color: #6a6a6a;
+}
+</style>

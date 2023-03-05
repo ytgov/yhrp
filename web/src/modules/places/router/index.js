@@ -16,6 +16,13 @@ export default [
         name: "Places",
         component: () => import("../views/Places.vue"),
       },
+      {
+        path: "view/:name",
+        name: "placeView",
+        component: () => import("../views/PlacesForm.vue"),
+        props: true,
+        // meta: { requiresAuth: true },
+      },
     ],
   },
 ];
