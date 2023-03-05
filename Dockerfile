@@ -17,7 +17,7 @@ RUN npm install && npm cache clean --force --loglevel=error
 COPY --chown=node:node src/api /home/node/app/
 COPY --chown=node:node web /home/node/app/web/
 
-RUN npm run build
+RUN npm run build:docker
 
 
 WORKDIR /home/node/app
