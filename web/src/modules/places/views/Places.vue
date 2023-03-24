@@ -42,6 +42,7 @@
                 </v-card-actions>
               </v-card>
               <v-overlay
+                persistent
                 contained
                 :model-value="isHovering"
                 class="align-center justify-center"
