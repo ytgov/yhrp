@@ -1,4 +1,27 @@
 <template>
+  <v-app-bar flat class="pr-4 text-grey-darken-1">
+    <v-spacer />
+    <v-tooltip text="English">
+      <template v-slot:activator="{ props }">
+        <span
+          v-bind="props"
+          class="text-body-1 font-weight-bold"
+          @click="lang('EN')"
+          >EN</span
+        ></template
+      ></v-tooltip
+    >|
+    <v-tooltip text="Français">
+      <template v-slot:activator="{ props }">
+        <span
+          v-bind="props"
+          class="text-body-1 font-weight-bold"
+          @click="lang('FR')"
+          >FR</span
+        ></template
+      ></v-tooltip
+    >
+  </v-app-bar>
   <v-container width="100%" class="">
     <v-row justify="center">
       <v-col cols="9">
@@ -53,6 +76,7 @@
       <v-col cols="4">
         <v-card color="#BDBDBD" class="mx-auto" height="500">
           <div style="height: 500">Map will go here</div>
+          <!-- <BasicMap></BasicMap> -->
           <!-- <MapLoader
                 v-if="infoLoaded"
                 :fields="{
@@ -109,7 +133,7 @@
               quisquam perspiciatis error, placeat accusamus porro!
               {{ fieldsByLang[currentLang].heritageValue }}
               <div>
-                <v-expansion-panels>
+                <v-expansion-panels class="pt-5">
                   <v-expansion-panel>
                     <v-expansion-panel-title
                       color="#BDBDBD"
@@ -156,6 +180,7 @@
 <script>
 // import PrintButton from "../components/PrintButton";
 // import MapLoader from "../components/MapLoader";
+// import BasicMap from "@/modules/components/BasicMap";
 
 // import { REGISTER_URL } from "../../urls";
 import axios from "axios";
@@ -163,6 +188,7 @@ import axios from "axios";
 export default {
   name: "placesForm",
   components: {
+    // BasicMap,
     //MapLoader,
     // PrintButton,
   },
@@ -203,6 +229,9 @@ export default {
     // this.loadItem(localStorage.currentPlaceId);
   },
   methods: {
+    lang: function (locale) {
+      console.log("Change language to " + locale);
+    },
     photoURL: function (photoIndex) {
       let siteID = this.$route.params.name;
       // let photos
