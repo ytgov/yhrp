@@ -41,11 +41,11 @@
               <v-list-item-title>Map</v-list-item-title>
             </v-list-item>
 
-            <v-list-item @click="blip">
+            <v-list-item to="/places">
               <template v-slot:prepend>
                 <v-icon>mdi-information-outline</v-icon>
               </template>
-              <v-list-item-title>Register</v-list-item-title>
+              <v-list-item-title>Historic Places</v-list-item-title>
             </v-list-item>
             <!-- <v-list-item to="/administration" v-if="isAdmin">
               <template v-slot:prepend>
@@ -99,7 +99,7 @@ import { applicationName } from "@/config";
 // import { getInstance } from "@/auth/auth0-plugin";
 // const auth = getInstance();
 export default {
-  name: "Layout",
+  name: "DefaultLayout",
 
   data() {
     return {
