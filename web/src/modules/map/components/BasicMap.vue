@@ -45,8 +45,6 @@ export default {
     text: "",
     icon: "",
     map: {},
-    sidebarVisible: false,
-    tab: 0,
 
     baseMapGallery: {},
     layerList: {},
