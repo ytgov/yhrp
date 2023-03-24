@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 100%">
+  <div style="height: 100%; width: 100%">
     <v-navigation-drawer
       absolute
       temporary
@@ -35,7 +35,7 @@ import { MAPS_URL } from "@/urls";
 import { mapActions, mapState } from "pinia";
 import { useMapStore } from "../stores/MapStore";
 export default {
-  name: "web-map",
+  name: "BasicMap",
   data: () => ({
     view: null,
     sidebarVisible: false,
@@ -273,9 +273,10 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style>
 .map {
-  height: 100%;
+  /* height: 100%;
+  width: 100%; */
   border: 1px #ddd solid;
 }
 .esri-layer-list {

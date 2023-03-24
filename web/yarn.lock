@@ -6,6 +6,10 @@
   "integrity" "sha512-iL3O0vWanfKFVgy1J2ZHDPlAUK6EVHWEHWS6mUXwHEuPiK39tjlQtyUKQIJI1F5YsZB75ijGgRWMTawSDXlwCA=="
   "resolved" "https://registry.npmjs.org/@auth0/auth0-spa-js/-/auth0-spa-js-1.22.6.tgz"
   "version" "1.22.6"
+"@auth0/auth0-spa-js@^1.22.6":
+  "integrity" "sha512-iL3O0vWanfKFVgy1J2ZHDPlAUK6EVHWEHWS6mUXwHEuPiK39tjlQtyUKQIJI1F5YsZB75ijGgRWMTawSDXlwCA=="
+  "resolved" "https://registry.npmjs.org/@auth0/auth0-spa-js/-/auth0-spa-js-1.22.6.tgz"
+  "version" "1.22.6"
   dependencies:
     "abortcontroller-polyfill" "^1.7.3"
     "browser-tabs-lock" "^1.2.15"
@@ -16,6 +20,9 @@
     "unfetch" "^4.2.0"
 
 "@auth0/auth0-vue@^1.0.2":
+  "integrity" "sha512-uw9bvu8R16h9BpaoLl9cDzGDmDklaYjfffVudTG8EOYWBolzckzqXYisg7ugJsrzQCX2XYB0+CHgjzXdlERZ3Q=="
+  "resolved" "https://registry.npmjs.org/@auth0/auth0-vue/-/auth0-vue-1.0.3.tgz"
+  "version" "1.0.3"
   "integrity" "sha512-uw9bvu8R16h9BpaoLl9cDzGDmDklaYjfffVudTG8EOYWBolzckzqXYisg7ugJsrzQCX2XYB0+CHgjzXdlERZ3Q=="
   "resolved" "https://registry.npmjs.org/@auth0/auth0-vue/-/auth0-vue-1.0.3.tgz"
   "version" "1.0.3"
@@ -980,14 +987,6 @@
   "version" "4.2.0"
   dependencies:
     "find-up" "^4.0.0"
-
-"postcss-selector-parser@^6.0.9":
-  "integrity" "sha512-zbARubNdogI9j7WY4nQJBiNqQf3sLS3wCP4WfOidu+p28LofJqDH1tcXypGrcmMHhDk2t9wGhCsYe/+szLTy1g=="
-  "resolved" "https://registry.npmjs.org/postcss-selector-parser/-/postcss-selector-parser-6.0.11.tgz"
-  "version" "6.0.11"
-  dependencies:
-    "cssesc" "^3.0.0"
-    "util-deprecate" "^1.0.2"
 
 "postcss@^8.1.10", "postcss@^8.4.21":
   "integrity" "sha512-tP7u/Sn/dVxK2NnruI4H9BG+x+Wxz6oeZ1cJ8P6G/PZY0IKk4k/63TDsQf2kQq3+qoJeLm2kIBUNlZe3zgb4Zg=="
