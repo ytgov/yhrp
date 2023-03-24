@@ -1,53 +1,59 @@
 <template>
-  <div>
-    <v-main>
-      <v-container class="mx-40">
-        <v-row>
-          <v-col cols="9">
-            <h1>{{ communityName }}</h1>
-          </v-col>
-          <v-col cols="3">
-            <v-btn
-              class="button"
-              v-if="currentLang == 'En'"
-              @click="handleClick('Fr')"
-              >Francais</v-btn
-            >
-            <v-btn
-              class="button"
-              v-if="currentLang == 'Fr'"
-              @click="handleClick('En')"
-              >English</v-btn
-            >
-            <v-btn class="mx-1 form-header">Print</v-btn>
-            <!-- <PrintButton
+  <v-container width="100%" class="">
+    <v-row justify="center">
+      <v-col cols="9">
+        <h1>{{ communityName }}</h1>
+      </v-col>
+      <v-col cols="3">
+        <v-btn
+          class="button"
+          v-if="currentLang == 'En'"
+          @click="handleClick('Fr')"
+          >Francais</v-btn
+        >
+        <v-btn
+          class="button"
+          v-if="currentLang == 'Fr'"
+          @click="handleClick('En')"
+          >English</v-btn
+        >
+        <v-btn class="mx-1 form-header">Print</v-btn>
+        <!-- <PrintButton
               :data="printData"
               :name="printData.primaryName"
               class="mx-1 form-header"
             /> -->
-          </v-col>
-        </v-row>
+      </v-col>
+    </v-row>
 
-        <v-row>
-          <v-col cols="8">
-            <v-card>
-              <v-carousel cycle height="500">
-                <v-carousel-item
-                  v-for="(photo, i) in photos"
-                  :key="i"
-                  :src="photo.ThumbFile.base64"
-                  reverse-transition="fade-transition"
-                  transition="fade-transition"
-                  hide-delimiter-background
-                ></v-carousel-item>
-              </v-carousel>
-              <!-- everytime the image changes it bumps the user to the top of the screen, need to fix so that doesn't happen. Annoying when trying to read the boundary description-->
-            </v-card>
-          </v-col>
-          <v-col cols="4">
-            <v-card color="#BDBDBD" class="mx-auto" height="500">
-              <div style="height: 500">Map will go here</div>
-              <!-- <MapLoader
+    <v-row>
+      <v-col cols="8">
+        <v-card>
+          <v-carousel cycle height="500">
+            <!-- <v-carousel-item
+              v-for="(photo, i) in photos"
+              :key="i"
+              :src="photo.ThumbFile.base64"
+              reverse-transition="fade-transition"
+              transition="fade-transition"
+              hide-delimiter-background
+            ></v-carousel-item> -->
+            <v-carousel-item
+              v-for="(photo, i) in photos"
+              :key="i"
+              :src="photoURL(i + 1)"
+              reverse-transition="fade-transition"
+              transition="fade-transition"
+              hide-delimiter-background
+            ></v-carousel-item>
+          </v-carousel>
+          <!-- everytime the image changes it bumps the user to the top of the screen, need to fix so that doesn't happen. Annoying when trying to read the boundary description-->
+        </v-card>
+      </v-col>
+      <v-col cols="4">
+        <v-card color="#BDBDBD" class="mx-auto" height="500">
+          <div style="height: 500">Map will go here</div>
+          <!-- <MapLoader
                 v-if="infoLoaded"
                 :fields="{
                   lat: latitude,
@@ -55,89 +61,96 @@
                 }"
                 height="500"
               /> -->
-            </v-card>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <h4>{{ primaryName }}</h4>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="12">
-            <v-expansion-panels v-model="panel" multiple>
-              <v-expansion-panel>
-                <v-expansion-panel-header
-                  color="#BDBDBD"
-                  class="font-weight-black"
-                >
-                  Designation
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  {{ designations }}
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-              <v-expansion-panel>
-                <v-expansion-panel-header
-                  color="#BDBDBD"
-                  class="font-weight-black"
-                >
-                  Place Description
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  {{ fieldsByLang[currentLang].placeDescription }}
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-              <v-expansion-panel>
-                <v-expansion-panel-header
-                  color="#BDBDBD"
-                  class="font-weight-black"
-                >
-                  Heritage Value
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  {{ fieldsByLang[currentLang].heritageValue }}
-                </v-expansion-panel-content>
-                <v-expansion-panel>
-                  <v-expansion-panel-header
-                    color="#BDBDBD"
-                    class="font-weight-black"
-                  >
-                    Character Definition
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    {{ fieldsByLang[currentLang].characterDef }}
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel>
-                  <v-expansion-panel-header
-                    color="#BDBDBD"
-                    class="font-weight-black"
-                  >
-                    Additional Information
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    {{ fieldsByLang[currentLang].additionalInfo }}
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel>
-                  <v-expansion-panel-header
-                    color="#BDBDBD"
-                    class="font-weight-black"
-                  >
-                    Description of Boundaries
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    {{ fieldsByLang[currentLang].descBound }}
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-              </v-expansion-panel>
-            </v-expansion-panels>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-main>
-  </div>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <h4>{{ primaryName }}</h4>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="8">
+        <v-expansion-panels v-model="panel" multiple>
+          <v-expansion-panel>
+            <v-expansion-panel-title color="primary" class="font-weight-black">
+              Designation
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eius
+              dolor obcaecati temporibus totam aut at aliquid, fugit, qui
+              consequuntur eum asperiores minima exercitationem dolorem,
+              accusantium illum corrupti distinctio enim repudiandae!
+              {{ designations }}
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+
+          <v-expansion-panel>
+            <v-expansion-panel-title color="primary" class="font-weight-black">
+              Place Description
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Voluptas
+              dolorem distinctio, quam necessitatibus reprehenderit eaque rerum
+              quasi omnis totam architecto, facere quaerat! Ducimus voluptates
+              sapiente fuga cum nobis in vitae.
+              {{ fieldsByLang[currentLang].placeDescription }}
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+
+          <v-expansion-panel>
+            <v-expansion-panel-title color="primary" class="font-weight-black">
+              Heritage Value
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nisi
+              optio soluta odio recusandae eaque veritatis nihil fuga
+              blanditiis, dignissimos voluptatum quia cum vel laboriosam
+              quisquam perspiciatis error, placeat accusamus porro!
+              {{ fieldsByLang[currentLang].heritageValue }}
+              <div>
+                <v-expansion-panels>
+                  <v-expansion-panel>
+                    <v-expansion-panel-title
+                      color="#BDBDBD"
+                      class="font-weight-black"
+                    >
+                      Character Definition
+                    </v-expansion-panel-title>
+                    <v-expansion-panel-text>
+                      {{ fieldsByLang[currentLang].characterDef }}
+                    </v-expansion-panel-text>
+                  </v-expansion-panel>
+                  <v-expansion-panel>
+                    <v-expansion-panel-title
+                      color="#BDBDBD"
+                      class="font-weight-black"
+                    >
+                      Additional Information
+                    </v-expansion-panel-title>
+                    <v-expansion-panel-text>
+                      {{ fieldsByLang[currentLang].additionalInfo }}
+                    </v-expansion-panel-text>
+                  </v-expansion-panel>
+                  <v-expansion-panel>
+                    <v-expansion-panel-title
+                      color="#BDBDBD"
+                      class="font-weight-black"
+                    >
+                      Description of Boundaries
+                    </v-expansion-panel-title>
+                    <v-expansion-panel-text>
+                      {{ fieldsByLang[currentLang].descBound }}
+                    </v-expansion-panel-text>
+                  </v-expansion-panel>
+                </v-expansion-panels>
+              </div>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -180,14 +193,22 @@ export default {
     designations: "",
     selectedImage: null,
     placeId: null,
-    photos: [],
+    // photos: [],
+    photos: [1, 2, 3, 4],
+
     infoLoaded: false,
   }),
   created() {
-    this.saveCurrentPlace();
-    this.loadItem(localStorage.currentPlaceId);
+    // this.saveCurrentPlace();
+    // this.loadItem(localStorage.currentPlaceId);
   },
   methods: {
+    photoURL: function (photoIndex) {
+      let siteID = this.$route.params.name;
+      // let photos
+      //http://register.yukonhistoricplaces.ca/Images/Places/598/1.jpg
+      return `http://register.yukonhistoricplaces.ca/Images/Places/${siteID}/${photoIndex}.jpg`;
+    },
     handleClick(value) {
       //Redirects the user to the site form
       this.currentLang = value;
