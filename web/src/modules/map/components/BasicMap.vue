@@ -32,9 +32,14 @@
 <script>
 import { MAPS_URL } from "@/urls";
 import { loadModules } from "esri-loader";
+import { useMapService } from "../services/mapService";
 
 export default {
   name: "BasicMap",
+  setup() {
+    const { bookmarks, loadToken } = useMapService();
+    return { bookmarks, loadToken };
+  },
   data: () => ({
     view: null,
     sidebarVisible: false,
@@ -46,7 +51,6 @@ export default {
     map: {},
     baseMapGallery: {},
     layerList: {},
-    bookmarksSorted: [], // TODO: Move this to a proper data source
   }),
   methods: {
     showSidebar() {
@@ -54,10 +58,6 @@ export default {
     },
     hideSidebar() {
       this.sidebarVisible = false;
-    },
-    loadToken() {
-      // TODO: Implement token loading logic
-      return Promise.resolve({ access_token: "" });
     },
   },
   mounted() {
@@ -203,7 +203,7 @@ export default {
           container: "gallery",
         });
 
-        const bookmarks = parent.bookmarksSorted.map((x) => new Bookmark(x));
+        const bookmarks = this.bookmarks.map((x) => new Bookmark(x));
 
         new Bookmarks({
           view: view,
