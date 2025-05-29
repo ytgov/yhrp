@@ -61,7 +61,7 @@
               <!-- <v-list-item-icon>
                 <v-icon>mdi-exit-run</v-icon>
               </v-list-item-icon> -->
-              <v-list-item-title>Contact Us </v-list-item-title>
+              <v-list-item-title>Contact Us</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -90,62 +90,40 @@
 </template>
 
 <script>
-import { useUserStore } from "@/stores/UserStore";
-import { useNotificationStore } from "@/stores/NotificationStore";
-
-import { mapState, mapActions, mapWritableState } from "pinia";
-// import { mapActions, mapState } from "vuex";
 import { applicationName } from "@/config";
-// import { getInstance } from "@/auth/auth0-plugin";
-// const auth = getInstance();
+import { useNotificationService } from "@/services/notificationService";
+
 export default {
   name: "DefaultLayout",
 
+  setup() {
+    const { showNotification, show } = useNotificationService();
+    return { showNotification, show };
+  },
+
   data() {
     return {
-      isAuthenticated: this.$auth0.isAuthenticated,
-      authUser: this.$auth0.user,
       loadingClass: "d-none",
       showOverlay: true,
     };
   },
-  computed: {
-    ...mapWritableState(useNotificationStore, ["showNotification"]),
-    ...mapState(useUserStore, ["user", "isAdmin"]),
 
+  computed: {
     title() {
       return applicationName;
     },
-    username() {
-      return this.authUser.name;
-    },
-    returnTo: function () {
-      return window.location.origin;
-      // return auth.options.logout_redirect;
-    },
-    // canAdminister() {
-    //   if (this.profile && this.profile.roles && this.profile.roles.length > 0) {
-    //     if (this.profile.roles.includes("System Admin")) return true;
-    //   }
-    //   return false;
-    // },
   },
 
-  async mounted() {
-    await this.initialize();
+  mounted() {
     this.showOverlay = false;
   },
+
   methods: {
-    ...mapActions(useNotificationStore, ["notify"]),
-    ...mapActions(useUserStore, ["initialize", "toggleAdmin"]),
-    blip: function () {
-      let message = {
-        status_code: 0,
+    blip() {
+      this.show({
         text: "Register not implemented yet",
-        icon: "mdi-information",
         variant: "primary",
-      };
-      this.notify(message);
+      });
     },
   },
 };

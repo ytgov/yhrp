@@ -13,21 +13,11 @@
         </BaseCard>
       </v-col>
     </v-row>
-
-    <v-row v-if="$auth0.isAuthenticated.value">
-      <v-col>
-        <SecureAPI />
-      </v-col>
-    </v-row>
   </v-container>
 </template>
-<script>
-import SecureAPI from "../components/SecureAPI.vue";
 
+<script>
 export default {
-  name: "Dashboard",
-  components: {
-    SecureAPI,
-  },
+  name: "HomeDashboard",
 };
 </script>

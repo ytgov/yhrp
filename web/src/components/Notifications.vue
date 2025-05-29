@@ -10,33 +10,23 @@
 </template>
 
 <script>
-import { useNotificationStore } from "@/stores/NotificationStore";
-import { mapWritableState } from "pinia";
+import { useNotificationService } from "@/services/notificationService";
+
 export default {
+  name: "NotificationDisplay",
   setup() {
-    const notifcation = useNotificationStore();
-
-    // this subscription will be kept even after the component is unmounted
-    notifcation.$subscribe((mutation, state) => {
-      console.log(mutation.type, mutation.payload);
-      console.log(state.showNotification);
-    });
-  },
-
-  name: "Notifications",
-  data: () => ({}),
-  computed: {
-    ...mapWritableState(useNotificationStore, ["showNotification", "message"]),
+    const { showNotification, message } = useNotificationService();
+    return { showNotification, message };
   },
   methods: {
     prettyMessage(message) {
-      if (message.variant == "success") {
+      if (message.variant === "success") {
         return {
           color: "green",
           icon: "mdi-check",
           text: message.text,
         };
-      } else if (message.variant == "error") {
+      } else if (message.variant === "error") {
         return {
           color: "red",
           icon: "mdi-cancel",
@@ -50,37 +40,6 @@ export default {
         };
       }
     },
-    // show(color, icon, message) {
-    //   this.color = color;
-    //   this.icon = icon;
-    //   this.text = message;
-    //   this.visible = true;
-    // },
-    // showSuccess(message) {
-    //   this.color = "green";
-    //   this.icon = "mdi-thumb-up";
-    //   this.text = message;
-    //   this.visible = true;
-    // },
-    // showError(message) {
-    //   this.color = "red";
-    //   this.icon = "mdi-thumb-down";
-    //   this.text = message;
-    //   this.visible = true;
-    // },
-    // showAPIMessages(apiResponse) {
-    //   if (apiResponse.errors) {
-    //     return this.showError(apiResponse.errors[0].text);
-    //   }
-    //   if (apiResponse.messages) {
-    //     let message = apiResponse.messages[0];
-    //     if (message.variant == "success") this.showSuccess(message.text);
-    //     else if (message.variant == "error") this.showError(message.text);
-    //     else this.show(message.variant, "mdi-help-circle", message.text);
-    //     return;
-    //   }
-    //   this.show("primary", "mdi-check", "Complete");
-    // },
   },
 };
 </script>

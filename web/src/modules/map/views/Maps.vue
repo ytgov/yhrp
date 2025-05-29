@@ -9,28 +9,19 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "pinia";
-// import { UserRoles } from "../../../authorization";
 import AdvancedMap from "../components/AdvancedMap.vue";
 
 export default {
+  name: "MapsView",
   components: { AdvancedMap },
-  data: () => {
-    return {
-      showAdvanced: true,
-    };
-  },
-  computed: {
-    // ...mapGetters(["userInRole", "user"]),
-  },
-  mounted: function () {
+  data: () => ({
+    showAdvanced: true,
+  }),
+  mounted() {
     this.showAdvanced = true;
-    // this.showAdvanced = this.userInRole(UserRoles.ADVANCED_MAPS);
-
     this.$nextTick(() => {
       window.addEventListener("resize", this.adjustMapHeight);
     });
-
     this.adjustMapHeight();
   },
   methods: {

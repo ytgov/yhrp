@@ -30,10 +30,9 @@
 </template>
 
 <script>
-import { loadModules } from "esri-loader";
 import { MAPS_URL } from "@/urls";
-import { mapActions, mapState } from "pinia";
-import { useMapStore } from "../stores/MapStore";
+import { loadModules } from "esri-loader";
+
 export default {
   name: "BasicMap",
   data: () => ({
@@ -45,21 +44,21 @@ export default {
     text: "",
     icon: "",
     map: {},
-
     baseMapGallery: {},
     layerList: {},
+    bookmarksSorted: [], // TODO: Move this to a proper data source
   }),
   methods: {
-    ...mapActions(useMapStore, ["loadToken"]),
     showSidebar() {
       this.sidebarVisible = true;
     },
     hideSidebar() {
       this.sidebarVisible = false;
     },
-  },
-  computed: {
-    ...mapState(useMapStore, ["bookmarksSorted"]),
+    loadToken() {
+      // TODO: Implement token loading logic
+      return Promise.resolve({ access_token: "" });
+    },
   },
   mounted() {
     let parent = this;
@@ -75,7 +74,6 @@ export default {
         "esri/widgets/Search",
         "esri/widgets/Legend",
         "esri/layers/FeatureLayer",
-        // "esri/widgets/LayerList",
         "esri/widgets/BasemapGallery",
         "esri/widgets/Bookmarks",
         "esri/webmap/Bookmark",
@@ -90,7 +88,6 @@ export default {
         Search,
         Legend,
         FeatureLayer,
-        // LayerList,
         BasemapGallery,
         Bookmarks,
         Bookmark,
@@ -131,7 +128,6 @@ export default {
         settingWidget.className =
           "esri-icon-drag-horizontal esri-widget--button esri-widget esri-interactive esri-settings";
         settingWidget.addEventListener("click", function () {
-          //parent.showSidebar = true;
           parent.showSidebar();
         });
 
@@ -150,9 +146,6 @@ export default {
           { component: searchWidget, position: "manual" },
         ]);
 
-        // const featureLayer = new FeatureLayer({
-        //   url: "https://mapservices.gov.yk.ca/arcgis/rest/services/GeoYukon/GY_CultureHeritage/MapServer/0",
-        // });
         let viewSiteAction = {
           title: "View site details",
           id: "view-site",
@@ -165,7 +158,6 @@ export default {
         };
         var YHSIpopup = {
           title: "{SITE_NAME}",
-
           content: [
             {
               type: "fields",
@@ -193,23 +185,15 @@ export default {
               ],
             },
           ],
-
-          //removes the default zoom action
           overwriteActions: true,
           actions: [viewSiteAction, viewSiteActionFR],
         };
         var sites = new FeatureLayer({
           url: "https://mapservices.gov.yk.ca/arcgis/rest/services/GeoYukon/GY_CultureHeritage/MapServer/0",
-          // url: "http://localhost:3001/api/maps/sites",
-          // url: `${MAPS_URL}/sites/0`,
           popupTemplate: YHSIpopup,
           outFields: ["YHSI_ID"],
         });
 
-        // new LayerList({
-        //   view: view,
-        //   container: "list",
-        // });
         new Legend({
           view: view,
           container: "legend",
@@ -232,42 +216,11 @@ export default {
           layer: sites,
           searchFields: ["YHSI_ID", "SITE_NAME"],
           suggestionTemplate: "{SITE_NAME}",
-          exactMatch: false,
-          outFields: ["SITE_NAME"],
-          name: "Sites",
-          placeholder: "example: Mayo Legion Hall",
-        });
-        view.popup.on("trigger-action", async (event) => {
-          if (event.action.id === "view-site") {
-            let yhsiId = view.popup.selectedFeature.attributes.YHSI_ID;
-            console.log("See site details for " + yhsiId);
-            // let results = await parent.searchByYHSIId(yhsiId);
-          }
-          if (event.action.id === "view-site-fr") {
-            let yhsiId = view.popup.selectedFeature.attributes.YHSI_ID;
-            console.log("See french site details for " + yhsiId);
-            // let results = await parent.searchByYHSIId(yhsiId);
-          }
-          // if (results.length > 0) {
-          //   let item = results[0];
-          window.open(`https://google.com`, "_blank");
-          // }
-
-          // if (event.action.id === "view-aircrash") {
-          //   let id = view.popup.selectedFeature.attributes.YACSI_NUM;
-          //   window.open(`/airplane/view/${id}`, "_blank");
-          // }
         });
 
         map.add(sites);
       }
     );
-  },
-  beforeDestroy() {
-    if (this.view) {
-      // destroy the map view
-      this.view.container = null;
-    }
   },
 };
 </script>
@@ -277,20 +230,24 @@ export default {
   width: 100%; */
   border: 1px #ddd solid;
 }
+
 .esri-layer-list {
   background-color: white !important;
 }
+
 .esri-layer-list__list--root,
 .esri-layer-list__item-container {
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
+
 .esri-search {
   top: 15px;
   right: 55px;
   border: 1px #6e6e6e solid;
   width: 400px !important;
 }
+
 .esri-settings {
   top: 15px;
   right: 15px;
