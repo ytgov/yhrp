@@ -56,11 +56,10 @@
 </style>
 
 <script>
-import { loadModules } from "esri-loader";
-import { mapActions, mapGetters } from "pinia";
-import { useMapStore } from "../stores/MapStore";
-import { UserRoles } from "../../../authorization";
 import { MAPS_URL } from "@/urls";
+import { loadModules } from "esri-loader";
+import { UserRoles } from "../../../authorization";
+import { useMapService } from "../services/mapService";
 
 export default {
   name: "Home",
@@ -72,19 +71,17 @@ export default {
     map: {},
     sidebarVisible: false,
     tab: 0,
-
     baseMapGallery: {},
     layerList: {},
   }),
-  computed: {
-    // YHRP doesn't use roles, so this is commented out
-    // ...mapGetters(["userInRole"]),
+  setup() {
+    const mapService = useMapService();
+    return {
+      ...mapService,
+    };
   },
   methods: {
-    ...mapActions(useMapStore, ["loadToken", "searchByYHSIId"]),
-
-    // YHRP doesn't use roles so for now here's a heck to show everything
-    //
+    // YHRP doesn't use roles so for now here's a hack to show everything
     userInRole(role) {
       return true;
     },
@@ -97,7 +94,6 @@ export default {
     let resp = {};
     resp.token = this.loadToken;
 
-    // this.loadToken().then((resp) => {
     loadModules(
       [
         "esri/identity/IdentityManager",
@@ -168,7 +164,6 @@ export default {
         settingWidget.className =
           "esri-icon-drag-horizontal esri-widget--button esri-widget esri-interactive esri-settings";
         settingWidget.addEventListener("click", function () {
-          //parent.showSidebar = true;
           parent.showSidebar();
         });
 
@@ -195,14 +190,7 @@ export default {
           container: "legend",
         });
 
-        if (
-          this.userInRole(
-            [UserRoles.SITE_VIEWER],
-            [UserRoles.SITE_VIEWER_LIMITED],
-            [UserRoles.SITE_EDITOR],
-            [UserRoles.SITE_ADMIN]
-          )
-        ) {
+        if (this.userInRole([UserRoles.SITE_VIEWER])) {
           let viewSiteAction = {
             title: "View site details",
             id: "view-site",
@@ -390,7 +378,6 @@ export default {
         });
       }
     );
-    // });
   },
 };
 </script>
