@@ -4,41 +4,68 @@
 
 This document outlines the plan for cleaning up and reorganizing the YHRP Site Registry Viewer repository to improve maintainability, documentation, and code organization.
 
-## Phase 1: Documentation Reorganization
+## Phase 1: Documentation Reorganization ✅
 
-- [x] Create new documentation structure:
-  ```
-  docs/
-  ├── architecture/
-  │   ├── state-management.md
-  │   ├── caching-strategy.md
-  │   └── api-schemas/
-  │       ├── places-api-schema.md
-  │       └── places-data-schema.md
-  ├── development/
-  │   ├── vue3-migration.md
-  │   ├── urls-and-endpoints.md
-  │   └── api-consumption.md
-  ├── processes/
-  │   ├── release-process.md
-  │   ├── branching-strategy.md
-  │   ├── CHANGELOG_GUIDE.md
-  │   └── ARCHIVED_TODOS.md
-  └── overview/
-      └── application-overview.md
-  ```
+- [x] Create new documentation structure
 - [x] Move existing documentation files to new structure
 - [x] Update cross-references in documentation
-- [x] Remove duplicate CHANGELOG.md (resolved by keeping root CHANGELOG.md and renaming docs version to CHANGELOG_GUIDE.md)
-- [x] Review and archive TODO.md items (moved to ARCHIVED_TODOS.md)
+- [x] Resolve CHANGELOG.md situation
+- [x] Archive TODO.md items
 
 ## Phase 2: Code Structure Cleanup
 
-- [ ] Consolidate `src/` and `web/` directories
-- [ ] Create dedicated `api/` directory
-- [ ] Implement consistent naming conventions
-- [ ] Move `register-router.ts` from docs to source code
-- [ ] Review and clean up any temporary or build files
+- [x] Move web directory to src
+- [x] Update Dockerfile for new structure
+- [ ] Frontend Structure (src/web)
+  - [x] Review and organize src/web/src structure
+    - [x] Evaluate current module organization
+      - [x] Keep root-level files (main.js, App.vue, router.js, config.js, urls.js)
+      - [x] Remove unused user module
+      - [x] Remove empty store directories
+      - [x] Remove unused authorization.js
+    - [x] Plan feature-based organization
+      - [x] Map module (map visualization)
+      - [x] Places module (places management)
+      - [x] Home module (landing page)
+    - [x] Document proposed structure
+  - [ ] Implement consistent naming
+    - [x] Define naming conventions
+    - [ ] Plan file migrations
+      - [ ] Map Module
+        - [ ] Add README.md
+        - [ ] Move Migration Tasks.md content to README.md
+        - [ ] Ensure consistent naming in all directories
+      - [ ] Places Module
+        - [ ] Remove empty migration directory
+        - [ ] Add services directory for API integration
+        - [ ] Add README.md
+        - [ ] Ensure consistent naming in all directories
+      - [ ] Home Module
+        - [ ] Remove empty store directory
+        - [ ] Add data and services directories
+        - [ ] Add README.md
+        - [ ] Ensure consistent naming in all directories
+    - [ ] Update import paths
+- [ ] Backend Structure (src/api)
+  - [ ] Review current structure
+    - [ ] Evaluate directory organization
+    - [ ] Identify inconsistencies
+    - [ ] Plan improvements
+  - [ ] Standardize naming
+    - [ ] Define naming conventions
+    - [ ] Plan file migrations
+    - [ ] Update import paths
+- [ ] Build and Development
+  - [x] Remove .DS_Store files
+  - [x] Update .gitignore
+  - [ ] Review build artifacts
+    - [ ] Audit build outputs
+    - [ ] Clean unnecessary files
+    - [ ] Document build process
+  - [ ] Development scripts
+    - [ ] Review current scripts
+    - [ ] Add cleanup scripts
+    - [ ] Update documentation
 
 ## Phase 3: Configuration and Build Files
 
@@ -48,10 +75,10 @@ This document outlines the plan for cleaning up and reorganizing the YHRP Site R
 - [ ] Create `config/` directory
   - [ ] Move environment files
   - [ ] Update environment variable documentation
-- [ ] Update `.gitignore`
-  - [ ] Remove `.DS_Store` files
-  - [ ] Add common build artifacts
-  - [ ] Add IDE-specific files
+- [ ] Update build configuration
+  - [ ] Review current setup
+  - [ ] Plan improvements
+  - [ ] Document changes
 
 ## Phase 4: Final Documentation Updates
 
@@ -59,31 +86,6 @@ This document outlines the plan for cleaning up and reorganizing the YHRP Site R
 - [ ] Add contribution guidelines
 - [ ] Update deployment instructions
 - [ ] Review and update all documentation cross-references
-
-## Final Repository Structure
-
-```
-yhrp/
-├── docs/           # All documentation
-├── src/            # Source code
-│   ├── api/        # Backend API
-│   └── web/        # Frontend application
-├── config/         # Configuration files
-├── docker/         # Docker-related files
-├── scripts/        # Build and utility scripts
-├── tests/          # Test files
-├── .gitignore
-├── README.md
-├── LICENSE
-└── package.json
-```
-
-## Progress Tracking
-
-- [ ] Phase 1: Documentation Reorganization
-- [ ] Phase 2: Code Structure Cleanup
-- [ ] Phase 3: Configuration and Build Files
-- [ ] Phase 4: Final Documentation Updates
 
 ## Notes
 
