@@ -2,7 +2,7 @@ FROM node:18-alpine
 
 RUN mkdir /home/node/app && chown -R node:node /home/node/app
 
-COPY --chown=node:node web/package*.json /home/node/app/web/
+COPY --chown=node:node src/web/package*.json /home/node/app/web/
 COPY --chown=node:node src/api/package*.json /home/node/app/
 
 USER node
@@ -15,10 +15,9 @@ WORKDIR /home/node/app/web
 RUN npm install && npm cache clean --force --loglevel=error
 
 COPY --chown=node:node src/api /home/node/app/
-COPY --chown=node:node web /home/node/app/web/
+COPY --chown=node:node src/web /home/node/app/web/
 
 RUN npm run build:docker
-
 
 WORKDIR /home/node/app
 
