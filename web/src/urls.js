@@ -12,3 +12,6 @@ export const SOME_ENDPOINT_URL = `${config.apiBaseUrl}/api/some-endpoint`;
 
 export const MAPS_URL = `${config.apiBaseUrl}/api/maps`;
 // export const MAPS_URL = `http://localhost:3001/api/maps`;
+
+// Register URL for historic places
+export const REGISTER_URL = `${config.apiBaseUrl}/api/register`;

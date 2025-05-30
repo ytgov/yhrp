@@ -73,9 +73,12 @@
   </v-container>
 </template>
 <script>
-import localData from "../data/places";
+import placeholderBase64 from "@/assets/no_photo_base64";
+import { REGISTER_URL } from "@/urls";
 import axios from "axios";
+import { get } from "lodash";
 import QueryMultiSelect from "../components/QueryMultiSelect.vue";
+import localData from "../data/places";
 
 export default {
   name: "HistoricPlaces",
@@ -126,11 +129,6 @@ export default {
   mounted() {
     this.placesList = localData.PlacesList;
     console.log(this.placesList);
-    // // Get search text when searching from view screen
-    // if (this.$store.getters["photos/searchText"]) {
-    //   this.search = this.$store.getters["photos/searchText"];
-    // }
-    // this.getDataFromApi();
   },
   methods: {
     photoURL: function (siteID) {
