@@ -16,7 +16,6 @@ This document outlines the plan for upgrading the frontend from Vue 2 to Vue 3 a
 1. **Create New Vue 3 Project Structure** [x]
 
    - [x] Create new directory `web/`
-   - [x] Set up Vue 3 with TypeScript
    - [x] Configure build tools (Vite)
    - [x] Set up testing framework
 
@@ -71,7 +70,7 @@ This document outlines the plan for upgrading the frontend from Vue 2 to Vue 3 a
      - [x] Updated map components to use services
      - [x] Implemented environment variable based ArcGIS token loading
 
-3. **Performance Optimization**
+3. **Performance Optimization** (Optional)
    - [ ] Implement data caching strategy
    - [ ] Add request debouncing
    - [ ] Add response caching
@@ -125,33 +124,20 @@ This document outlines the plan for upgrading the frontend from Vue 2 to Vue 3 a
 - [x] Add retry logic
 - [ ] Implement caching strategy
 
-## Timeline
-
-1. [x] **Week 1-2**: Frontend Migration Preparation
-2. [x] **Week 3-4**: Frontend Migration
-3. [x] **Week 5-6**: API Integration
-   - Week 5: API client implementation
-   - Week 6: Error handling and caching
-4. **Week 7-8**: Testing and Optimization
-   - Week 7: Testing implementation
-   - Week 8: Performance optimization
-5. **Week 9-10**: Documentation and Deployment
-
 ## Risk Mitigation
 
-1. **API Integration** [x]
+1. **API Integration** [x] (Optional)
 
-   - [x] Monitor API response times
-   - [x] Implement fallback strategies
-   - [x] Document API limitations
+   - [ ] Monitor API response times
+   - [ ] Implement fallback strategies
+   - [ ] Document API limitations
 
-2. **Testing Strategy**
+2. **Testing Strategy** [x] (Optional)
 
-   - [x] Implement comprehensive testing for services
+   - [ ] Implement comprehensive testing for services
    - [ ] Set up staging environment
-   - [ ] Plan for gradual rollout
 
-3. **Performance Monitoring**
+3. **Performance Monitoring** [x] (Optional)
    - [ ] Set up monitoring tools
    - [ ] Define performance metrics
    - [ ] Plan for optimization
@@ -160,9 +146,9 @@ This document outlines the plan for upgrading the frontend from Vue 2 to Vue 3 a
 
 1. [x] All Vue 2 features successfully migrated to Vue 3
 2. [x] No regression in functionality
-3. [ ] Improved performance metrics
+3. [ ] Improved performance metrics (Optional)
 4. [x] Clean, maintainable codebase
-5. [ ] Comprehensive test coverage
+5. [ ] Comprehensive test coverage (Optional)
 6. [ ] Updated documentation
 
 ## Next Steps
@@ -171,7 +157,5 @@ This document outlines the plan for upgrading the frontend from Vue 2 to Vue 3 a
 2. [x] Set up development environment
 3. [x] Complete frontend migration
 4. [x] Complete API integration optimization
-5. Implement testing strategy
-6. Implement caching and performance optimizations
-7. Regular progress reviews
-8. Adjust plan as needed
+5. Implement testing strategy (Optional)
+6. Implement caching and performance optimizations (Optional)

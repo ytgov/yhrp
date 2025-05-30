@@ -89,13 +89,6 @@ This plan outlines the steps to remove unnecessary state management and implemen
 - [ ] Complete test coverage
 - [ ] Future: Search functionality implemented
 
-## Rollback Plan
-
-1. Keep backup of store files
-2. Document all changes
-3. Create feature branch for changes
-4. Test thoroughly before merging
-
 ## Next Actions
 
 1. [x] Implement proper token loading for map components
