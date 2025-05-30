@@ -6,80 +6,86 @@ This plan outlines the steps to remove unnecessary state management and implemen
 
 ## Current State
 
-- ✅ Removed all store files from `web/src/stores/`:
-  - `ApiStore.js` ✅
-  - `AuthStore.js` ✅
-  - `NotificationStore.js` ✅
-  - `UserStore.js` ✅
-- ✅ Removed Pinia dependency and imports
-- ✅ Successfully refactored components to use Composition API:
-  - Created `notificationService.js` for notification handling
-  - Created `apiService.js` for API calls
-  - Removed user-related functionality
-  - Removed SecureAPI component
-  - Updated map components to remove store dependencies
+- [x] Removed all store files from `web/src/stores/`:
+  - [x] `ApiStore.js`
+  - [x] `AuthStore.js`
+  - [x] `NotificationStore.js`
+  - [x] `UserStore.js`
+- [x] Removed Pinia dependency and imports
+- [x] Successfully refactored components to use Composition API:
+  - [x] Created `notificationService.js` for notification handling
+  - [x] Created `apiService.js` for API calls
+  - [x] Removed user-related functionality
+  - [x] Removed SecureAPI component
+  - [x] Updated map components to remove store dependencies
+- [x] Implemented environment variable based ArcGIS token loading
+- [x] Restored 22 community bookmarks with original UTM coordinates
 
 ## Next Steps
 
 ### Phase 1: API Client Implementation (Completed)
 
-- ✅ Create API client service using native `fetch`
-- ✅ Implement response caching
-- ✅ Add error handling
+- [x] Create API client service using native `fetch`
+- [x] Implement response caching
+- [x] Add error handling
 
 ### Phase 2: Component Refactoring (In Progress)
 
-- ✅ Remove store dependencies from components
-- ✅ Implement local state management
-- ✅ Update map components to use services
-- 🔄 TODO: Implement proper token loading for map components
-- 🔄 TODO: Set up proper data source for map bookmarks
+- [x] Remove store dependencies from components
+- [x] Implement local state management
+- [x] Update map components to use services
+- [x] Implement proper token loading for map components via environment variables
+- [ ] Add tests for map service
+- [ ] Future: Implement search functionality (currently using placeholder)
 
 ### Phase 3: Cleanup and Optimization
 
-- ✅ Remove unused store files
-- ✅ Clean up dependencies
-- 🔄 TODO: Update build configuration
-- 🔄 TODO: Add tests for new services
-- 🔄 TODO: Document new architecture
+- [x] Remove unused store files
+- [x] Clean up dependencies
+- [ ] Update build configuration
+- [ ] Add tests for new services
+- [ ] Document new architecture
 
 ## Implementation Plan
 
 Week 1 (Completed):
 
-- ✅ Remove store files
-- ✅ Create notification service
-- ✅ Create API service
-- ✅ Remove user functionality
+- [x] Remove store files
+- [x] Create notification service
+- [x] Create API service
+- [x] Remove user functionality
 
-Week 2 (In Progress):
+Week 2 (Completed):
 
-- ✅ Update components to use new services
-- 🔄 Implement proper token loading
-- 🔄 Set up map bookmarks data source
-- 🔄 Add tests
+- [x] Update components to use new services
+- [x] Implement token loading via environment variables
+- [x] Restore community bookmarks
+- [ ] Add tests
 
 Week 3 (Planned):
 
-- 🔄 Update build configuration
-- 🔄 Add documentation
-- 🔄 Performance optimization
+- [ ] Update build configuration
+- [ ] Add documentation
+- [ ] Performance optimization
+- [ ] Future: Implement search functionality
 
 ## Testing Strategy
 
-- Unit tests for services
-- Component tests for refactored components
-- Integration tests for API calls
-- Map component tests
+- [ ] Unit tests for services
+- [ ] Component tests for refactored components
+- [ ] Integration tests for API calls
+- [ ] Map component tests
 
 ## Success Criteria
 
-- ✅ No store dependencies
-- ✅ Simpler architecture
-- ✅ Better error handling
-- ✅ Reduced bundle size
-- 🔄 Improved performance
-- 🔄 Complete test coverage
+- [x] No store dependencies
+- [x] Simpler architecture
+- [x] Better error handling
+- [x] Reduced bundle size
+- [x] Environment variables properly configured
+- [ ] Improved performance
+- [ ] Complete test coverage
+- [ ] Future: Search functionality implemented
 
 ## Rollback Plan
 
@@ -90,7 +96,8 @@ Week 3 (Planned):
 
 ## Next Actions
 
-1. 🔄 Implement proper token loading for map components
-2. 🔄 Set up data source for map bookmarks
-3. 🔄 Add tests for new services
-4. 🔄 Update documentation
+1. [x] Implement proper token loading for map components
+2. [x] Set up data source for map bookmarks
+3. [ ] Add tests for new services
+4. [ ] Update documentation
+5. [ ] Future: Implement search functionality

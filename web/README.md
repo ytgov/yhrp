@@ -7,6 +7,27 @@
 - [] remove auth guards from router
 - [] wire to YHRP API vs ArcGIS Online
 
+## Environment Variables
+
+### ArcGIS Token
+
+The application requires an ArcGIS token for accessing Yukon map services. This token should be provided through environment variables:
+
+1. Create a `.env` file in the root directory:
+
+```bash
+VITE_ARCGIS_TOKEN=your_token_here
+```
+
+2. For production, set the environment variable in your deployment environment.
+
+The token is used to authenticate with:
+
+- Yukon maps server (`yukon.maps.arcgis.com`)
+- Local API endpoints (`${MAPS_URL}/sites`)
+
+Note: Never commit the `.env` file to version control. A `.env.example` file is provided as a template.
+
 ## Important Differences from Vue 2
 
 ### Vue Migration
