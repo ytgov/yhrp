@@ -31,23 +31,23 @@ export interface Description {
 }
 
 export interface RegisterService {
-  getRegisterAll(skip: number, take: number): Promise<Place[]>;
+  getRegisterAll(_skip: number, _take: number): Promise<Place[]>;
   getPlaceInRegisterCount(): Promise<number>;
-  getRegisterById(id: number): Promise<Place | null>;
+  getRegisterById(_id: number): Promise<Place | null>;
 }
 
 export interface DescriptionService {
-  getForPlace(id: number): Promise<Description[]>;
+  getForPlace(_id: number): Promise<Description[]>;
 }
 
 export interface PhotoService {
-  getAllForPlace(id: number): Promise<Photo[]>;
-  getFileById(id: string): Promise<PhotoFile | null>;
+  getAllForPlace(_id: number): Promise<Photo[]>;
+  getFileById(_id: string): Promise<PhotoFile | null>;
 }
 
 // TODO: Implement actual service with database calls
 export class RegisterServiceImpl implements RegisterService {
-  async getRegisterAll(skip: number, take: number): Promise<Place[]> {
+  async getRegisterAll(_skip: number, _take: number): Promise<Place[]> {
     // TODO: Implement actual database query
     throw new Error("Not implemented");
   }
@@ -57,26 +57,26 @@ export class RegisterServiceImpl implements RegisterService {
     throw new Error("Not implemented");
   }
 
-  async getRegisterById(id: number): Promise<Place | null> {
+  async getRegisterById(_id: number): Promise<Place | null> {
     // TODO: Implement actual database query
     throw new Error("Not implemented");
   }
 }
 
 export class DescriptionServiceImpl implements DescriptionService {
-  async getForPlace(id: number): Promise<Description[]> {
+  async getForPlace(_id: number): Promise<Description[]> {
     // TODO: Implement actual database query
     throw new Error("Not implemented");
   }
 }
 
 export class PhotoServiceImpl implements PhotoService {
-  async getAllForPlace(id: number): Promise<Photo[]> {
+  async getAllForPlace(_id: number): Promise<Photo[]> {
     // TODO: Implement actual database query
     throw new Error("Not implemented");
   }
 
-  async getFileById(id: string): Promise<PhotoFile | null> {
+  async getFileById(_id: string): Promise<PhotoFile | null> {
     // TODO: Implement actual file retrieval
     throw new Error("Not implemented");
   }
