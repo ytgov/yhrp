@@ -39,6 +39,7 @@ export const communityBookmarks = [
         },
         xmin: 707154.113349452,
         ymin: 622302.163954539,
+
         xmax: 715197.462769484,
         ymax: 629075.510834567,
       },
@@ -191,6 +192,21 @@ export const communityBookmarks = [
         ymin: 628749.404173009,
         xmax: 382853.002626855,
         ymax: 635522.751053036,
+      },
+    },
+  },
+  {
+    name: "Teslin",
+    viewpoint: {
+      targetGeometry: {
+        type: "extent",
+        spatialReference: {
+          wkid: 3579,
+        },
+        xmin: 492026.266427091,
+        ymin: 634891.06413234,
+        xmax: 500154.282683123,
+        ymax: 641664.411012367,
       },
     },
   },
