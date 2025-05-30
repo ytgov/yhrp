@@ -20,6 +20,9 @@ This plan outlines the steps to remove unnecessary state management and implemen
   - [x] Updated map components to remove store dependencies
 - [x] Implemented environment variable based ArcGIS token loading
 - [x] Restored 22 community bookmarks with original UTM coordinates
+- [x] Removed map store in favor of service-based approach
+- [x] Added placeholder image for missing photos
+- [x] Updated URL configurations for API endpoints
 
 ## Next Steps
 
@@ -35,6 +38,7 @@ This plan outlines the steps to remove unnecessary state management and implemen
 - [x] Implement local state management
 - [x] Update map components to use services
 - [x] Implement proper token loading for map components via environment variables
+- [x] Add placeholder image for missing photos
 - [ ] Add tests for map service
 - [ ] Future: Implement search functionality (currently using placeholder)
 
@@ -60,6 +64,8 @@ Week 2 (Completed):
 - [x] Update components to use new services
 - [x] Implement token loading via environment variables
 - [x] Restore community bookmarks
+- [x] Remove map store and implement service-based approach
+- [x] Add placeholder image for missing photos
 - [ ] Add tests
 
 Week 3 (Planned):
@@ -83,6 +89,7 @@ Week 3 (Planned):
 - [x] Better error handling
 - [x] Reduced bundle size
 - [x] Environment variables properly configured
+- [x] Placeholder image for missing photos
 - [ ] Improved performance
 - [ ] Complete test coverage
 - [ ] Future: Search functionality implemented
@@ -98,6 +105,7 @@ Week 3 (Planned):
 
 1. [x] Implement proper token loading for map components
 2. [x] Set up data source for map bookmarks
-3. [ ] Add tests for new services
-4. [ ] Update documentation
-5. [ ] Future: Implement search functionality
+3. [x] Add placeholder image for missing photos
+4. [ ] Add tests for new services
+5. [ ] Update documentation
+6. [ ] Future: Implement search functionality
