@@ -23,6 +23,8 @@ This plan outlines the steps to remove unnecessary state management and implemen
 - [x] Removed map store in favor of service-based approach
 - [x] Added placeholder image for missing photos
 - [x] Updated URL configurations for API endpoints
+- [x] Added and passed tests for API service error handling and map bookmarks (using kebab-case for test files)
+- [x] Removed token handling test (endpoint is in use and not mocked)
 
 ## Next Steps
 
@@ -39,37 +41,29 @@ This plan outlines the steps to remove unnecessary state management and implemen
 - [x] Update map components to use services
 - [x] Implement proper token loading for map components via environment variables
 - [x] Add placeholder image for missing photos
-- [ ] Add tests for map service
+- [x] Add tests for map service (bookmarks)
 - [ ] Future: Implement search functionality (currently using placeholder)
 
 ### Phase 3: Cleanup and Optimization
 
 - [x] Remove unused store files
 - [x] Clean up dependencies
+- [x] Add tests for new services (API service error handling)
 - [ ] Update build configuration
-- [ ] Add tests for new services
 - [ ] Document new architecture
 
 ## Implementation Plan
-
-Week 1 (Completed):
 
 - [x] Remove store files
 - [x] Create notification service
 - [x] Create API service
 - [x] Remove user functionality
-
-Week 2 (Completed):
-
 - [x] Update components to use new services
 - [x] Implement token loading via environment variables
 - [x] Restore community bookmarks
 - [x] Remove map store and implement service-based approach
 - [x] Add placeholder image for missing photos
-- [ ] Add tests
-
-Week 3 (Planned):
-
+- [x] Add tests
 - [ ] Update build configuration
 - [ ] Add documentation
 - [ ] Performance optimization
@@ -77,10 +71,11 @@ Week 3 (Planned):
 
 ## Testing Strategy
 
-- [ ] Unit tests for services
+- [x] Unit tests for services (API service error handling, map bookmarks)
 - [ ] Component tests for refactored components
 - [ ] Integration tests for API calls
-- [ ] Map component tests
+- [ ] Map component tests (future: more coverage)
+- [x] Test files use kebab-case naming
 
 ## Success Criteria
 
@@ -106,6 +101,6 @@ Week 3 (Planned):
 1. [x] Implement proper token loading for map components
 2. [x] Set up data source for map bookmarks
 3. [x] Add placeholder image for missing photos
-4. [ ] Add tests for new services
+4. [x] Add tests for new services (API service error handling, map bookmarks)
 5. [ ] Update documentation
 6. [ ] Future: Implement search functionality
