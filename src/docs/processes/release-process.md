@@ -1,6 +1,6 @@
-# Release and Feature Management Process
+# Release Process
 
-This document outlines our process for managing features and releases in the project. For information about our branching strategy, please refer to [BRANCHING_STRATEGY.md](./BRANCHING_STRATEGY.md).
+This document outlines the release process for the YHRP Site Registry Viewer. For information about our branching strategy, please refer to [branching-strategy.md](./branching-strategy.md).
 
 ## Versioning Strategy
 
@@ -12,7 +12,7 @@ We follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) with the fo
 
 ## Feature Development Workflow
 
-For detailed information about branch types and naming conventions, see [BRANCHING_STRATEGY.md](./BRANCHING_STRATEGY.md).
+For detailed information about branch types and naming conventions, see [branching-strategy.md](./branching-strategy.md).
 
 ### 1. Starting a New Feature
 
@@ -25,7 +25,7 @@ git checkout -b feature/feature-name
 
 ### 2. During Development
 
-- Update the "Unreleased" section in `CHANGELOG.md` with your feature details
+- Update the "Unreleased" section in `../../CHANGELOG.md` with your feature details
 - Write tests for new functionality
 - Ensure all tests pass before completing the feature
 - Keep the feature branch up to date with main:
@@ -58,7 +58,7 @@ git checkout -b release/X.Y.Z
 
 ### 2. Preparing the Release
 
-1. Update `CHANGELOG.md`:
+1. Update `../../CHANGELOG.md`:
 
    - Move features from "Unreleased" to the new version section
    - Set the release date
@@ -72,7 +72,7 @@ git checkout -b release/X.Y.Z
 
 3. Create the release commit:
    ```bash
-   git add CHANGELOG.md
+   git add ../../CHANGELOG.md
    git commit -m "chore: prepare release X.Y.Z"
    ```
 
@@ -132,7 +132,7 @@ git checkout -b release/X.Y.Z
 
 ## Branch Naming Conventions
 
-For a complete list of branch types and naming conventions, see [BRANCHING_STRATEGY.md](./BRANCHING_STRATEGY.md).
+For a complete list of branch types and naming conventions, see [branching-strategy.md](./branching-strategy.md).
 
 - Feature branches: `feature/feature-name`
 - Release branches: `release/X.Y.Z`
@@ -154,11 +154,12 @@ Example: `feat: add user authentication system`
 
 ## Changelog Management
 
-The `CHANGELOG.md` file should be updated:
+The `../../CHANGELOG.md` file should be updated:
 
 1. When starting a new feature (in the "Unreleased" section)
 2. When preparing a release (moving items to the new version)
 3. When fixing bugs (in the "Unreleased" section)
+4. Add dependency updates to ../../CHANGELOG.md
 
 ## Release Checklist
 
@@ -261,7 +262,7 @@ Before creating a release, ensure:
    ```
 
 2. **Changelog Updates**
-   - Add dependency updates to CHANGELOG.md
+   - Add dependency updates to ../../CHANGELOG.md
    - Include version changes
    - Note any breaking changes
 

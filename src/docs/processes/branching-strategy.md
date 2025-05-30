@@ -1,6 +1,6 @@
 # Branching Strategy
 
-This document outlines our Git branching strategy and workflow for the project. For information about our release process, please refer to [RELEASE_PROCESS.md](./RELEASE_PROCESS.md).
+This document outlines our Git branching strategy and workflow for the project. For information about our release process, please refer to [release-process.md](./release-process.md).
 
 ## Main Branches
 
@@ -45,7 +45,7 @@ This document outlines our Git branching strategy and workflow for the project. 
    - Naming examples:
      - `release/v1.2.0`
      - `release/v2.0.0`
-   - For detailed release process, see [RELEASE_PROCESS.md](./RELEASE_PROCESS.md)
+   - For detailed release process, see [release-process.md](./release-process.md)
 
 ## Branch Protection Rules
 
@@ -140,7 +140,7 @@ This document outlines our Git branching strategy and workflow for the project. 
    - Test thoroughly
    - Merge to prod, uat, and main
    - Deploy immediately
-   - For detailed emergency release process, see [RELEASE_PROCESS.md](./RELEASE_PROCESS.md)
+   - For detailed emergency release process, see [release-process.md](./release-process.md)
 
 2. **Rollback Process**
    - Identify last stable version

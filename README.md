@@ -80,11 +80,13 @@ docker run -p 8222:3000 -e NODE_ENV=production --restart=on-failure yhrp-viewer
 
 For detailed information about the project, refer to the documentation in `src/docs/`:
 
-- `VUE3_MIGRATION_PLAN.md` - Details about the Vue 3 migration
-- `STATE_MANAGEMENT_PLAN.md` - State management architecture
-- `CACHING_STRATEGY.md` - Caching implementation details
-- `RELEASE_PROCESS.md` - Release and deployment procedures
-- `CHANGELOG.md` - Version history and changes
+- `architecture/state-management.md` - State management architecture
+- `architecture/caching-strategy.md` - Caching implementation details
+- `development/vue3-migration.md` - Details about the Vue 3 migration
+- `processes/release-process.md` - Release and deployment procedures
+- `processes/branching-strategy.md` - Branch management and workflow
+- `processes/CHANGELOG_GUIDE.md` - Guidelines for maintaining the changelog
+- `CHANGELOG.md` - Version history and changes (in root directory)
 
 ## Contributing
 
