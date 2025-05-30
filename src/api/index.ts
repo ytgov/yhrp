@@ -1,7 +1,5 @@
-import express, { Request, Response } from "express";
 import cors from "cors";
-import helmet from "helmet";
-import { userRouter, dataRouter } from "./routes";
+import express, { Request, Response } from "express";
 import * as config from "./config";
 import { doHealthCheck } from "./utils/healthCheck";
 // import { configureAuthentication } from './routes/auth';
@@ -43,7 +41,7 @@ app.use(
 
 // configureAuthentication(app);
 
-app.get("/api/healthCheck", (req: Request, res: Response) => {
+app.get("/api/healthCheck", (_req: Request, res: Response) => {
   doHealthCheck(res);
 });
 
@@ -56,7 +54,7 @@ let baseWebPath = "/web";
 app.use(express.static(__dirname + baseWebPath));
 
 // if no other routes match, just send the front-end
-app.use((req: Request, res: Response) => {
+app.use((_req: Request, res: Response) => {
   res.sendFile(__dirname + baseWebPath + "/index.html");
 });
 
