@@ -6,7 +6,7 @@ This document outlines the plan for upgrading the frontend from Vue 2 to Vue 3 a
 
 ## Current Structure
 
-- Frontend: Vue 3 application in `web/` (already migrated)
+- Frontend: Vue 3 application in `web/` (migration completed)
 - External API: YHRP site registry API (https://github.com/ytgov/yhsi/blob/main/src/api/routes/register-router.ts)
 
 ## Migration Steps
@@ -27,7 +27,7 @@ This document outlines the plan for upgrading the frontend from Vue 2 to Vue 3 a
    - Current key dependencies:
      - Vue 3.2.38
      - Vuetify 3.1.7
-     - Pinia 2.0.27 (to be evaluated if needed)
+     - ~~Pinia 2.0.27 (to be evaluated if needed)~~
      - Vue Router 4.1.6
      - Axios for API calls
 
@@ -37,7 +37,7 @@ This document outlines the plan for upgrading the frontend from Vue 2 to Vue 3 a
    - [x] Plan for Composition API adoption
    - [x] Create migration checklist for each component
 
-### Phase 2: API Integration Optimization
+### Phase 2: API Integration Optimization [x]
 
 1. **API Integration Review** [x]
 
@@ -85,6 +85,7 @@ This document outlines the plan for upgrading the frontend from Vue 2 to Vue 3 a
    - [x] Migrate core components
    - [x] Update state management
    - [x] Implement new API integration
+   - [x] Add 404 Not Found page
 
 2. **UI/UX Updates** [x]
 
@@ -110,6 +111,7 @@ This document outlines the plan for upgrading the frontend from Vue 2 to Vue 3 a
 - [x] Update routing system
 - [x] Evaluate and implement state management
 - [x] Update API integration
+- [x] Remove Vue 2 codebase
 - [ ] Migrate tests
 - [ ] Performance testing
 - [ ] Browser compatibility testing
@@ -126,18 +128,18 @@ This document outlines the plan for upgrading the frontend from Vue 2 to Vue 3 a
 
 ## Risk Mitigation
 
-1. **API Integration** [x] (Optional)
+1. **API Integration**
 
    - [ ] Monitor API response times
    - [ ] Implement fallback strategies
    - [ ] Document API limitations
 
-2. **Testing Strategy** [x] (Optional)
+2. **Testing Strategy** (Optional)
 
    - [ ] Implement comprehensive testing for services
    - [ ] Set up staging environment
 
-3. **Performance Monitoring** [x] (Optional)
+3. **Performance Monitoring** (Optional)
    - [ ] Set up monitoring tools
    - [ ] Define performance metrics
    - [ ] Plan for optimization
@@ -157,5 +159,8 @@ This document outlines the plan for upgrading the frontend from Vue 2 to Vue 3 a
 2. [x] Set up development environment
 3. [x] Complete frontend migration
 4. [x] Complete API integration optimization
-5. Implement testing strategy (Optional)
-6. Implement caching and performance optimizations (Optional)
+5. [x] Remove Vue 2 codebase
+6. Implement testing strategy (Optional)
+7. Implement caching and performance optimizations (Optional)
+8. Regular progress reviews
+9. Adjust plan as needed
