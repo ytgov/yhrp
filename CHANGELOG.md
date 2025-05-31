@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New services directory for Places module
 - Added rich mock data for historic places with detailed information
 - Added markdown-based mock data structure for better maintainability
+- Added custom markdown parser for historic places data (this could be replaced by a library or removed down the road)
+- Added support for nested sections in markdown parsing
+- Added proper handling of heritage values and historical sources
 
 ### Changed
 
@@ -50,6 +53,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced Places form view to display rich data structure
 - Updated mock data format to match real API structure
 - Improved data organization in Places views
+- Refactored markdown parser for better maintainability
+- Improved heritage values and historical sources parsing
+- Enhanced data transformation in Places API service
 
 ### Removed
 
@@ -72,6 +78,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Property name mismatches between API service and views
 - Error handling in Places view data fetching
 - Fixed image loading in Places form view
+- Fixed heritage values section parsing in markdown
+- Fixed subsection title formatting in markdown parser
+- Fixed data transformation for Places API service
 
 ## [Previous Version]
 
