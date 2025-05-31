@@ -1,10 +1,13 @@
 import { Request, Response } from "express";
-import { validationResult } from "express-validator";
-import moment from "moment";
+import {
+  ErrorResponse,
+  PhotosResponse,
+  RegisterPlaceResponse,
+  RegisterPlacesResponse,
+} from "../models/api-response.model";
 import {
   DescriptionService,
   PhotoService,
-  Place,
   RegisterService,
 } from "../services/register-service";
 
@@ -15,24 +18,25 @@ export class RegisterController {
     private photoService: PhotoService
   ) {}
 
-  async getRegisterPlaces(req: Request, res: Response) {
+  async getRegisterPlaces(
+    req: Request,
+    res: Response<RegisterPlacesResponse | ErrorResponse>
+  ) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-
+      // Validation is now handled in the route middleware
       const page = parseInt(req.query.page as string);
       const skip = (page - 1) * 12;
       const take = 12;
 
       const data = await this.registerService.getRegisterAll(skip, take);
-      const formattedData = data.map((d) => ({
-        ...d,
-        recognitionDate: moment(d.recognitionDate)
-          .add(7, "hours")
-          .format("YYYY-MM-DD"),
-      }));
+      const formattedData = data.map((d) => {
+        const date = new Date(d.recognitionDate);
+        date.setHours(date.getHours() + 7);
+        return {
+          ...d,
+          recognitionDate: date.toISOString().split("T")[0], // Format as YYYY-MM-DD
+        };
+      });
 
       const item_count = await this.registerService.getPlaceInRegisterCount();
       const page_count = Math.ceil(item_count / 12);
@@ -43,11 +47,17 @@ export class RegisterController {
       });
     } catch (error) {
       console.error("Error fetching register data:", error);
-      return res.status(500).json({ error: "Internal server error" });
+      return res.status(500).json({
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : undefined,
+      });
     }
   }
 
-  async getPlaceDetails(req: Request, res: Response) {
+  async getPlaceDetails(
+    req: Request,
+    res: Response<RegisterPlaceResponse | ErrorResponse>
+  ) {
     try {
       const { id } = req.params;
       const data = await this.registerService.getRegisterById(parseInt(id));
@@ -56,8 +66,12 @@ export class RegisterController {
         return res.status(404).json({ error: "Place not found" });
       }
 
-      const placeData: Place = {
+      const placeData = {
         ...data,
+        recognitionDate:
+          data.recognitionDate instanceof Date
+            ? data.recognitionDate.toISOString().split("T")[0]
+            : data.recognitionDate,
         placeDescriptionEn: "",
         placeDescriptionFr: "",
         heritageValueEn: "",
@@ -68,7 +82,7 @@ export class RegisterController {
         descBoundFr: "",
         additionalInfoEn: "",
         additionalInfoFr: "",
-      };
+      } as import("../models/register-place.model").RegisterPlace;
 
       const descs = await this.descriptionService.getForPlace(parseInt(id));
 
@@ -100,11 +114,17 @@ export class RegisterController {
       return res.json({ data: placeData });
     } catch (error) {
       console.error("Error fetching place details:", error);
-      return res.status(500).json({ error: "Internal server error" });
+      return res.status(500).json({
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : undefined,
+      });
     }
   }
 
-  async getPlacePhotos(req: Request, res: Response) {
+  async getPlacePhotos(
+    req: Request,
+    res: Response<PhotosResponse | ErrorResponse>
+  ) {
     try {
       const { id } = req.params;
       const data = await this.registerService.getRegisterById(parseInt(id));
@@ -117,11 +137,14 @@ export class RegisterController {
       return res.json({ data: photos });
     } catch (error) {
       console.error("Error fetching photos:", error);
-      return res.status(500).json({ error: "Internal server error" });
+      return res.status(500).json({
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : undefined,
+      });
     }
   }
 
-  async getPhotoFile(req: Request, res: Response) {
+  async getPhotoFile(req: Request, res: Response<Buffer | ErrorResponse>) {
     try {
       const { id, photoId } = req.params;
       const data = await this.registerService.getRegisterById(parseInt(id));
@@ -138,7 +161,10 @@ export class RegisterController {
       return res.status(404).json({ error: "Photo not found" });
     } catch (error) {
       console.error("Error fetching photo:", error);
-      return res.status(500).json({ error: "Internal server error" });
+      return res.status(500).json({
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : undefined,
+      });
     }
   }
 }

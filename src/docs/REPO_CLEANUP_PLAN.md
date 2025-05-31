@@ -61,14 +61,42 @@ This document outlines the plan for cleaning up and reorganizing the YHRP Site R
   - [x] Remove unused roboto-fontface dependency
   - [ ] Review and clean up other unused dependencies
 - [ ] Backend Structure (src/api)
-  - [ ] Review current structure
-    - [ ] Evaluate directory organization
-    - [ ] Identify inconsistencies
-    - [ ] Plan improvements
-  - [ ] Standardize naming
-    - [ ] Define naming conventions
-    - [ ] Plan file migrations
-    - [ ] Update import paths
+  - [x] Review current structure
+    - [x] Evaluate directory organization
+    - [x] Identify inconsistencies
+    - [x] Plan improvements
+  - [x] Standardize naming
+    - [x] Define naming conventions
+    - [x] Plan file migrations
+    - [x] Update import paths
+  - [ ] API Models
+    - [x] Remove unused auth and user models
+    - [x] Create RegisterPlace model
+    - [x] Document model differences with frontend
+    - [ ] Add TypeScript interfaces for API responses
+    - [ ] Add validation for API request/response types
+  - [ ] API Routes
+    - [x] Clean up register routes
+    - [x] Remove express-validator dependency
+    - [x] Implement simple validation middleware
+    - [ ] Add proper error handling middleware
+    - [ ] Add request logging middleware
+    - [ ] Add API documentation (OpenAPI/Swagger)
+  - [ ] API Services
+    - [ ] Review and standardize service interfaces
+    - [ ] Add proper error handling
+    - [ ] Add service-level logging
+    - [ ] Add service-level caching
+  - [ ] Testing
+    - [ ] Add unit tests for models
+    - [ ] Add unit tests for controllers
+    - [ ] Add unit tests for services
+    - [ ] Add integration tests for API endpoints
+  - [ ] Documentation
+    - [ ] Add API documentation
+    - [ ] Add service documentation
+    - [ ] Add model documentation
+    - [ ] Add testing documentation
 - [ ] Build and Development
   - [x] Remove .DS_Store files
   - [x] Update .gitignore

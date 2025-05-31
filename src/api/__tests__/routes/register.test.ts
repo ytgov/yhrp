@@ -1,5 +1,5 @@
 import express from "express";
-import { query } from "express-validator";
+import "jest";
 import request from "supertest";
 import { RegisterController } from "../../controllers/register-controller";
 import {
@@ -91,9 +91,25 @@ describe("Register Router", () => {
       mockPhotoService
     );
 
+    // Simple validation middleware for testing
+    const validatePage = (
+      req: express.Request,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const page = parseInt(req.query.page as string);
+      if (isNaN(page) || page < 1) {
+        return res
+          .status(400)
+          .json({ error: "Page must be a positive integer" });
+      }
+      next();
+      return;
+    };
+
     testRouter.get(
       "/",
-      [query("page").default(1).isInt({ gt: 0 })],
+      validatePage,
       controller.getRegisterPlaces.bind(controller)
     );
     testRouter.get("/:id", controller.getPlaceDetails.bind(controller));
@@ -123,6 +139,10 @@ describe("Register Router", () => {
       const response = await request(app).get(BASE_URL).query({ page: 0 });
 
       expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty(
+        "error",
+        "Page must be a positive integer"
+      );
     });
   });
 

@@ -1,5 +1,4 @@
 import express, { Request, Response } from "express";
-import { query } from "express-validator";
 import { RegisterController } from "../controllers/register-controller";
 import {
   DescriptionServiceImpl,
@@ -14,10 +13,17 @@ const controller = new RegisterController(
   new PhotoServiceImpl()
 );
 
-registerRouter.get(
-  "/",
-  [query("page").default(1).isInt({ gt: 0 })],
-  (req: Request, res: Response) => controller.getRegisterPlaces(req, res)
+// Simple validation middleware for page parameter
+const validatePage = (req: Request, res: Response, next: Function) => {
+  const page = parseInt(req.query.page as string);
+  if (isNaN(page) || page < 1) {
+    return res.status(400).json({ error: "Page must be a positive integer" });
+  }
+  next();
+};
+
+registerRouter.get("/", validatePage, (req: Request, res: Response) =>
+  controller.getRegisterPlaces(req, res)
 );
 
 registerRouter.get("/:id", (req: Request, res: Response) =>

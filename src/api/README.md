@@ -1,52 +1,100 @@
-# API Tests
+# API Directory Structure
 
-This directory contains the API implementation and tests for the register endpoints.
+## Overview
 
-## Running Tests
+This directory contains the backend API implementation for the YHRP Site Registry Viewer.
 
-### Basic Test Run
+## Directory Structure
 
-To run all tests:
-
-```bash
-npm test
+```
+api/
+├── controllers/     # Request handlers and business logic
+├── models/         # Data models and API response types
+├── routes/         # API route definitions
+├── services/       # Business logic and external service integrations
+├── utils/          # Utility functions and helpers
+├── __tests__/      # Test files
+├── @types/         # TypeScript type definitions
+└── config/         # Configuration files
 ```
 
-To run tests in watch mode (tests will re-run when files change):
+## Naming Conventions
 
-```bash
-npm run test:watch
-```
+### Files
 
-### Running Tests Against a Custom Base URL
+- Use kebab-case for file names (e.g., `user-controller.ts`)
+- Suffix files with their type:
+  - Controllers: `-controller.ts`
+  - Models: `-model.ts`
+  - Routes: `-routes.ts`
+  - Services: `-service.ts`
+  - Utils: `-util.ts`
 
-You can run the tests against a specific API endpoint using one of these methods:
+### Classes and Interfaces
 
-1. Using the test:url script:
+- Use PascalCase for class and interface names
+- Suffix interfaces with their type:
+  - Models: `IModel`
+  - Services: `IService`
+  - Controllers: `IController`
 
-```bash
-npm run test:url --url=http://your-api-url/api/register
-```
+### Functions and Variables
 
-2. Using the API_BASE_URL environment variable directly:
+- Use camelCase for function and variable names
+- Use descriptive names that indicate purpose
+- Prefix private methods with underscore
 
-```bash
-API_BASE_URL=http://your-api-url/api/register npm test
-```
+## Code Organization
 
-The default base URL is '/api/register' if none is specified.
+### Controllers
 
-## Test Structure
+- Handle HTTP requests and responses
+- Validate input data (using custom middleware, not express-validator)
+- Call appropriate services
+- Format responses
+- Handle errors
 
-The tests are located in `routes/__tests__/register.test.ts` and cover the following endpoints:
+### Services
 
-- GET / - List paginated register places
-- GET /:id - Get place details with descriptions
-- GET /:id/photos - Get photos for a place
-- GET /:id/photos/:photoId - Get a specific photo file
+- Contain business logic
+- Handle data operations
+- Interact with external services
+- Implement caching where needed
 
-## Development Notes
+### Models
 
-- The tests use mock services for development purposes
-- Some tests are currently commented out due to pending status code handling improvements
-- The test suite uses Jest and Supertest for testing Express routes
+- Define data structures (see `RegisterPlace` and API response models)
+- Include validation rules (type-checked)
+- Document relationships
+- Include type definitions
+
+### Routes
+
+- Define API endpoints
+- Group related endpoints
+- Include middleware (custom validation, error handling)
+- Document route parameters
+
+## Validation
+
+- Input validation is handled by custom middleware (see `register-routes.ts`)
+- No longer uses `express-validator`
+- All input is type-checked and validated for correctness
+
+## Testing
+
+- Unit and integration tests are in `__tests__/`
+- Use Jest and Supertest for testing
+- Contract testing supported: run tests against any API URL using:
+  ```sh
+  npm run test:url --url=https://heritage.yukon.ca/api/register
+  ```
+
+## Future Improvements
+
+- [ ] Implement proper logging system
+- [ ] Add request rate limiting
+- [ ] Implement caching strategy
+- [ ] Add API documentation using Swagger/OpenAPI
+- [ ] Set up monitoring and metrics
+- [ ] Add more contract tests for API compatibility

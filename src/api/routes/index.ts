@@ -1,3 +1,2 @@
-export * from "./data";
-export * from "./register";
-export * from "./user";
+export * from "./data-routes";
+export * from "./register-routes";
