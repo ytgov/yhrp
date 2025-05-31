@@ -72,9 +72,9 @@
   <v-main>
     <!-- Provides the application the proper gutter -->
     <!-- fill-height causes the main content to fill the entire page -->
-    <v-container fluid class="page-wrapper fill-height">
-      <router-view></router-view>
-    </v-container>
+    <!-- <v-container fluid class=""> -->
+    <router-view></router-view>
+    <!-- </v-container> -->
   </v-main>
 
   <v-overlay v-model="showOverlay" class="align-center justify-center">
