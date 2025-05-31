@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 100%; width: 100%">
+  <div class="map-container">
     <v-navigation-drawer
       absolute
       temporary
@@ -30,7 +30,6 @@
 </template>
 
 <script>
-import { MAPS_URL } from "@/urls";
 import { loadModules } from "esri-loader";
 import { useMapService } from "../services/mapService";
 
@@ -67,14 +66,18 @@ export default {
   },
   mounted() {
     let parent = this;
-    let resp = {};
-    resp.token = this.loadToken;
+
+    // Ensure map container exists and has dimensions
+    const mapContainer = document.getElementById("map");
+    if (!mapContainer) {
+      console.error("Map container not found");
+      return;
+    }
 
     // lazy load the required ArcGIS API for JavaScript modules and CSS
     loadModules(
       [
         "esri/Map",
-        "esri/identity/IdentityManager",
         "esri/views/MapView",
         "esri/widgets/Search",
         "esri/widgets/Legend",
@@ -82,163 +85,174 @@ export default {
         "esri/widgets/BasemapGallery",
         "esri/widgets/Bookmarks",
         "esri/webmap/Bookmark",
-        "esri/config",
       ],
       { css: true }
-    ).then(
-      ([
-        ArcGISMap,
-        IdentityManager,
-        MapView,
-        Search,
-        Legend,
-        FeatureLayer,
-        BasemapGallery,
-        Bookmarks,
-        Bookmark,
-        config,
-      ]) => {
-        const map = new ArcGISMap({
-          basemap: "topo-vector",
-        });
-        IdentityManager.registerToken({
-          server: "https://yukon.maps.arcgis.com",
-          token: resp.access_token,
-        });
-        IdentityManager.registerToken({
-          server: `${MAPS_URL}/sites`,
-          token: resp.access_token,
-        });
+    )
+      .then(
+        async ([
+          ArcGISMap,
+          MapView,
+          Search,
+          Legend,
+          FeatureLayer,
+          BasemapGallery,
+          Bookmarks,
+          Bookmark,
+        ]) => {
+          try {
+            const map = new ArcGISMap({
+              basemap: "topo-vector",
+            });
 
-        config.request.interceptors.push({
-          urls: `${MAPS_URL}/sites`,
-          before: function (params) {
-            params.requestOptions.withCredentials = true;
-          },
-        });
+            const view = new MapView({
+              container: mapContainer,
+              map: map,
+              center: [-135.5, 60.45],
+              zoom: 6,
+              popup: {
+                dockEnabled: true,
+                buttonEnabled: false,
+              },
+            });
 
-        const view = new MapView({
-          container: this.$el,
-          map: map,
-          center: [-135.5, 60.45],
-          zoom: 6,
-          popup: {
-            dockEnabled: true,
-            buttonEnabled: false,
-          },
-        });
+            // Wait for view to load
+            await view.when();
 
-        var settingWidget = document.createElement("div");
-        settingWidget.title = "Map settings";
-        settingWidget.className =
-          "esri-icon-drag-horizontal esri-widget--button esri-widget esri-interactive esri-settings";
-        settingWidget.addEventListener("click", function () {
-          parent.showSidebar();
-        });
+            var settingWidget = document.createElement("div");
+            settingWidget.title = "Map settings";
+            settingWidget.className =
+              "esri-icon-drag-horizontal esri-widget--button esri-widget esri-interactive esri-settings";
+            settingWidget.addEventListener("click", function () {
+              parent.showSidebar();
+            });
 
-        const searchWidget = new Search({
-          view: view,
-          includeDefaultSources: false,
-          sources: [],
-          allPlaceholder: "Search for a site ",
-        });
+            const searchWidget = new Search({
+              view: view,
+              includeDefaultSources: false,
+              sources: [],
+              allPlaceholder: "Search for a site ",
+            });
 
-        view.ui.add([
-          {
-            component: settingWidget,
-            position: "manual",
-          },
-          { component: searchWidget, position: "manual" },
-        ]);
+            view.ui.add([
+              {
+                component: settingWidget,
+                position: "manual",
+              },
+              { component: searchWidget, position: "manual" },
+            ]);
 
-        let viewSiteAction = {
-          title: "View site details",
-          id: "view-site",
-          className: "esri-icon-visible",
-        };
-        let viewSiteActionFR = {
-          title: "Regardez les détails du site",
-          id: "view-site-fr",
-          className: "esri-icon-visible",
-        };
-        var YHSIpopup = {
-          title: "{SITE_NAME}",
-          content: [
-            {
-              type: "fields",
-              fieldInfos: [
+            let viewSiteAction = {
+              title: "View site details",
+              id: "view-site",
+              className: "esri-icon-visible",
+            };
+            let viewSiteActionFR = {
+              title: "Regardez les détails du site",
+              id: "view-site-fr",
+              className: "esri-icon-visible",
+            };
+            var YHSIpopup = {
+              title: "{SITE_NAME}",
+              content: [
                 {
-                  fieldName: "YHSI_ID",
-                  label: "YHSI ID",
-                },
-                {
-                  fieldName: "SITE_NAME",
-                  label: "Site Name",
-                },
-              ],
-            },
-            {
-              type: "media",
-              width: "1000px",
-              mediaInfos: [
-                {
-                  type: "image",
-                  value: {
-                    // sourceURL: this.photoURL(),
-                    function(feature) {
-                      console.log(feature);
-                      return parent.photoURL(
-                        feature.graphic.attributes.YHSI_ID
-                      );
+                  type: "fields",
+                  fieldInfos: [
+                    {
+                      fieldName: "YHSI_ID",
+                      label: "YHSI ID",
                     },
-                  },
+                    {
+                      fieldName: "SITE_NAME",
+                      label: "Site Name",
+                    },
+                    {
+                      fieldName: "SITE_TYPE",
+                      label: "Site Type",
+                    },
+                    {
+                      fieldName: "LATITUDE_DD",
+                      label: "Latitude",
+                      format: {
+                        places: 6,
+                        digitSeparator: true,
+                      },
+                    },
+                    {
+                      fieldName: "LONGITUDE_DD",
+                      label: "Longitude",
+                      format: {
+                        places: 6,
+                        digitSeparator: true,
+                      },
+                    },
+                  ],
                 },
               ],
-            },
-          ],
-          overwriteActions: true,
-          actions: [viewSiteAction, viewSiteActionFR],
-        };
-        var sites = new FeatureLayer({
-          url: "https://mapservices.gov.yk.ca/arcgis/rest/services/GeoYukon/GY_CultureHeritage/MapServer/0",
-          popupTemplate: YHSIpopup,
-          outFields: ["YHSI_ID"],
-        });
+              overwriteActions: true,
+              actions: [viewSiteAction, viewSiteActionFR],
+            };
+            var sites = new FeatureLayer({
+              url: "https://mapservices.gov.yk.ca/arcgis/rest/services/GeoYukon/GY_CultureHeritage/MapServer/0",
+              popupTemplate: YHSIpopup,
+              outFields: [
+                "YHSI_ID",
+                "SITE_NAME",
+                "SITE_TYPE",
+                "LATITUDE_DD",
+                "LONGITUDE_DD",
+              ],
+              definitionExpression: "SITE_TYPE IS NOT NULL",
+            });
 
-        new Legend({
-          view: view,
-          container: "legend",
-        });
-        new BasemapGallery({
-          view: view,
-          container: "gallery",
-        });
+            // Add sites layer to map
+            map.add(sites);
 
-        const bookmarks = this.bookmarks.map((x) => new Bookmark(x));
+            // Add widgets after view is loaded
+            new Legend({
+              view: view,
+              container: "legend",
+            });
 
-        new Bookmarks({
-          view: view,
-          container: "bookmarks",
-          editingEnabled: false,
-          bookmarks: bookmarks,
-        });
+            new BasemapGallery({
+              view: view,
+              container: "gallery",
+            });
 
-        searchWidget.sources.push({
-          layer: sites,
-          searchFields: ["YHSI_ID", "SITE_NAME"],
-          suggestionTemplate: "{SITE_NAME}",
-        });
+            const bookmarks = this.bookmarks.map((x) => new Bookmark(x));
 
-        map.add(sites);
-      }
-    );
+            new Bookmarks({
+              view: view,
+              container: "bookmarks",
+              editingEnabled: false,
+              bookmarks: bookmarks,
+            });
+
+            searchWidget.sources.push({
+              layer: sites,
+              searchFields: ["YHSI_ID", "SITE_NAME"],
+              suggestionTemplate: "{SITE_NAME}",
+            });
+          } catch (error) {
+            console.error("Error initializing map:", error);
+          }
+        }
+      )
+      .catch((error) => {
+        console.error("Error loading ArcGIS modules:", error);
+      });
   },
 };
 </script>
 <style>
+.map-container {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+}
+
 .map {
-  /* height: 100%;
-  width: 100%; */
+  height: 100%;
+  width: 100%;
   border: 1px #ddd solid;
 }
 
