@@ -7,13 +7,23 @@ import mockPlaces from "../data/mock/places.json";
 // Types
 /**
  * @typedef {Object} Place
- * @property {string} id - Unique identifier
+ * @property {number} placeId - Unique identifier
  * @property {string} name - Place name
+ * @property {string} location - Community/location name
  * @property {string} description - Place description
- * @property {string} [image] - Base64 encoded image
- * @property {Object} location - Location coordinates
- * @property {number} location.lat - Latitude
- * @property {number} location.lng - Longitude
+ * @property {Array<number>} coordinates - [latitude, longitude]
+ * @property {Array<Object>} designations - Array of designations
+ * @property {string} designations[].level - Designation level
+ * @property {string} designations[].date - Designation date
+ * @property {string} designations[].bylaw - Bylaw number
+ * @property {Array<string>} designations[].reasons - Reasons for designation
+ * @property {Array<Object>} heritageValues - Array of heritage values
+ * @property {string} heritageValues[].title - Section title
+ * @property {Array<string>} heritageValues[].items - Section items
+ * @property {string} culturalHistory - Cultural history text
+ * @property {Array<Object>} historicalSources - Array of historical sources
+ * @property {string} historicalSources[].title - Source collection title
+ * @property {Array<string>} historicalSources[].items - Source items
  */
 
 /**
@@ -27,6 +37,38 @@ import mockPlaces from "../data/mock/places.json";
  */
 
 /**
+ * Transform raw place data into the format expected by the UI
+ * @param {Object} place - Raw place data from mock
+ * @returns {Place} Transformed place data
+ */
+function transformPlace(place) {
+  // Ensure we have a valid placeId
+  const placeId = place.placeId || place.id;
+  if (!placeId) {
+    console.warn("Missing placeId in place data:", place);
+  }
+
+  return {
+    placeId: placeId,
+    id: placeId, // Add id for backward compatibility
+    name: place.name,
+    location: place.location,
+    description: place.description,
+    coordinates: place.coordinates,
+    designations: place.designations || [],
+    heritageValues: (place.heritageValues || []).map((value) => ({
+      title: value.title,
+      items: Array.isArray(value.content) ? value.content : [value.content],
+    })),
+    culturalHistory: place.culturalHistory,
+    historicalSources: (place.historicalSources || []).map((source) => ({
+      title: source.title,
+      items: Array.isArray(source.content) ? source.content : [source.content],
+    })),
+  };
+}
+
+/**
  * Fetch places with pagination
  * @param {Object} params - Query parameters
  * @param {number} params.page - Page number
@@ -37,7 +79,7 @@ import mockPlaces from "../data/mock/places.json";
 export async function fetchPlaces() {
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 500));
-  return mockPlaces;
+  return mockPlaces.map(transformPlace);
 }
 
 /**
@@ -48,9 +90,9 @@ export async function fetchPlaces() {
 export async function fetchPlaceById(id) {
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 500));
-  const place = mockPlaces.find((p) => p.id === parseInt(id));
+  const place = mockPlaces.find((p) => p.placeId === parseInt(id));
   if (!place) {
     throw new Error("Place not found");
   }
-  return place;
+  return transformPlace(place);
 }
