@@ -36,20 +36,20 @@ This document outlines the plan for cleaning up and reorganizing the YHRP Site R
         - [x] Move Migration Tasks.md content to README.md
         - [x] Ensure consistent naming in all directories
       - [ ] Places Module
-        - [ ] Add services directory for API integration
-        - [ ] Add README.md
-        - [ ] Ensure consistent naming in all directories
+        - [x] Add services directory for API integration
+        - [x] Add README.md
+        - [x] Ensure consistent naming in all directories
         - [x] Temporarily use mock data while API integration is pending
         - [x] Clean up Places.vue component
         - [ ] Future Work (TODOs)
           - [ ] Complete backend API implementation
-          - [ ] Convert axios calls to fetch
-          - [ ] Add proper error handling and loading states
-          - [ ] Implement proper data fetching with pagination
+          - [x] Convert axios calls to fetch
+          - [x] Add proper error handling and loading states
+          - [x] Implement proper data fetching with pagination
           - [ ] Re-implement original API functionality:
             - [ ] Image base64 conversion
             - [ ] Proper pagination handling
-            - [ ] Error handling for API responses
+            - [x] Error handling for API responses
       - [ ] Home Module
         - [ ] Remove empty store directory
         - [ ] Add data and services directories
