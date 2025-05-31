@@ -56,6 +56,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored markdown parser for better maintainability
 - Improved heritage values and historical sources parsing
 - Enhanced data transformation in Places API service
+- Refactored backend validation: removed `express-validator` and implemented custom middleware for input validation.
+- Standardized and documented API response models, including `RegisterPlace` and paginated response types.
+- Improved type safety and contract alignment with the YHSI reference API.
+- Updated test suite to support contract testing against any compatible API endpoint using the `test:url` script.
+- Cleaned up unused models (`auth`, `user`) and related code.
+- Ensured all API responses use consistent error handling and type-checked data.
 
 ### Removed
 
