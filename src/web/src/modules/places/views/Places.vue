@@ -17,47 +17,14 @@
       <v-col
         v-for="(item, i) in placesList.slice(0, 6)"
         :key="`photo-${i}`"
-        class="child-flex"
         cols="4"
       >
-        <v-hover>
-          <template v-slot="{ isHovering, props }">
-            <v-card elevation="5" v-bind="props">
-              <v-card-title>{{ item.Community || "" }} </v-card-title>
-
-              <!-- <v-overlay absolute color="#036358"> -->
-
-              <v-card flat class="mx-auto">
-                <v-img
-                  :src="photoURL(item.PlaceId)"
-                  class="white--text align-end"
-                  aspect-ratio="1"
-                  cover
-                >
-                </v-img>
-
-                <v-card-actions>
-                  <v-card-subtitle v-if="selectedSorter == 0">
-                    {{ item.PrimaryName }}
-                  </v-card-subtitle>
-                  <v-card-subtitle v-else>
-                    {{ item.PrimaryName }}</v-card-subtitle
-                  >
-                </v-card-actions>
-              </v-card>
-              <v-overlay
-                persistent
-                contained
-                :model-value="isHovering"
-                class="align-center justify-center"
-              >
-                <div>
-                  <v-btn @click="handleClick(item)">View Place</v-btn>
-                </div>
-              </v-overlay>
-            </v-card>
-          </template>
-        </v-hover>
+        <place-card
+          :image-url="photoURL(item.PlaceId)"
+          :title="item.Community"
+          :subtitle="item.PrimaryName"
+          @click="handleClick(item)"
+        />
       </v-col>
     </v-row>
     <v-row v-if="loading">
@@ -77,12 +44,13 @@
   </v-container>
 </template>
 <script>
+import PlaceCard from "../components/PlaceCard.vue";
 import QueryMultiSelect from "../components/QueryMultiSelect.vue";
 import localData from "../data/places";
 
 export default {
   name: "HistoricPlaces",
-  components: { QueryMultiSelect },
+  components: { QueryMultiSelect, PlaceCard },
   props: {
     initialPage: {
       type: Number,

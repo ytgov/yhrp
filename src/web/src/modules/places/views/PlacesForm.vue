@@ -1,27 +1,29 @@
 <template>
-  <v-app-bar flat class="pr-4 text-grey-darken-1">
-    <v-spacer />
-    <v-tooltip text="English">
-      <template v-slot:activator="{ props }">
-        <span
-          v-bind="props"
-          class="text-body-1 font-weight-bold"
-          @click="lang('EN')"
-          >EN</span
-        ></template
-      ></v-tooltip
-    >|
-    <v-tooltip text="Français">
-      <template v-slot:activator="{ props }">
-        <span
-          v-bind="props"
-          class="text-body-1 font-weight-bold"
-          @click="lang('FR')"
-          >FR</span
-        ></template
-      ></v-tooltip
-    >
+  <v-app-bar flat class="text-grey-darken-1">
+    <template v-slot:append>
+      <v-tooltip text="English">
+        <template v-slot:activator="{ props }">
+          <span
+            v-bind="props"
+            class="text-body-1 font-weight-bold"
+            @click="lang('EN')"
+            >EN</span
+          ></template
+        ></v-tooltip
+      >|
+      <v-tooltip text="Français">
+        <template v-slot:activator="{ props }">
+          <span
+            v-bind="props"
+            class="text-body-1 font-weight-bold"
+            @click="lang('FR')"
+            >FR</span
+          ></template
+        ></v-tooltip
+      >
+    </template>
   </v-app-bar>
+
   <v-container width="100%" class="">
     <v-row justify="center">
       <v-col cols="9">
