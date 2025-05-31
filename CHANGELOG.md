@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Places module API service with mock data integration
 - Proper error handling and loading states in Places views
 - Pagination support for places list
+- New services directory for Places module
 
 ### Changed
 
@@ -40,6 +41,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added request/response type definitions
   - Added loading and error states
 - Updated build and development configuration.
+- Updated Places view to use transformed API data structure
+- Improved route parameter naming for consistency
+- Removed 6-item limit on places list display
+- Removed unused dependencies (axios, roboto-fontface)
 
 ### Removed
 
@@ -59,6 +64,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed layout bug introduced by package upgrade.
 - Fixed router for maps.
 - Fixed build pipeline issues.
+- Property name mismatches between API service and views
+- Error handling in Places view data fetching
 
 ## [Previous Version]
 
