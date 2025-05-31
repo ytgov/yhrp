@@ -184,13 +184,12 @@
 // import MapLoader from "../components/MapLoader";
 // import BasicMap from "@/modules/components/BasicMap";
 
-import { REGISTER_URL } from "@/urls";
-import axios from "axios";
+import { fetchPlaceById } from "../services/placesApi";
 
 export default {
   name: "PlacesForm",
   props: {
-    name: {
+    placeId: {
       type: String,
       required: true,
     },
@@ -228,151 +227,76 @@ export default {
     selectedImage: null,
     photos: [1, 2, 3, 4],
     infoLoaded: false,
-    localPlaceId: "",
+    loading: false,
+    error: null,
   }),
   computed: {
     currentPlaceId() {
-      return this.name;
+      return this.placeId;
     },
     printData() {
-      let printData = {};
-
-      printData.primaryName = this.primaryName;
-      printData.communityName = this.communityName;
-      printData.latitude = this.latitude;
-      printData.longitude = this.longitude;
-      printData.recognitionDate = this.recognitionDate;
-      printData.designations = this.designations;
-
-      printData = Object.assign(
-        {},
-        printData,
-        this.fieldsByLang[this.currentLang]
-      );
-      return printData;
+      return {
+        primaryName: this.primaryName,
+        communityName: this.communityName,
+        latitude: this.latitude,
+        longitude: this.longitude,
+        recognitionDate: this.recognitionDate,
+        designations: this.designations,
+        ...this.fieldsByLang[this.currentLang],
+      };
     },
   },
-  created() {
-    // TODO: API Integration
-    // 1. Complete backend API implementation
-    // 2. Convert to use axios for all API calls
-    // 3. Add proper error handling and loading states
-    // 4. Implement proper data fetching for place details and photos
-    this.loadPlaceData();
-    if (this.$route.params.id) {
-      localStorage.currentPlaceId = this.$route.params.id;
-    }
-    this.localPlaceId = localStorage.currentPlaceId;
+  watch: {
+    currentPlaceId: {
+      immediate: true,
+      handler(newId) {
+        if (newId) {
+          this.fetchPlaceDetails();
+        }
+      },
+    },
   },
   methods: {
-    async loadPlaceData() {
-      // TODO: Implement API integration
-      // Temporarily using mock data until API is ready
-      this.primaryName = "Sample Place";
-      this.communityName = "Sample Community";
-      this.latitude = "60.7212";
-      this.longitude = "-135.0568";
-      this.recognitionDate = "2024-01-01";
-      this.designations = "Sample Designation";
+    async fetchPlaceDetails() {
+      this.loading = true;
+      this.error = null;
 
-      this.fieldsByLang.En = {
-        placeDescription: "Sample English description",
-        heritageValue: "Sample English heritage value",
-        characterDef: "Sample English character definition",
-        descBound: "Sample English boundary description",
-        additionalInfo: "Sample English additional information",
-      };
-
-      this.fieldsByLang.Fr = {
-        placeDescription: "Description en français",
-        heritageValue: "Valeur patrimoniale en français",
-        characterDef: "Définition du caractère en français",
-        descBound: "Description des limites en français",
-        additionalInfo: "Informations supplémentaires en français",
-      };
-
-      this.infoLoaded = true;
-
-      /* Original API call - to be implemented
       try {
-        const response = await axios.get(
-          `${REGISTER_URL}/places/${this.currentPlaceId}`
-        );
-        const data = response.data;
-        // ... rest of the implementation
+        const place = await fetchPlaceById(this.currentPlaceId);
+
+        // Update place details
+        this.primaryName = place.name;
+        this.communityName = place.community;
+        this.latitude = place.location.lat;
+        this.longitude = place.location.lng;
+        this.recognitionDate = place.recognitionDate;
+        this.designations = place.designations;
+
+        // Update language fields
+        this.fieldsByLang.En.placeDescription = place.description;
+        this.fieldsByLang.Fr.placeDescription = place.description; // TODO: Add French description when available
+
+        // TODO: Add other fields when available in the API
+        // this.fieldsByLang.En.heritageValue = place.heritageValueEn;
+        // this.fieldsByLang.Fr.heritageValue = place.heritageValueFr;
+        // etc...
+
+        this.infoLoaded = true;
       } catch (error) {
-        console.error("Error loading place data:", error);
+        console.error("Error fetching place details:", error);
+        this.error = "Failed to load place details";
+      } finally {
+        this.loading = false;
       }
-      */
     },
-    lang(locale) {
-      this.currentLang = locale === "EN" ? "En" : "Fr";
+    photoURL(index) {
+      return `http://register.yukonhistoricplaces.ca/Images/Places/${this.currentPlaceId}/${index}.jpg`;
     },
-    photoURL(photoIndex) {
-      return `http://register.yukonhistoricplaces.ca/Images/Places/${this.currentPlaceId}/${photoIndex}.jpg`;
+    handleClick(lang) {
+      this.currentLang = lang;
     },
-    handleClick(value) {
-      this.currentLang = value;
-    },
-    checkPath(word) {
-      let path = this.$route.path.split("/");
-      if (path[2] == word) {
-        return true;
-      }
-      return false;
-    },
-    loadItem(id) {
-      axios
-        .get(`${REGISTER_URL}/${id}`)
-        .then((resp) => {
-          this.setPlace(resp.data);
-        })
-        .catch((error) => console.error(error));
-      axios
-        .get(`${REGISTER_URL}/${id}/photos`)
-        .then((resp) => {
-          this.setPhotos(resp.data);
-        })
-        .catch((error) => console.error(error));
-    },
-    setPhotos(photos) {
-      this.photos = photos.data.map((x) => {
-        x.ThumbFile.base64 = `data:image/png;base64,${this.toBase64(
-          x.ThumbFile.data
-        )}`;
-        return x;
-      });
-    },
-    toBase64(arr) {
-      return btoa(
-        arr.reduce((data, byte) => data + String.fromCharCode(byte), "")
-      );
-    },
-    setPlace({ data: place }) {
-      this.primaryName = place.primaryName || "";
-      this.communityName = place.communityName || "";
-      this.latitude = place.latitude || "";
-      this.longitude = place.longitude || "";
-      this.recognitionDate = place.recognitionDate || "";
-      this.designations = place.designations || "";
-
-      this.fieldsByLang.En = {
-        placeDescription: place.placeDescriptionEn || "",
-        heritageValue: place.heritageValueEn || "",
-        characterDef: place.characterDefEn || "",
-        descBound: place.descBoundEn || "",
-        additionalInfo: place.additionalInfoEn || "",
-      };
-
-      this.fieldsByLang.Fr = {
-        placeDescription: place.placeDescriptionFr || "",
-        heritageValue: place.heritageValueFr || "",
-        characterDef: place.characterDefFr || "",
-        descBound: place.descBoundFr || "",
-        additionalInfo: place.additionalInfoFr || "",
-      };
-
-      this.infoLoaded = true;
+    lang(lang) {
+      this.currentLang = lang;
     },
   },
 };

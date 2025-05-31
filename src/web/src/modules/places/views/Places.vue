@@ -13,22 +13,36 @@
     ></query-multi-select>
   </v-app-bar>
   <v-container>
-    <v-row v-if="!loading">
-      <v-col
-        v-for="(item, i) in placesList.slice(0, 6)"
-        :key="`photo-${i}`"
-        cols="4"
-      >
+    <v-row v-if="loading">
+      <v-col cols="12" class="text-center">
+        <v-progress-circular
+          indeterminate
+          color="primary"
+          class="mt-4"
+        ></v-progress-circular>
+      </v-col>
+    </v-row>
+    <v-row v-else-if="error">
+      <v-col cols="12" class="text-center">
+        <v-alert type="error" class="mt-4">
+          {{ error }}
+        </v-alert>
+      </v-col>
+    </v-row>
+    <v-row v-else-if="placesList.length === 0">
+      <v-col cols="12" class="text-center">
+        <v-alert type="info" class="mt-4"> No places found </v-alert>
+      </v-col>
+    </v-row>
+    <v-row v-else>
+      <v-col v-for="(item, i) in placesList" :key="`photo-${i}`" cols="4">
         <place-card
-          :image-url="photoURL(item.PlaceId)"
-          :title="item.Community"
-          :subtitle="item.PrimaryName"
+          :image-url="photoURL(item.id)"
+          :title="item.community"
+          :subtitle="item.name"
           @click="handleClick(item)"
         />
       </v-col>
-    </v-row>
-    <v-row v-if="loading">
-      <div class="loading">Loading...</div>
     </v-row>
     <v-row class="mb-2" v-if="!loading">
       <v-col>
@@ -46,7 +60,7 @@
 <script>
 import PlaceCard from "../components/PlaceCard.vue";
 import QueryMultiSelect from "../components/QueryMultiSelect.vue";
-import localData from "../data/places";
+import { fetchPlaces } from "../services/placesApi";
 
 export default {
   name: "HistoricPlaces",
@@ -67,12 +81,13 @@ export default {
     sortOptions: [],
     photos: [],
     sortedData: [],
-    numberOfPages: 10,
+    numberOfPages: 1,
     page: 1,
     totalLength: 0,
     page_size: 12,
     placesList: [],
     loading: false,
+    error: null,
     queryRules: [],
     queryBuilder: { children: [] },
     queryLabels: {
@@ -100,69 +115,42 @@ export default {
     },
   },
   mounted() {
-    this.placesList = localData.PlacesList;
     this.page = this.initialPage;
     this.page_size = this.pageSize;
+    this.getDataFromApi();
   },
   methods: {
-    photoURL(siteID) {
-      return `http://register.yukonhistoricplaces.ca/Images/Places/${siteID}/1.jpg`;
+    photoURL(placeId) {
+      return `http://register.yukonhistoricplaces.ca/Images/Places/${placeId}/1.jpg`;
     },
-    handleClick(value) {
+    handleClick(place) {
       this.$router.push({
         name: "placeView",
-        params: { name: value.PlaceId },
+        params: { placeId: place.id },
       });
     },
     async getDataFromApi() {
       this.loading = true;
+      this.error = null;
       this.buildQueryBody();
 
-      // TODO: API Integration
-      // 1. Complete backend API implementation
-      // 2. Convert axios calls to fetch
-      // 3. Add proper error handling and loading states
-      // 4. Implement proper data fetching with pagination
-
-      // Temporarily using local data until API is ready
-      this.placesList = localData.PlacesList;
-      this.totalLength = this.placesList.length;
-      this.numberOfPages = Math.ceil(this.totalLength / this.page_size);
-      this.loading = false;
-
-      /* Original API implementation - to be implemented
       try {
-        const resp = await axios.get(`${REGISTER_URL}/`, {
-          params: { page: this.page },
+        const response = await fetchPlaces({
+          page: this.page,
+          pageSize: this.page_size,
+          search: this.search,
         });
 
-        const placesThumbs = get(resp, "data.data", []);
-
-        this.photos = placesThumbs.map((item) => {
-          if (get(item, "ThumbFile.data", "")) {
-            item.ThumbFile.base64 = `data:image/png;base64,${this.toBase64(
-              item.ThumbFile.data
-            )}`;
-          } else {
-            item = { ...item, ThumbFile: { base64: placeholderBase64 } };
-          }
-          return item;
-        });
-
-        this.totalLength = resp.data.meta.item_count;
-        this.numberOfPages = resp.data.meta.page_count;
-        this.page_size = resp.data.meta.page_size;
-      } catch (err) {
-        console.error("Error in getDataFromApi: " + err);
+        this.placesList = response.data;
+        this.totalLength = response.meta.item_count;
+        this.numberOfPages = response.meta.page_count;
+        this.page_size = response.meta.page_size;
+      } catch (error) {
+        console.error("Error fetching places:", error);
+        this.error = "Failed to load places. Please try again later.";
       } finally {
         this.loading = false;
       }
-      */
-    },
-    toBase64(arr) {
-      return btoa(
-        arr.reduce((data, byte) => data + String.fromCharCode(byte), "")
-      );
     },
     runQuery() {
       this.getDataFromApi();
@@ -203,20 +191,20 @@ export default {
       return this.placesList.length;
     },
     sortByName() {
-      return this.photos
+      return this.placesList
         .slice()
         .sort((a, b) =>
-          !a.featureName || !b.featureName
+          !a.name || !b.name
             ? 0
-            : a.featureName.toLowerCase() > b.featureName.toLowerCase()
+            : a.name.toLowerCase() > b.name.toLowerCase()
             ? 1
-            : b.featureName.toLowerCase() > a.featureName.toLowerCase()
+            : b.name.toLowerCase() > a.name.toLowerCase()
             ? -1
             : 0
         );
     },
     sortByRating() {
-      return this.photos
+      return this.placesList
         .slice()
         .sort((a, b) =>
           !a.rating || !b.rating
@@ -229,21 +217,17 @@ export default {
         );
     },
     sortByAge: function () {
-      //let photos =JSON.parse(JSON.stringify(this.photos));
-      return (
-        this.photos
-          //.filter((a) => a.featureName.toLowerCase().includes(this.search.toLowerCase()))
-          .slice()
-          .sort((a, b) =>
-            !a.dateCreated || !b.dateCreated
-              ? 0
-              : a.dateCreated > b.dateCreated
-              ? 1
-              : b.dateCreated > a.dateCreated
-              ? -1
-              : 0
-          )
-      );
+      return this.placesList
+        .slice()
+        .sort((a, b) =>
+          !a.recognitionDate || !b.recognitionDate
+            ? 0
+            : a.recognitionDate > b.recognitionDate
+            ? 1
+            : b.recognitionDate > a.recognitionDate
+            ? -1
+            : 0
+        );
     },
     queryBuilderEmpty: function () {
       return (
