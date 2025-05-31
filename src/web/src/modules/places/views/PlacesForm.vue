@@ -1,5 +1,20 @@
 <template>
   <v-app-bar flat class="text-grey-darken-1">
+    <v-breadcrumbs
+      :items="[
+        {
+          title: 'Places',
+          disabled: false,
+          to: '/places',
+        },
+        {
+          title: currentPlace?.name || '',
+          disabled: true,
+        },
+      ]"
+      divider=">"
+    >
+    </v-breadcrumbs>
     <template v-slot:append>
       <v-tooltip text="English">
         <template v-slot:activator="{ props }">
@@ -43,11 +58,6 @@
           >English</v-btn
         >
         <v-btn class="mx-1 form-header">Print</v-btn>
-        <!-- <PrintButton
-              :data="printData"
-              :name="printData.primaryName"
-              class="mx-1 form-header"
-            /> -->
       </v-col>
     </v-row>
 
@@ -55,14 +65,6 @@
       <v-col cols="8">
         <v-card>
           <v-carousel cycle height="500">
-            <!-- <v-carousel-item
-              v-for="(photo, i) in photos"
-              :key="i"
-              :src="photo.ThumbFile.base64"
-              reverse-transition="fade-transition"
-              transition="fade-transition"
-              hide-delimiter-background
-            ></v-carousel-item> -->
             <v-carousel-item
               v-for="(photo, i) in photos"
               :key="i"
@@ -72,27 +74,20 @@
               hide-delimiter-background
             ></v-carousel-item>
           </v-carousel>
-          <!-- everytime the image changes it bumps the user to the top of the screen, need to fix so that doesn't happen. Annoying when trying to read the boundary description-->
         </v-card>
       </v-col>
       <v-col cols="4">
         <v-card color="#BDBDBD" class="mx-auto" height="500">
           <div style="height: 500">Map will go here</div>
-          <!-- <BasicMap></BasicMap> -->
-          <!-- <MapLoader
-                v-if="infoLoaded"
-                :fields="{
-                  lat: latitude,
-                  long: longitude,
-                }"
-                height="500"
-              /> -->
         </v-card>
       </v-col>
     </v-row>
     <v-row>
       <v-col>
         <h4>{{ primaryName }}</h4>
+        <div class="text-subtitle-1">
+          {{ currentPlace?.constructionPeriod }}
+        </div>
       </v-col>
     </v-row>
     <v-row>
@@ -103,11 +98,23 @@
               Designation
             </v-expansion-panel-title>
             <v-expansion-panel-text>
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eius
-              dolor obcaecati temporibus totam aut at aliquid, fugit, qui
-              consequuntur eum asperiores minima exercitationem dolorem,
-              accusantium illum corrupti distinctio enim repudiandae!
-              {{ designations }}
+              <div
+                v-for="(designation, index) in currentPlace?.designations"
+                :key="index"
+              >
+                <div class="text-subtitle-1">{{ designation.level }}</div>
+                <div>Date: {{ designation.date }}</div>
+                <div>Bylaw: {{ designation.bylaw }}</div>
+                <div>Reasons:</div>
+                <ul>
+                  <li
+                    v-for="(reason, rIndex) in designation.reasons"
+                    :key="rIndex"
+                  >
+                    {{ reason }}
+                  </li>
+                </ul>
+              </div>
             </v-expansion-panel-text>
           </v-expansion-panel>
 
@@ -116,10 +123,6 @@
               Place Description
             </v-expansion-panel-title>
             <v-expansion-panel-text>
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Voluptas
-              dolorem distinctio, quam necessitatibus reprehenderit eaque rerum
-              quasi omnis totam architecto, facere quaerat! Ducimus voluptates
-              sapiente fuga cum nobis in vitae.
               {{ fieldsByLang[currentLang].placeDescription }}
             </v-expansion-panel-text>
           </v-expansion-panel>
@@ -129,10 +132,6 @@
               Heritage Value
             </v-expansion-panel-title>
             <v-expansion-panel-text>
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nisi
-              optio soluta odio recusandae eaque veritatis nihil fuga
-              blanditiis, dignissimos voluptatum quia cum vel laboriosam
-              quisquam perspiciatis error, placeat accusamus porro!
               {{ fieldsByLang[currentLang].heritageValue }}
               <div>
                 <v-expansion-panels class="pt-5">
@@ -141,21 +140,21 @@
                       color="#BDBDBD"
                       class="font-weight-black"
                     >
-                      Character Definition
+                      Character Defining Elements
                     </v-expansion-panel-title>
                     <v-expansion-panel-text>
-                      {{ fieldsByLang[currentLang].characterDef }}
-                    </v-expansion-panel-text>
-                  </v-expansion-panel>
-                  <v-expansion-panel>
-                    <v-expansion-panel-title
-                      color="#BDBDBD"
-                      class="font-weight-black"
-                    >
-                      Additional Information
-                    </v-expansion-panel-title>
-                    <v-expansion-panel-text>
-                      {{ fieldsByLang[currentLang].additionalInfo }}
+                      <ul>
+                        <li
+                          v-for="(
+                            item, index
+                          ) in currentPlace?.heritageValues?.find(
+                            (v) => v.title === 'Character Defining Elements'
+                          )?.content"
+                          :key="index"
+                        >
+                          {{ item }}
+                        </li>
+                      </ul>
                     </v-expansion-panel-text>
                   </v-expansion-panel>
                   <v-expansion-panel>
@@ -166,10 +165,51 @@
                       Description of Boundaries
                     </v-expansion-panel-title>
                     <v-expansion-panel-text>
-                      {{ fieldsByLang[currentLang].descBound }}
+                      <ul>
+                        <li
+                          v-for="(
+                            item, index
+                          ) in currentPlace?.heritageValues?.find(
+                            (v) => v.title === 'Description of Boundaries'
+                          )?.content"
+                          :key="index"
+                        >
+                          {{ item }}
+                        </li>
+                      </ul>
+                    </v-expansion-panel-text>
+                  </v-expansion-panel>
+                  <v-expansion-panel>
+                    <v-expansion-panel-title
+                      color="#BDBDBD"
+                      class="font-weight-black"
+                    >
+                      Cultural History
+                    </v-expansion-panel-title>
+                    <v-expansion-panel-text>
+                      {{ currentPlace?.culturalHistory }}
                     </v-expansion-panel-text>
                   </v-expansion-panel>
                 </v-expansion-panels>
+              </div>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+
+          <v-expansion-panel>
+            <v-expansion-panel-title color="primary" class="font-weight-black">
+              Historical Sources
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <div
+                v-for="(source, index) in currentPlace?.historicalSources"
+                :key="index"
+              >
+                <div class="text-subtitle-1">{{ source.title }}</div>
+                <ul>
+                  <li v-for="(item, i) in source.content" :key="i">
+                    {{ item }}
+                  </li>
+                </ul>
               </div>
             </v-expansion-panel-text>
           </v-expansion-panel>
@@ -184,15 +224,17 @@
 // import MapLoader from "../components/MapLoader";
 // import BasicMap from "@/modules/components/BasicMap";
 
-import { REGISTER_URL } from "@/urls";
-import axios from "axios";
+import { fetchPlaceById } from "../services/placesApi";
 
 export default {
   name: "PlacesForm",
   props: {
-    name: {
-      type: String,
+    placeId: {
+      type: [String, Number],
       required: true,
+      validator: (value) => {
+        return value !== undefined && value !== null && value !== "";
+      },
     },
   },
   components: {
@@ -228,151 +270,97 @@ export default {
     selectedImage: null,
     photos: [1, 2, 3, 4],
     infoLoaded: false,
-    localPlaceId: "",
+    loading: false,
+    error: null,
+    currentPlace: null,
   }),
   computed: {
     currentPlaceId() {
-      return this.name;
+      return this.placeId;
     },
     printData() {
-      let printData = {};
-
-      printData.primaryName = this.primaryName;
-      printData.communityName = this.communityName;
-      printData.latitude = this.latitude;
-      printData.longitude = this.longitude;
-      printData.recognitionDate = this.recognitionDate;
-      printData.designations = this.designations;
-
-      printData = Object.assign(
-        {},
-        printData,
-        this.fieldsByLang[this.currentLang]
-      );
-      return printData;
+      return {
+        primaryName: this.primaryName,
+        communityName: this.communityName,
+        latitude: this.latitude,
+        longitude: this.longitude,
+        recognitionDate: this.recognitionDate,
+        designations: this.designations,
+        ...this.fieldsByLang[this.currentLang],
+      };
     },
   },
-  created() {
-    // TODO: API Integration
-    // 1. Complete backend API implementation
-    // 2. Convert to use axios for all API calls
-    // 3. Add proper error handling and loading states
-    // 4. Implement proper data fetching for place details and photos
-    this.loadPlaceData();
-    if (this.$route.params.id) {
-      localStorage.currentPlaceId = this.$route.params.id;
-    }
-    this.localPlaceId = localStorage.currentPlaceId;
+  watch: {
+    currentPlaceId: {
+      immediate: true,
+      handler(newId) {
+        if (newId) {
+          this.fetchPlaceDetails();
+        }
+      },
+    },
   },
   methods: {
-    async loadPlaceData() {
-      // TODO: Implement API integration
-      // Temporarily using mock data until API is ready
-      this.primaryName = "Sample Place";
-      this.communityName = "Sample Community";
-      this.latitude = "60.7212";
-      this.longitude = "-135.0568";
-      this.recognitionDate = "2024-01-01";
-      this.designations = "Sample Designation";
-
-      this.fieldsByLang.En = {
-        placeDescription: "Sample English description",
-        heritageValue: "Sample English heritage value",
-        characterDef: "Sample English character definition",
-        descBound: "Sample English boundary description",
-        additionalInfo: "Sample English additional information",
-      };
-
-      this.fieldsByLang.Fr = {
-        placeDescription: "Description en français",
-        heritageValue: "Valeur patrimoniale en français",
-        characterDef: "Définition du caractère en français",
-        descBound: "Description des limites en français",
-        additionalInfo: "Informations supplémentaires en français",
-      };
-
-      this.infoLoaded = true;
-
-      /* Original API call - to be implemented
+    async fetchPlaceDetails() {
+      this.loading = true;
       try {
-        const response = await axios.get(
-          `${REGISTER_URL}/places/${this.currentPlaceId}`
-        );
-        const data = response.data;
-        // ... rest of the implementation
+        const place = await fetchPlaceById(this.currentPlaceId);
+        this.currentPlace = place;
+
+        // Map basic information
+        this.primaryName = place.name;
+        this.communityName = place.location;
+        this.latitude = place.coordinates[0];
+        this.longitude = place.coordinates[1];
+
+        // Map designations
+        this.designations = place.designations
+          .map((designation) => ({
+            level: designation.level,
+            date: designation.date,
+            bylaw: designation.bylaw,
+            reasons: designation.reasons.join(", "),
+          }))
+          .join("\n");
+
+        // Map heritage values
+        const heritageValues = place.heritageValues.reduce((acc, value) => {
+          acc[value.title.toLowerCase().replace(/\s+/g, "")] = Array.isArray(
+            value.content
+          )
+            ? value.content.join("\n")
+            : value.content;
+          return acc;
+        }, {});
+
+        // Map language fields
+        this.fieldsByLang.En = {
+          placeDescription: place.description,
+          heritageValue: place.description, // Using description as heritage value for now
+          characterDef: heritageValues.characterdefiningelements || "",
+          descBound: heritageValues.descriptionofboundaries || "",
+          additionalInfo: place.culturalHistory || "",
+        };
+
+        // For now, using English content for French
+        this.fieldsByLang.Fr = { ...this.fieldsByLang.En };
+
+        this.infoLoaded = true;
       } catch (error) {
-        console.error("Error loading place data:", error);
+        console.error("Error fetching place details:", error);
+        this.error = "Failed to load place details. Please try again later.";
+      } finally {
+        this.loading = false;
       }
-      */
     },
-    lang(locale) {
-      this.currentLang = locale === "EN" ? "En" : "Fr";
+    photoURL(index) {
+      return `http://register.yukonhistoricplaces.ca/Images/Places/${this.currentPlaceId}/${index}.jpg`;
     },
-    photoURL(photoIndex) {
-      return `http://register.yukonhistoricplaces.ca/Images/Places/${this.currentPlaceId}/${photoIndex}.jpg`;
+    handleClick(lang) {
+      this.currentLang = lang;
     },
-    handleClick(value) {
-      this.currentLang = value;
-    },
-    checkPath(word) {
-      let path = this.$route.path.split("/");
-      if (path[2] == word) {
-        return true;
-      }
-      return false;
-    },
-    loadItem(id) {
-      axios
-        .get(`${REGISTER_URL}/${id}`)
-        .then((resp) => {
-          this.setPlace(resp.data);
-        })
-        .catch((error) => console.error(error));
-      axios
-        .get(`${REGISTER_URL}/${id}/photos`)
-        .then((resp) => {
-          this.setPhotos(resp.data);
-        })
-        .catch((error) => console.error(error));
-    },
-    setPhotos(photos) {
-      this.photos = photos.data.map((x) => {
-        x.ThumbFile.base64 = `data:image/png;base64,${this.toBase64(
-          x.ThumbFile.data
-        )}`;
-        return x;
-      });
-    },
-    toBase64(arr) {
-      return btoa(
-        arr.reduce((data, byte) => data + String.fromCharCode(byte), "")
-      );
-    },
-    setPlace({ data: place }) {
-      this.primaryName = place.primaryName || "";
-      this.communityName = place.communityName || "";
-      this.latitude = place.latitude || "";
-      this.longitude = place.longitude || "";
-      this.recognitionDate = place.recognitionDate || "";
-      this.designations = place.designations || "";
-
-      this.fieldsByLang.En = {
-        placeDescription: place.placeDescriptionEn || "",
-        heritageValue: place.heritageValueEn || "",
-        characterDef: place.characterDefEn || "",
-        descBound: place.descBoundEn || "",
-        additionalInfo: place.additionalInfoEn || "",
-      };
-
-      this.fieldsByLang.Fr = {
-        placeDescription: place.placeDescriptionFr || "",
-        heritageValue: place.heritageValueFr || "",
-        characterDef: place.characterDefFr || "",
-        descBound: place.descBoundFr || "",
-        additionalInfo: place.additionalInfoFr || "",
-      };
-
-      this.infoLoaded = true;
+    lang(lang) {
+      this.currentLang = lang;
     },
   },
 };

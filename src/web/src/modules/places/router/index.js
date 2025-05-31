@@ -17,7 +17,7 @@ export default [
         component: () => import("../views/Places.vue"),
       },
       {
-        path: "view/:name",
+        path: "view/:placeId",
         name: "placeView",
         component: () => import("../views/PlacesForm.vue"),
         props: true,

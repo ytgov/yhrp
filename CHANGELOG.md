@@ -1,5 +1,10 @@
 # Changelog
 
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
 ## [Unreleased]
 
 ### Added
@@ -11,6 +16,15 @@
 - Added service-based architecture for better state management.
 - Added environment variable based ArcGIS token loading.
 - Added 404 Not Found page and catch-all route.
+- Places module API service with mock data integration
+- Proper error handling and loading states in Places views
+- Pagination support for places list
+- New services directory for Places module
+- Added rich mock data for historic places with detailed information
+- Added markdown-based mock data structure for better maintainability
+- Added custom markdown parser for historic places data (this could be replaced by a library or removed down the road)
+- Added support for nested sections in markdown parsing
+- Added proper handling of heritage values and historical sources
 
 ### Changed
 
@@ -32,6 +46,16 @@
   - Added request/response type definitions
   - Added loading and error states
 - Updated build and development configuration.
+- Updated Places view to use transformed API data structure
+- Improved route parameter naming for consistency
+- Removed 6-item limit on places list display
+- Removed unused dependencies (axios, roboto-fontface)
+- Enhanced Places form view to display rich data structure
+- Updated mock data format to match real API structure
+- Improved data organization in Places views
+- Refactored markdown parser for better maintainability
+- Improved heritage values and historical sources parsing
+- Enhanced data transformation in Places API service
 
 ### Removed
 
@@ -51,6 +75,12 @@
 - Fixed layout bug introduced by package upgrade.
 - Fixed router for maps.
 - Fixed build pipeline issues.
+- Property name mismatches between API service and views
+- Error handling in Places view data fetching
+- Fixed image loading in Places form view
+- Fixed heritage values section parsing in markdown
+- Fixed subsection title formatting in markdown parser
+- Fixed data transformation for Places API service
 
 ## [Previous Version]
 

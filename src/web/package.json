@@ -1,20 +1,20 @@
 {
   "name": "vue3-template",
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:docker": "vite build --outDir ../dist/web/",
+    "build:docker": "vite build --outDir ../dist/web/ --emptyOutDir",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "generate:mock-data": "node src/modules/places/data/mock/convert-markdown.js"
   },
   "dependencies": {
     "@mdi/font": "^7.1.96",
-    "axios": "^1.9.0",
     "esri-loader": "^3.7.0",
-    "roboto-fontface": "*",
     "vue": "^3.5.16",
     "vue-router": "^4.5.1",
     "vuetify": "^3.8.7",
