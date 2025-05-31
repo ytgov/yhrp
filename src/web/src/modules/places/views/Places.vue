@@ -131,20 +131,10 @@ export default {
     },
     async getDataFromApi() {
       this.loading = true;
-      this.error = null;
-      this.buildQueryBody();
-
       try {
-        const response = await fetchPlaces({
-          page: this.page,
-          pageSize: this.page_size,
-          search: this.search,
-        });
-
-        this.placesList = response.data;
-        this.totalLength = response.meta.item_count;
-        this.numberOfPages = response.meta.page_count;
-        this.page_size = response.meta.page_size;
+        const places = await fetchPlaces();
+        this.placesList = places;
+        this.totalLength = places.length;
       } catch (error) {
         console.error("Error fetching places:", error);
         this.error = "Failed to load places. Please try again later.";
