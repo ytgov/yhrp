@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:docker": "vite build --outDir ../dist/web/",
+    "build:docker": "vite build --outDir ../dist/web/ --emptyOutDir",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",

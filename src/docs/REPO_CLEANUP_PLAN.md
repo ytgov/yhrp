@@ -73,6 +73,7 @@ This document outlines the plan for cleaning up and reorganizing the YHRP Site R
   - [x] Remove .DS_Store files
   - [x] Update .gitignore
   - [ ] Review build artifacts
+    - [x] Fix Docker build output directory issue
     - [ ] Audit build outputs
     - [ ] Clean unnecessary files
     - [ ] Document build process
