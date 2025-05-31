@@ -32,9 +32,9 @@ This document outlines the plan for cleaning up and reorganizing the YHRP Site R
     - [x] Define naming conventions
     - [ ] Plan file migrations
       - [ ] Map Module
-        - [ ] Add README.md
-        - [ ] Move Migration Tasks.md content to README.md
-        - [ ] Ensure consistent naming in all directories
+        - [x] Add README.md
+        - [x] Move Migration Tasks.md content to README.md
+        - [x] Ensure consistent naming in all directories
       - [ ] Places Module
         - [x] Add services directory for API integration
         - [x] Add README.md
