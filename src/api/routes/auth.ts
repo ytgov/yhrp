@@ -1,7 +1,7 @@
 import { Express, NextFunction, Request, Response } from "express";
 import * as ExpressSession from "express-session";
-import { AuthUser } from "../models/auth";
 import { AUTH_REDIRECT, FRONTEND_URL } from "../config";
+import { AuthUser } from "../models/auth";
 
 const { auth } = require("express-openid-connect");
 
@@ -31,7 +31,7 @@ export function configureAuthentication(app: Express) {
     })
   );
 
-  app.use("/", async (req: Request, res: Response, next: NextFunction) => {
+  app.use("/", async (req: Request, _res: Response, next: NextFunction) => {
     if (req.oidc.isAuthenticated()) {
       req.user = AuthUser.fromOpenId(req.oidc.user);
       (req.session as any).user = req.user;
