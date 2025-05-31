@@ -12,14 +12,14 @@
     <v-toolbar-title>
       <span class="font-weight-bold text-h5">{{ title }}</span>
 
-      <v-progress-circular
+      <!-- <v-progress-circular
         :class="loadingClass"
         indeterminate
         color="#f3b228"
         size="20"
         width="2"
         class="ml-4"
-      ></v-progress-circular>
+      ></v-progress-circular> -->
     </v-toolbar-title>
     <v-spacer></v-spacer>
 
