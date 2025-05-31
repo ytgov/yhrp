@@ -1,5 +1,20 @@
 <template>
   <v-app-bar flat class="text-grey-darken-1">
+    <v-breadcrumbs
+      :items="[
+        {
+          title: 'Places',
+          disabled: false,
+          to: '/places',
+        },
+        {
+          title: currentPlace?.name || '',
+          disabled: true,
+        },
+      ]"
+      divider=">"
+    >
+    </v-breadcrumbs>
     <template v-slot:append>
       <v-tooltip text="English">
         <template v-slot:activator="{ props }">
@@ -134,7 +149,7 @@
                             item, index
                           ) in currentPlace?.heritageValues?.find(
                             (v) => v.title === 'Character Defining Elements'
-                          )?.items"
+                          )?.content"
                           :key="index"
                         >
                           {{ item }}
@@ -156,7 +171,7 @@
                             item, index
                           ) in currentPlace?.heritageValues?.find(
                             (v) => v.title === 'Description of Boundaries'
-                          )?.items"
+                          )?.content"
                           :key="index"
                         >
                           {{ item }}
@@ -191,7 +206,7 @@
               >
                 <div class="text-subtitle-1">{{ source.title }}</div>
                 <ul>
-                  <li v-for="(item, i) in source.items" :key="i">
+                  <li v-for="(item, i) in source.content" :key="i">
                     {{ item }}
                   </li>
                 </ul>
@@ -215,8 +230,11 @@ export default {
   name: "PlacesForm",
   props: {
     placeId: {
-      type: String,
+      type: [String, Number],
       required: true,
+      validator: (value) => {
+        return value !== undefined && value !== null && value !== "";
+      },
     },
   },
   components: {
@@ -307,8 +325,11 @@ export default {
 
         // Map heritage values
         const heritageValues = place.heritageValues.reduce((acc, value) => {
-          acc[value.title.toLowerCase().replace(/\s+/g, "")] =
-            value.items.join("\n");
+          acc[value.title.toLowerCase().replace(/\s+/g, "")] = Array.isArray(
+            value.content
+          )
+            ? value.content.join("\n")
+            : value.content;
           return acc;
         }, {});
 

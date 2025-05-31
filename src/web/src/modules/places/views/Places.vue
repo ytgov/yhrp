@@ -126,7 +126,7 @@ export default {
     handleClick(place) {
       this.$router.push({
         name: "placeView",
-        params: { placeId: place.id },
+        params: { placeId: place.placeId || place.id },
       });
     },
     async getDataFromApi() {
