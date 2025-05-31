@@ -17,10 +17,16 @@ function convertMarkdownToJson() {
   const places = files.map((file) => {
     const filePath = path.join(MOCK_DATA_DIR, file);
     const fileContent = fs.readFileSync(filePath, "utf8");
-    const { data } = matter(fileContent);
-    return data;
+    const { data, content } = matter(fileContent);
+
+    // Add the markdown content to the data object
+    return {
+      ...data,
+      content: content.trim(), // Trim whitespace but preserve internal formatting
+    };
   });
 
+  // Use pretty printing with 2 spaces for indentation
   fs.writeFileSync(OUTPUT_FILE, JSON.stringify(places, null, 2));
   console.log(`Converted ${places.length} markdown files to ${OUTPUT_FILE}`);
 }
