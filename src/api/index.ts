@@ -1,8 +1,7 @@
 import cors from "cors";
 import express, { Request, Response } from "express";
-import * as config from "./config";
+import * as config from "./config/app-config";
 import { doHealthCheck } from "./utils/healthCheck";
-// import { configureAuthentication } from './routes/auth';
 
 const app = express();
 
@@ -39,14 +38,9 @@ app.use(
   })
 );
 
-// configureAuthentication(app);
-
 app.get("/api/healthCheck", (_req: Request, res: Response) => {
   doHealthCheck(res);
 });
-
-// app.use('/api/user', userRouter);
-// app.use('/api/data', dataRouter);
 
 let baseWebPath = "/web";
 
