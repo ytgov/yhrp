@@ -36,9 +36,9 @@ This document outlines the plan for cleaning up and reorganizing the YHRP Site R
         - [x] Move Migration Tasks.md content to README.md
         - [x] Ensure consistent naming in all directories
       - [ ] Places Module
-        - [x] Add services directory for API integration
-        - [x] Add README.md
-        - [x] Ensure consistent naming in all directories
+        - [ ] Add services directory for API integration
+        - [ ] Add README.md
+        - [ ] Ensure consistent naming in all directories
         - [x] Temporarily use mock data while API integration is pending
         - [x] Clean up Places.vue component
         - [ ] Future Work (TODOs)
