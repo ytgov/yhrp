@@ -60,6 +60,21 @@ interface Place {
 }
 ```
 
+---
+
+### Note: Differences Between Backend and Frontend Place Models
+
+- **Backend (API) fields:**
+  - `id` (number) <-> `PlaceId` (frontend)
+  - `name` (string) <-> `PrimaryName` (frontend)
+  - `location` (string) <-> `Community` (frontend)
+  - `recognitionDate` (string) <-> `RecognitionDate` (frontend)
+  - `placeDescriptionEn/Fr` <-> `EnglishTeaser`/`FrenchTeaser` (frontend uses teasers)
+  - `heritageValueEn/Fr`, `characterDefEn/Fr`, `descBoundEn/Fr`, `additionalInfoEn/Fr`: only in backend
+  - (not present) <-> `YHSIId`, `Latitude`, `Longitude`, `Designations`, `PhotoURL` (frontend only)
+
+See also the backend model in `src/api/models/register-place.model.ts` for the full API structure.
+
 ## Mock Data
 
 Mock data is stored in markdown format and converted to JSON using a custom parser. The markdown files follow a specific structure:
