@@ -43,7 +43,7 @@ This document outlines the plan for cleaning up and reorganizing the YHRP Site R
         - [x] Clean up Places.vue component
         - [ ] Future Work (TODOs)
           - [ ] Complete backend API implementation
-          - [x] Convert axios calls to fetch (completed in new implementation)
+          - [x] Convert axios calls to fetch
           - [x] Add proper error handling and loading states
           - [x] Implement proper data fetching with pagination
           - [ ] Re-implement original API functionality:
@@ -56,6 +56,10 @@ This document outlines the plan for cleaning up and reorganizing the YHRP Site R
         - [ ] Add README.md
         - [ ] Ensure consistent naming in all directories
     - [ ] Update import paths
+- [ ] Dependencies
+  - [x] Remove unused axios dependency
+  - [x] Remove unused roboto-fontface dependency
+  - [ ] Review and clean up other unused dependencies
 - [ ] Backend Structure (src/api)
   - [ ] Review current structure
     - [ ] Evaluate directory organization
