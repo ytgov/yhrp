@@ -43,11 +43,6 @@
           >English</v-btn
         >
         <v-btn class="mx-1 form-header">Print</v-btn>
-        <!-- <PrintButton
-              :data="printData"
-              :name="printData.primaryName"
-              class="mx-1 form-header"
-            /> -->
       </v-col>
     </v-row>
 
@@ -55,14 +50,6 @@
       <v-col cols="8">
         <v-card>
           <v-carousel cycle height="500">
-            <!-- <v-carousel-item
-              v-for="(photo, i) in photos"
-              :key="i"
-              :src="photo.ThumbFile.base64"
-              reverse-transition="fade-transition"
-              transition="fade-transition"
-              hide-delimiter-background
-            ></v-carousel-item> -->
             <v-carousel-item
               v-for="(photo, i) in photos"
               :key="i"
@@ -72,27 +59,20 @@
               hide-delimiter-background
             ></v-carousel-item>
           </v-carousel>
-          <!-- everytime the image changes it bumps the user to the top of the screen, need to fix so that doesn't happen. Annoying when trying to read the boundary description-->
         </v-card>
       </v-col>
       <v-col cols="4">
         <v-card color="#BDBDBD" class="mx-auto" height="500">
           <div style="height: 500">Map will go here</div>
-          <!-- <BasicMap></BasicMap> -->
-          <!-- <MapLoader
-                v-if="infoLoaded"
-                :fields="{
-                  lat: latitude,
-                  long: longitude,
-                }"
-                height="500"
-              /> -->
         </v-card>
       </v-col>
     </v-row>
     <v-row>
       <v-col>
         <h4>{{ primaryName }}</h4>
+        <div class="text-subtitle-1">
+          {{ currentPlace?.constructionPeriod }}
+        </div>
       </v-col>
     </v-row>
     <v-row>
@@ -103,11 +83,23 @@
               Designation
             </v-expansion-panel-title>
             <v-expansion-panel-text>
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eius
-              dolor obcaecati temporibus totam aut at aliquid, fugit, qui
-              consequuntur eum asperiores minima exercitationem dolorem,
-              accusantium illum corrupti distinctio enim repudiandae!
-              {{ designations }}
+              <div
+                v-for="(designation, index) in currentPlace?.designations"
+                :key="index"
+              >
+                <div class="text-subtitle-1">{{ designation.level }}</div>
+                <div>Date: {{ designation.date }}</div>
+                <div>Bylaw: {{ designation.bylaw }}</div>
+                <div>Reasons:</div>
+                <ul>
+                  <li
+                    v-for="(reason, rIndex) in designation.reasons"
+                    :key="rIndex"
+                  >
+                    {{ reason }}
+                  </li>
+                </ul>
+              </div>
             </v-expansion-panel-text>
           </v-expansion-panel>
 
@@ -116,10 +108,6 @@
               Place Description
             </v-expansion-panel-title>
             <v-expansion-panel-text>
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Voluptas
-              dolorem distinctio, quam necessitatibus reprehenderit eaque rerum
-              quasi omnis totam architecto, facere quaerat! Ducimus voluptates
-              sapiente fuga cum nobis in vitae.
               {{ fieldsByLang[currentLang].placeDescription }}
             </v-expansion-panel-text>
           </v-expansion-panel>
@@ -129,10 +117,6 @@
               Heritage Value
             </v-expansion-panel-title>
             <v-expansion-panel-text>
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nisi
-              optio soluta odio recusandae eaque veritatis nihil fuga
-              blanditiis, dignissimos voluptatum quia cum vel laboriosam
-              quisquam perspiciatis error, placeat accusamus porro!
               {{ fieldsByLang[currentLang].heritageValue }}
               <div>
                 <v-expansion-panels class="pt-5">
@@ -141,21 +125,21 @@
                       color="#BDBDBD"
                       class="font-weight-black"
                     >
-                      Character Definition
+                      Character Defining Elements
                     </v-expansion-panel-title>
                     <v-expansion-panel-text>
-                      {{ fieldsByLang[currentLang].characterDef }}
-                    </v-expansion-panel-text>
-                  </v-expansion-panel>
-                  <v-expansion-panel>
-                    <v-expansion-panel-title
-                      color="#BDBDBD"
-                      class="font-weight-black"
-                    >
-                      Additional Information
-                    </v-expansion-panel-title>
-                    <v-expansion-panel-text>
-                      {{ fieldsByLang[currentLang].additionalInfo }}
+                      <ul>
+                        <li
+                          v-for="(
+                            item, index
+                          ) in currentPlace?.heritageValues?.find(
+                            (v) => v.title === 'Character Defining Elements'
+                          )?.items"
+                          :key="index"
+                        >
+                          {{ item }}
+                        </li>
+                      </ul>
                     </v-expansion-panel-text>
                   </v-expansion-panel>
                   <v-expansion-panel>
@@ -166,10 +150,51 @@
                       Description of Boundaries
                     </v-expansion-panel-title>
                     <v-expansion-panel-text>
-                      {{ fieldsByLang[currentLang].descBound }}
+                      <ul>
+                        <li
+                          v-for="(
+                            item, index
+                          ) in currentPlace?.heritageValues?.find(
+                            (v) => v.title === 'Description of Boundaries'
+                          )?.items"
+                          :key="index"
+                        >
+                          {{ item }}
+                        </li>
+                      </ul>
+                    </v-expansion-panel-text>
+                  </v-expansion-panel>
+                  <v-expansion-panel>
+                    <v-expansion-panel-title
+                      color="#BDBDBD"
+                      class="font-weight-black"
+                    >
+                      Cultural History
+                    </v-expansion-panel-title>
+                    <v-expansion-panel-text>
+                      {{ currentPlace?.culturalHistory }}
                     </v-expansion-panel-text>
                   </v-expansion-panel>
                 </v-expansion-panels>
+              </div>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+
+          <v-expansion-panel>
+            <v-expansion-panel-title color="primary" class="font-weight-black">
+              Historical Sources
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <div
+                v-for="(source, index) in currentPlace?.historicalSources"
+                :key="index"
+              >
+                <div class="text-subtitle-1">{{ source.title }}</div>
+                <ul>
+                  <li v-for="(item, i) in source.items" :key="i">
+                    {{ item }}
+                  </li>
+                </ul>
               </div>
             </v-expansion-panel-text>
           </v-expansion-panel>
@@ -229,6 +254,7 @@ export default {
     infoLoaded: false,
     loading: false,
     error: null,
+    currentPlace: null,
   }),
   computed: {
     currentPlaceId() {
@@ -259,32 +285,49 @@ export default {
   methods: {
     async fetchPlaceDetails() {
       this.loading = true;
-      this.error = null;
-
       try {
         const place = await fetchPlaceById(this.currentPlaceId);
+        this.currentPlace = place;
 
-        // Update place details
+        // Map basic information
         this.primaryName = place.name;
-        this.communityName = place.community;
-        this.latitude = place.location.lat;
-        this.longitude = place.location.lng;
-        this.recognitionDate = place.recognitionDate;
-        this.designations = place.designations;
+        this.communityName = place.location;
+        this.latitude = place.coordinates[0];
+        this.longitude = place.coordinates[1];
 
-        // Update language fields
-        this.fieldsByLang.En.placeDescription = place.description;
-        this.fieldsByLang.Fr.placeDescription = place.description; // TODO: Add French description when available
+        // Map designations
+        this.designations = place.designations
+          .map((designation) => ({
+            level: designation.level,
+            date: designation.date,
+            bylaw: designation.bylaw,
+            reasons: designation.reasons.join(", "),
+          }))
+          .join("\n");
 
-        // TODO: Add other fields when available in the API
-        // this.fieldsByLang.En.heritageValue = place.heritageValueEn;
-        // this.fieldsByLang.Fr.heritageValue = place.heritageValueFr;
-        // etc...
+        // Map heritage values
+        const heritageValues = place.heritageValues.reduce((acc, value) => {
+          acc[value.title.toLowerCase().replace(/\s+/g, "")] =
+            value.items.join("\n");
+          return acc;
+        }, {});
+
+        // Map language fields
+        this.fieldsByLang.En = {
+          placeDescription: place.description,
+          heritageValue: place.description, // Using description as heritage value for now
+          characterDef: heritageValues.characterdefiningelements || "",
+          descBound: heritageValues.descriptionofboundaries || "",
+          additionalInfo: place.culturalHistory || "",
+        };
+
+        // For now, using English content for French
+        this.fieldsByLang.Fr = { ...this.fieldsByLang.En };
 
         this.infoLoaded = true;
       } catch (error) {
         console.error("Error fetching place details:", error);
-        this.error = "Failed to load place details";
+        this.error = "Failed to load place details. Please try again later.";
       } finally {
         this.loading = false;
       }
