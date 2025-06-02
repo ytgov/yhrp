@@ -19,6 +19,10 @@ RUN npm install && npm cache clean --force --loglevel=error
 COPY --chown=node:node src/web /home/node/app/web/
 COPY --chown=node:node src/api /home/node/app/api/
 
+# Ensure TypeScript config is in the right place
+WORKDIR /home/node/app/api
+RUN cp config/tsconfig.json .
+
 # Build web app
 WORKDIR /home/node/app/web
 RUN npm run build:docker
