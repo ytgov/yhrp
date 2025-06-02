@@ -19,7 +19,7 @@
 <script>
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { onMounted, ref, watch } from "vue";
+import { nextTick, onMounted, ref, watch } from "vue";
 
 export default {
   name: "PlaceLocationMap",
@@ -106,16 +106,23 @@ export default {
         icon: customIcon,
       })
         .addTo(map)
-        .bindPopup(`<div class="popup-content">${props.placeName}</div>`, {
+        .bindPopup("", {
           className: "custom-popup",
           closeButton: false,
         });
 
-      // Open popup by default
-      marker.openPopup();
-
       // Set initial base layer
       changeBaseLayer("streets");
+    };
+
+    const updatePopupContent = async () => {
+      if (marker) {
+        await nextTick();
+        marker.setPopupContent(
+          `<div class="popup-content">${props.placeName}</div>`
+        );
+        marker.openPopup();
+      }
     };
 
     // Watch for changes in coordinates
@@ -129,8 +136,18 @@ export default {
       }
     );
 
-    onMounted(() => {
+    // Watch for changes in placeName
+    watch(
+      () => props.placeName,
+      () => {
+        updatePopupContent();
+      }
+    );
+
+    onMounted(async () => {
+      await nextTick();
       initMap();
+      updatePopupContent();
     });
 
     return {
@@ -157,9 +174,9 @@ export default {
   right: 10px;
   z-index: 1000;
   background: white;
-  padding: 5px;
+  padding: 3px;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); */
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -219,10 +236,12 @@ export default {
   margin: 0;
   font-weight: bold;
   font-size: 14px;
+  color: white;
 }
 
 :deep(.popup-content) {
   color: white;
   text-align: center;
+  font-weight: bold;
 }
 </style>
