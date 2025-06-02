@@ -1,41 +1,43 @@
+# Frontend builder stage
+FROM node:20-alpine AS frontend-builder
+
+WORKDIR /build/web
+COPY src/web/package*.json ./
+RUN npm install && npm cache clean --force --loglevel=error
+
+COPY src/web ./
+RUN npm run build:docker
+
+# API builder stage
+FROM node:20-alpine AS api-builder
+
+WORKDIR /build/api
+COPY src/api/package*.json ./
+RUN npm install && npm cache clean --force --loglevel=error
+
+COPY src/api ./
+RUN cp config/tsconfig.json . && \
+    npm run build:api
+
+# Final stage
 FROM node:20-alpine
 
 RUN mkdir -p /home/node/app && chown -R node:node /home/node/app
 
-# Copy package files
-COPY --chown=node:node src/web/package*.json /home/node/app/web/
-COPY --chown=node:node src/api/package*.json /home/node/app/api/
-
 USER node
+WORKDIR /home/node/app
 
-# Install dependencies
-WORKDIR /home/node/app/web
-RUN npm install && npm cache clean --force --loglevel=error
+# Copy built frontend from builder
+COPY --from=frontend-builder --chown=node:node /build/api/dist/web ./dist/web
 
-WORKDIR /home/node/app/api
-RUN npm install && npm cache clean --force --loglevel=error
+# Copy built API from builder
+COPY --from=api-builder --chown=node:node /build/api/dist ./dist
+COPY --from=api-builder --chown=node:node /build/api/package*.json ./
 
-# Copy source code
-COPY --chown=node:node src/web /home/node/app/web/
-COPY --chown=node:node src/api /home/node/app/api/
-
-# Ensure TypeScript config is in the right place
-WORKDIR /home/node/app/api
-RUN cp config/tsconfig.json .
-
-# Build web app
-WORKDIR /home/node/app/web
-RUN npm run build:docker
-
-# Build API
-WORKDIR /home/node/app/api
-RUN npm run build:api
-
-# Clean up source directories
-RUN rm -rf /home/node/app/web
+# Install production dependencies only
+RUN npm install --production && npm cache clean --force --loglevel=error
 
 ENV NODE_ENV=production
 
 EXPOSE 3000
-WORKDIR /home/node/app/api
 CMD [ "node", "dist/index.js" ]
