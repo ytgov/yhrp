@@ -21,10 +21,7 @@ RUN npm run build:docker
 
 WORKDIR /home/node/app
 RUN mkdir -p dist && \
-    cd src/api && \
     npm run build:api && \
-    mv dist/* ../dist/ && \
-    cd .. && \
     ls -la dist/
 
 ENV NODE_ENV=production
