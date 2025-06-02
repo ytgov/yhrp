@@ -20,11 +20,14 @@ COPY --chown=node:node src/web /home/node/app/web/
 RUN npm run build:docker
 
 WORKDIR /home/node/app
+RUN mkdir -p dist && \
+    cd src/api && \
+    npm run build:api && \
+    mv dist/* ../dist/ && \
+    cd .. && \
+    ls -la dist/
 
 ENV NODE_ENV=production
-RUN npm run build:api && \
-    ls -la dist/ && \
-    pwd
 
 EXPOSE 3000
 CMD [ "node", "dist/index.js" ]
