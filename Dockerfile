@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-RUN mkdir /home/node/app && chown -R node:node /home/node/app
+RUN mkdir -p /home/node/app && chown -R node:node /home/node/app
 
 COPY --chown=node:node src/web/package*.json /home/node/app/web/
 COPY --chown=node:node src/api/package*.json /home/node/app/
@@ -9,7 +9,6 @@ USER node
 
 WORKDIR /home/node/app
 RUN npm install && npm cache clean --force --loglevel=error
-# COPY --chown=node:node src/api/.env* ./
 
 WORKDIR /home/node/app/web
 RUN npm install && npm cache clean --force --loglevel=error
@@ -17,14 +16,17 @@ RUN npm install && npm cache clean --force --loglevel=error
 COPY --chown=node:node src/api /home/node/app/
 COPY --chown=node:node src/web /home/node/app/web/
 
+# Build web app
 RUN npm run build:docker
 
+# Build API and move files to final location
 WORKDIR /home/node/app
-RUN mkdir -p dist && \
-    npm run build:api && \
-    ls -la dist/
+RUN npm run build:api && \
+    mkdir -p api && \
+    cp -r dist/* api/ && \
+    ls -la api/
 
 ENV NODE_ENV=production
 
 EXPOSE 3000
-CMD [ "node", "dist/index.js" ]
+CMD [ "node", "api/index.js" ]
