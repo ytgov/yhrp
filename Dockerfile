@@ -7,7 +7,7 @@ COPY --chown=node:node src/api/package*.json /home/node/app/src/api/
 
 USER node
 
-WORKDIR /home/node/app
+WORKDIR /home/node/app/src/api
 RUN npm install && npm cache clean --force --loglevel=error
 
 WORKDIR /home/node/app/web
