@@ -5,7 +5,7 @@
     "lib": ["es2018", "esnext.asynciterable"],
     "skipLibCheck": true,
     "sourceMap": true,
-    "outDir": "./dist",
+    "outDir": "/home/node/app/dist",
     "moduleResolution": "node",
     "removeComments": true,
     "noImplicitAny": true,
