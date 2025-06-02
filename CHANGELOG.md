@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added PlaceLocationMap component for displaying individual place locations
+- Added base layer switcher with Streets, Satellite, and Terrain options
 - Added placeholder image for missing photos.
 - Added tests for API service error handling and map bookmarks.
 - Added ESRI CSS to index.html for proper map styling.
@@ -28,6 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Enhanced Places form view with interactive location map
+- Improved map marker styling with custom teal pin design
 - Removed all store files and dependencies, transitioning to Vue 3's Composition API.
 - Implemented environment variable based ArcGIS token loading.
 - Restored 22 community bookmarks with original UTM coordinates.
