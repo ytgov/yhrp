@@ -20,10 +20,12 @@ COPY --chown=node:node src/web /home/node/app/web/
 RUN npm run build:docker
 
 # Build API and move files to final location
-WORKDIR /home/node/app
+WORKDIR /home/node/app/src/api
 RUN npm run build:api && \
+    cd ../.. && \
     mkdir -p api && \
-    cp -r dist/* api/ && \
+    cp -r src/api/dist/* api/ && \
+    cp -r dist/web api/ && \
     ls -la api/
 
 ENV NODE_ENV=production
