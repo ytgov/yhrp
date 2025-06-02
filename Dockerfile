@@ -19,18 +19,15 @@ RUN npm install && npm cache clean --force --loglevel=error
 COPY --chown=node:node src/web /home/node/app/web/
 COPY --chown=node:node src/api /home/node/app/api/
 
-# Create dist directory
-RUN mkdir -p /home/node/app/dist
-
 # Build web app
 WORKDIR /home/node/app/web
 RUN npm run build:docker
 
-# Build API (output remains in /home/node/app/api/dist)
+# Build API
 WORKDIR /home/node/app/api
 RUN npm run build:api
 
-# Clean up only the web source directory
+# Clean up source directories
 RUN rm -rf /home/node/app/web
 
 ENV NODE_ENV=production
