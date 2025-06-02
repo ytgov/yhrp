@@ -22,7 +22,7 @@ RUN npm run build:docker
 # Build API and move files to final location
 WORKDIR /home/node/app/src/api
 RUN npm run build:api && \
-    cd ../.. && \
+    cd /home/node/app && \
     mkdir -p api && \
     cp -r src/api/dist/* api/ && \
     cp -r dist/web api/ && \
