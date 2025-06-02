@@ -11,7 +11,7 @@
     "test:watch": "jest --config config/jest.config.js --watch",
     "test:url": "cross-env API_BASE_URL=$npm_config_url jest --config config/jest.config.js",
     "start:dev": "ts-node-dev index.ts",
-    "build:api": "tsc"
+    "build:api": "tsc -p config/tsconfig.json"
   },
   "keywords": [],
   "author": "Michael Johnson",
@@ -26,7 +26,7 @@
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.12",
-    "@types/node": "^16.11.6",
+    "@types/node": "^20.11.24",
     "@types/supertest": "^6.0.2",
     "cross-env": "^7.0.3",
     "jest": "^29.7.0",
