@@ -3,7 +3,7 @@ FROM node:20-alpine
 RUN mkdir -p /home/node/app && chown -R node:node /home/node/app
 
 COPY --chown=node:node src/web/package*.json /home/node/app/web/
-COPY --chown=node:node src/api/package*.json /home/node/app/
+COPY --chown=node:node src/api/package*.json /home/node/app/src/api/
 
 USER node
 
@@ -13,7 +13,7 @@ RUN npm install && npm cache clean --force --loglevel=error
 WORKDIR /home/node/app/web
 RUN npm install && npm cache clean --force --loglevel=error
 
-COPY --chown=node:node src/api /home/node/app/
+COPY --chown=node:node src/api /home/node/app/src/api/
 COPY --chown=node:node src/web /home/node/app/web/
 
 # Build web app
@@ -24,8 +24,8 @@ WORKDIR /home/node/app/src/api
 RUN npm run build:api && \
     cd /home/node/app && \
     mkdir -p api && \
-    cp -r src/api/dist/* api/ && \
-    cp -r dist/web api/ && \
+    cp -r dist/* api/ && \
+    cp -r ../dist/web api/ && \
     ls -la api/
 
 ENV NODE_ENV=production
