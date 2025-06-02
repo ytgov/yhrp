@@ -106,9 +106,13 @@ export default {
         icon: customIcon,
       })
         .addTo(map)
-        .bindPopup(props.placeName || "Location", {
+        .bindPopup(`<div class="popup-content">${props.placeName}</div>`, {
           className: "custom-popup",
+          closeButton: false,
         });
+
+      // Open popup by default
+      marker.openPopup();
 
       // Set initial base layer
       changeBaseLayer("streets");
@@ -204,6 +208,7 @@ export default {
   background: #0097a9;
   color: white;
   border-radius: 4px;
+  padding: 8px 12px;
 }
 
 :deep(.custom-popup .leaflet-popup-tip) {
@@ -211,7 +216,13 @@ export default {
 }
 
 :deep(.custom-popup .leaflet-popup-content) {
-  margin: 8px 12px;
+  margin: 0;
   font-weight: bold;
+  font-size: 14px;
+}
+
+:deep(.popup-content) {
+  color: white;
+  text-align: center;
 }
 </style>
