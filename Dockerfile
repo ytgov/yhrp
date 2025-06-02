@@ -16,8 +16,7 @@ COPY src/api/package*.json ./
 RUN npm install && npm cache clean --force --loglevel=error
 
 COPY src/api ./
-RUN cp config/tsconfig.json . && \
-    npm run build:api
+RUN npm run build:api
 
 # Final stage
 FROM node:20-alpine
