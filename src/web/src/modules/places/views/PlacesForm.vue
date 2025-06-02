@@ -78,7 +78,11 @@
       </v-col>
       <v-col cols="4">
         <v-card color="#BDBDBD" class="mx-auto" height="500">
-          <div style="height: 500">Map will go here</div>
+          <PlaceLocationMap
+            :latitude="latitude"
+            :longitude="longitude"
+            :place-name="primaryName"
+          />
         </v-card>
       </v-col>
     </v-row>
@@ -224,6 +228,7 @@
 // import MapLoader from "../components/MapLoader";
 // import BasicMap from "@/modules/components/BasicMap";
 
+import PlaceLocationMap from "@/modules/map/components/PlaceLocationMap.vue";
 import { fetchPlaceById } from "../services/placesApi";
 
 export default {
@@ -241,6 +246,7 @@ export default {
     // BasicMap,
     //MapLoader,
     // PrintButton,
+    PlaceLocationMap,
   },
   data: () => ({
     currentLang: "En",
