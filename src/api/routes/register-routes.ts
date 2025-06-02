@@ -19,7 +19,7 @@ const validatePage = (req: Request, res: Response, next: Function) => {
   if (isNaN(page) || page < 1) {
     return res.status(400).json({ error: "Page must be a positive integer" });
   }
-  next();
+  return next();
 };
 
 registerRouter.get("/", validatePage, (req: Request, res: Response) =>

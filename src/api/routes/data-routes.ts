@@ -1,11 +1,11 @@
 import express, { Request, Response } from "express";
-import { EnsureAuthenticated } from "./auth";
+// import { EnsureAuthenticated } from "./auth";
 
 export const dataRouter = express.Router();
 
 dataRouter.post(
   "/",
-  EnsureAuthenticated,
+  // EnsureAuthenticated,
   async (req: Request, res: Response) => {
     // I have added a delay to this to show how the interface can wait for the response
     setTimeout(() => {

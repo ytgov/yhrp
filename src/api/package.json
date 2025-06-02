@@ -10,8 +10,9 @@
     "test": "jest --config config/jest.config.js",
     "test:watch": "jest --config config/jest.config.js --watch",
     "test:url": "cross-env API_BASE_URL=$npm_config_url jest --config config/jest.config.js",
+    "start": "node dist/index.js",
     "start:dev": "ts-node-dev index.ts",
-    "build:api": "tsc -p config/tsconfig.json"
+    "build:api": "tsc --outDir dist"
   },
   "keywords": [],
   "author": "Michael Johnson",
