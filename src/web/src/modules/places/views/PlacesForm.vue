@@ -3,6 +3,12 @@
     <v-breadcrumbs
       :items="[
         {
+          title: 'Home',
+          disabled: false,
+          to: '/',
+        },
+        ,
+        {
           title: 'Places',
           disabled: false,
           to: '/places',

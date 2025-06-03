@@ -1,5 +1,11 @@
 // Vuetify settings
 @use "vuetify/settings" with (
-  $utilities: false,
-  $color-pack: false
+  $utilities: (
+    "display": true,
+    "flex": true,
+    "spacing": true,
+    "text": true,
+    "visibility": true,
+  ),
+  $color-pack: true
 );

@@ -4,14 +4,9 @@ const routes = [
     component: () => import("@/layouts/Default.vue"),
     children: [
       {
-        path: "/dashboard",
-        component: () => import("../views/Dashboard.vue"),
-        children: [
-          // {
-          //   path: "",
-          //   component: () => import("./components/someComponent.vue"),
-          // },
-        ],
+        path: "/",
+        name: "home",
+        component: () => import("../views/Home.vue"),
       },
     ],
   },

@@ -23,3 +23,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.v-application {
+  font-family: "Roboto", sans-serif;
+}
+</style>

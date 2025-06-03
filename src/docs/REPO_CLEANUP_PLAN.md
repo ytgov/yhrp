@@ -31,11 +31,11 @@ This document outlines the plan for cleaning up and reorganizing the YHRP Site R
   - [ ] Implement consistent naming
     - [x] Define naming conventions
     - [ ] Plan file migrations
-      - [ ] Map Module
+      - [x] Map Module
         - [x] Add README.md
         - [x] Move Migration Tasks.md content to README.md
         - [x] Ensure consistent naming in all directories
-      - [ ] Places Module
+      - [x] Places Module
         - [x] Add services directory for API integration
         - [x] Add README.md
         - [x] Ensure consistent naming in all directories
@@ -51,14 +51,27 @@ This document outlines the plan for cleaning up and reorganizing the YHRP Site R
             - [ ] Proper pagination handling
             - [x] Error handling for API responses
       - [ ] Home Module
-        - [ ] Remove empty store directory
-        - [ ] Add data and services directories
-        - [ ] Add README.md
-        - [ ] Ensure consistent naming in all directories
+        - [x] Remove empty store directory
+        - [x] Add data and services directories
+        - [x] Add README.md
+        - [x] Ensure consistent naming in all directories
+        - [x] Refactor carousel into reusable component
+          - [x] Create HeroCarousel component
+          - [x] Implement responsive design
+          - [x] Add proper image scaling
+          - [x] Improve text overlay styling
+        - [ ] Future Work (TODOs)
+          - [ ] Add proper error handling for image loading
+          - [ ] Implement lazy loading for carousel images
+          - [ ] Add loading states for carousel
+          - [ ] Add unit tests for carousel component
     - [ ] Update import paths
 - [ ] Dependencies
   - [x] Remove unused axios dependency
   - [x] Remove unused roboto-fontface dependency
+  - [x] Remove express-validator dependency
+  - [x] Remove Moment.js dependency
+  - [x] Update to Node.js 20
   - [ ] Review and clean up other unused dependencies
 - [ ] Backend Structure (src/api)
   - [x] Review current structure
@@ -73,6 +86,7 @@ This document outlines the plan for cleaning up and reorganizing the YHRP Site R
     - [x] Remove unused auth and user models
     - [x] Create RegisterPlace model
     - [x] Document model differences with frontend
+    - [x] Replace Moment.js with native Date
     - [ ] Add TypeScript interfaces for API responses
     - [ ] Add validation for API request/response types
   - [ ] API Routes
@@ -87,6 +101,7 @@ This document outlines the plan for cleaning up and reorganizing the YHRP Site R
     - [ ] Add proper error handling
     - [ ] Add service-level logging
     - [ ] Add service-level caching
+    - [ ] Add retry logic for failed requests
   - [ ] Testing
     - [ ] Add unit tests for models
     - [ ] Add unit tests for controllers
@@ -100,34 +115,42 @@ This document outlines the plan for cleaning up and reorganizing the YHRP Site R
 - [ ] Build and Development
   - [x] Remove .DS_Store files
   - [x] Update .gitignore
-  - [ ] Review build artifacts
+  - [x] Review build artifacts
     - [x] Fix Docker build output directory issue
-    - [ ] Audit build outputs
-    - [ ] Clean unnecessary files
-    - [ ] Document build process
+    - [x] Audit build outputs
+    - [x] Clean unnecessary files
+    - [x] Document build process
   - [ ] Development scripts
-    - [ ] Review current scripts
-    - [ ] Add cleanup scripts
-    - [ ] Update documentation
 
 ## Phase 3: Configuration and Build Files
 
-- [ ] Create `docker/` directory
-  - [ ] Move Dockerfile
-  - [ ] Move docker-compose files
-- [ ] Create `config/` directory
-  - [ ] Move environment files
+- [x] Create `docker/` directory
+  - [x] Move Dockerfile
+  - [x] Move docker-compose files
+- [x] Create `config/` directory
+  - [x] Move environment files
   - [ ] Update environment variable documentation
-- [ ] Update build configuration
-  - [ ] Review current setup
-  - [ ] Plan improvements
-  - [ ] Document changes
+- [x] Update build configuration
+  - [x] Review current setup
+  - [x] Plan improvements
+  - [x] Document changes
 
 ## Phase 4: Final Documentation Updates
 
 - [ ] Update README.md with new structure
+  - [ ] Add project overview
+  - [ ] Add build and development setup instructions
+    - [ ] Document local development setup
+    - [ ] Document Docker-based development
+    - [ ] Document production build process
+    - [ ] Add troubleshooting section
+  - [ ] Add architecture overview
+  - [ ] Add technology stack details
 - [ ] Add contribution guidelines
 - [ ] Update deployment instructions
+  - [ ] Document deployment prerequisites
+  - [ ] Add step-by-step deployment guide
+  - [ ] Add environment configuration guide
 - [ ] Review and update all documentation cross-references
 
 ## Notes

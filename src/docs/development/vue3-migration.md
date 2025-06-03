@@ -53,6 +53,8 @@ This document outlines the plan for upgrading the frontend from Vue 2 to Vue 3 a
    - [x] Add loading states
    - [x] Add error states
    - [ ] Add retry logic for failed requests
+   - [x] Remove Moment.js dependency
+   - [x] Update to Node.js 20
 
 2. **State Management Evaluation** [x]
 
@@ -123,7 +125,7 @@ This document outlines the plan for upgrading the frontend from Vue 2 to Vue 3 a
 - [x] Add request/response type definitions
 - [x] Add loading states
 - [x] Add error states
-- [x] Add retry logic
+- [ ] Add retry logic
 - [ ] Implement caching strategy
 
 ## Risk Mitigation
