@@ -10,7 +10,7 @@ This application provides a modern interface for accessing and visualizing site 
 
 - Vue 3 with Composition API
 - Vuetify 3 for UI components
-- ArcGIS integration for map visualization
+- ArcGIS and Leaflet integration for map visualization
 - Service-based architecture for API integration
 - Responsive design for all device sizes
 
