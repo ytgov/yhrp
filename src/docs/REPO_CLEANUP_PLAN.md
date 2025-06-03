@@ -51,10 +51,20 @@ This document outlines the plan for cleaning up and reorganizing the YHRP Site R
             - [ ] Proper pagination handling
             - [x] Error handling for API responses
       - [ ] Home Module
-        - [ ] Remove empty store directory
-        - [ ] Add data and services directories
-        - [ ] Add README.md
-        - [ ] Ensure consistent naming in all directories
+        - [x] Remove empty store directory
+        - [x] Add data and services directories
+        - [x] Add README.md
+        - [x] Ensure consistent naming in all directories
+        - [x] Refactor carousel into reusable component
+          - [x] Create HeroCarousel component
+          - [x] Implement responsive design
+          - [x] Add proper image scaling
+          - [x] Improve text overlay styling
+        - [ ] Future Work (TODOs)
+          - [ ] Add proper error handling for image loading
+          - [ ] Implement lazy loading for carousel images
+          - [ ] Add loading states for carousel
+          - [ ] Add unit tests for carousel component
     - [ ] Update import paths
 - [ ] Dependencies
   - [x] Remove unused axios dependency
