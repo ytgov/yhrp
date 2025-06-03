@@ -1,73 +1,5 @@
 <template>
-  <v-app-bar
-    app
-    color="#fff"
-    flat
-    height="70"
-    style="left: 0; border-bottom: 3px #f3b228 solid"
-  >
-    <img src="/yukon.svg" style="margin: -8px 85px 0 30px" height="44" />
-    <!-- <v-img class="ml-0m pl-0" src="src/assets/yukon.svg" height="44" /> -->
-
-    <v-toolbar-title>
-      <span class="font-weight-bold text-h5">{{ title }}</span>
-
-      <!-- <v-progress-circular
-        :class="loadingClass"
-        indeterminate
-        color="#f3b228"
-        size="20"
-        width="2"
-        class="ml-4"
-      ></v-progress-circular> -->
-    </v-toolbar-title>
-    <v-spacer></v-spacer>
-
-    <div>
-      <v-divider class="mr-5" vertical inset></v-divider>
-
-      <v-btn variant="text" size="large" color="primary">
-        <v-icon>mdi-dots-vertical</v-icon>
-
-        <v-menu activator="parent" offset-y class="ml-0">
-          <v-list style="min-width: 300px">
-            <v-list-item to="/map">
-              <template v-slot:prepend>
-                <v-icon>mdi-map-outline</v-icon>
-              </template>
-              <!-- <v-list-item-icon>
-                <v-icon>mdi-account</v-icon>
-              </v-list-item-icon> -->
-              <v-list-item-title>Map</v-list-item-title>
-            </v-list-item>
-
-            <v-list-item to="/places">
-              <template v-slot:prepend>
-                <v-icon>mdi-information-outline</v-icon>
-              </template>
-              <v-list-item-title>Historic Places</v-list-item-title>
-            </v-list-item>
-            <!-- <v-list-item to="/administration" v-if="isAdmin">
-              <template v-slot:prepend>
-                <v-icon>mdi-cogs</v-icon>
-              </template>
-              <v-list-item-title>Administration</v-list-item-title>
-            </v-list-item> -->
-            <v-divider />
-            <v-list-item>
-              <template v-slot:prepend>
-                <v-icon>mdi-email</v-icon>
-              </template>
-              <!-- <v-list-item-icon>
-                <v-icon>mdi-exit-run</v-icon>
-              </v-list-item-icon> -->
-              <v-list-item-title>Contact Us</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-      </v-btn>
-    </div>
-  </v-app-bar>
+  <AppNavbar />
 
   <v-main>
     <!-- Provides the application the proper gutter -->
@@ -90,11 +22,15 @@
 </template>
 
 <script>
+import AppNavbar from "@/components/AppNavbar.vue";
 import { applicationName } from "@/config";
 import { useNotificationService } from "@/services/notificationService";
 
 export default {
   name: "DefaultLayout",
+  components: {
+    AppNavbar,
+  },
 
   setup() {
     const { showNotification, show } = useNotificationService();
