@@ -1,5 +1,23 @@
 <template>
   <v-app-bar color="white" flat class="pb-4">
+    <v-breadcrumbs
+      :items="[
+        {
+          title: 'Home',
+          disabled: false,
+          to: '/',
+        },
+        ,
+        {
+          title: 'Places',
+          disabled: true,
+        },
+      ]"
+      divider=">"
+    >
+    </v-breadcrumbs>
+  </v-app-bar>
+  <v-app-bar color="white" flat class="pb-4">
     <v-toolbar-title class="black--text mr-2">
       List of Historic Places {{ this.filterText }}
       {{ this.photoCountText }}</v-toolbar-title
