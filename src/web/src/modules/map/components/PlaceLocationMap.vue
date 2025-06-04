@@ -113,6 +113,17 @@ export default {
 
       // Set initial base layer
       changeBaseLayer("streets");
+      console.log("centerMapOnMarker");
+      centerMapOnMarker();
+    };
+
+    const centerMapOnMarker = () => {
+      if (map && marker) {
+        map.setView(marker.getLatLng(), map.getZoom(), {
+          animate: true,
+          duration: 1,
+        });
+      }
     };
 
     const updatePopupContent = async () => {
@@ -131,7 +142,7 @@ export default {
       ([newLat, newLng]) => {
         if (map && marker) {
           marker.setLatLng([newLat, newLng]);
-          map.setView([newLat, newLng]);
+          centerMapOnMarker();
         }
       }
     );
