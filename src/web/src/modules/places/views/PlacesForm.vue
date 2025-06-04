@@ -1,244 +1,93 @@
 <template>
-  <v-app-bar flat class="text-grey-darken-1">
-    <v-breadcrumbs
-      :items="[
-        {
-          title: 'Home',
-          disabled: false,
-          to: '/',
-        },
-        ,
-        {
-          title: 'Places',
-          disabled: false,
-          to: '/places',
-        },
-        {
-          title: currentPlace?.name || '',
-          disabled: true,
-        },
-      ]"
-      divider=">"
-    >
-    </v-breadcrumbs>
-    <template v-slot:append>
-      <v-tooltip text="English">
-        <template v-slot:activator="{ props }">
-          <span
-            v-bind="props"
-            class="text-body-1 font-weight-bold"
-            @click="lang('EN')"
-            >EN</span
-          ></template
-        ></v-tooltip
-      >|
-      <v-tooltip text="Français">
-        <template v-slot:activator="{ props }">
-          <span
-            v-bind="props"
-            class="text-body-1 font-weight-bold"
-            @click="lang('FR')"
-            >FR</span
-          ></template
-        ></v-tooltip
-      >
-    </template>
-  </v-app-bar>
+  <div class="places-form">
+    <PlaceHeader
+      :current-lang="currentLang"
+      :place-name="currentPlace?.name"
+      @lang-change="handleLangChange"
+    />
 
-  <v-container width="100%" class="">
-    <v-row justify="center">
-      <v-col cols="9">
-        <h1>{{ communityName }}</h1>
-      </v-col>
-      <v-col cols="3">
-        <v-btn
-          class="button"
-          v-if="currentLang == 'En'"
-          @click="handleClick('Fr')"
-          >Francais</v-btn
-        >
-        <v-btn
-          class="button"
-          v-if="currentLang == 'Fr'"
-          @click="handleClick('En')"
-          >English</v-btn
-        >
-        <v-btn class="mx-1 form-header">Print</v-btn>
-      </v-col>
-    </v-row>
+    <v-container>
+      <v-row>
+        <v-col cols="12">
+          <h1 class="text-h4 mb-2">{{ communityName }}</h1>
+          <div class="d-flex justify-end">
+            <v-btn
+              v-if="!isMobile"
+              class="button mx-1"
+              @click="handlePrint"
+              color="primary"
+              variant="flat"
+            >
+              Print
+            </v-btn>
+          </div>
+        </v-col>
+      </v-row>
 
-    <v-row>
-      <v-col cols="8">
-        <v-card>
-          <v-carousel cycle height="500">
-            <v-carousel-item
-              v-for="(photo, i) in photos"
-              :key="i"
-              :src="photoURL(i + 1)"
-              reverse-transition="fade-transition"
-              transition="fade-transition"
-              hide-delimiter-background
-            ></v-carousel-item>
-          </v-carousel>
-        </v-card>
-      </v-col>
-      <v-col cols="4">
-        <v-card color="#BDBDBD" class="mx-auto" height="500">
-          <PlaceLocationMap
-            :latitude="latitude"
-            :longitude="longitude"
-            :place-name="primaryName"
+      <v-row>
+        <v-col cols="12" md="8">
+          <PlaceGallery :place-id="currentPlaceId" :photos="photos" />
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-card color="#BDBDBD" class="mx-auto" :height="mapHeight">
+            <PlaceLocationMap
+              :latitude="latitude"
+              :longitude="longitude"
+              :place-name="primaryName"
+            />
+          </v-card>
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <v-col cols="12">
+          <h4 class="text-h5">{{ primaryName }}</h4>
+          <div class="text-subtitle-1">
+            {{ currentPlace?.constructionPeriod }}
+          </div>
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <v-col cols="12">
+          <PlaceInfo
+            :designations="currentPlace?.designations || []"
+            :place-description="fieldsByLang[currentLang].placeDescription"
+            :heritage-value="fieldsByLang[currentLang].heritageValue"
+            :character-defining-elements="
+              currentPlace?.heritageValues?.find(
+                (v) => v.title === 'Character Defining Elements'
+              )?.content || []
+            "
+            :boundaries="
+              currentPlace?.heritageValues?.find(
+                (v) => v.title === 'Description of Boundaries'
+              )?.content || []
+            "
+            :cultural-history="currentPlace?.culturalHistory"
+            :historical-sources="currentPlace?.historicalSources || []"
           />
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col>
-        <h4>{{ primaryName }}</h4>
-        <div class="text-subtitle-1">
-          {{ currentPlace?.constructionPeriod }}
-        </div>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="8">
-        <v-expansion-panels v-model="panel" multiple>
-          <v-expansion-panel>
-            <v-expansion-panel-title color="primary" class="font-weight-black">
-              Designation
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <div
-                v-for="(designation, index) in currentPlace?.designations"
-                :key="index"
-              >
-                <div class="text-subtitle-1">{{ designation.level }}</div>
-                <div>Date: {{ designation.date }}</div>
-                <div>Bylaw: {{ designation.bylaw }}</div>
-                <div>Reasons:</div>
-                <ul>
-                  <li
-                    v-for="(reason, rIndex) in designation.reasons"
-                    :key="rIndex"
-                  >
-                    {{ reason }}
-                  </li>
-                </ul>
-              </div>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-
-          <v-expansion-panel>
-            <v-expansion-panel-title color="primary" class="font-weight-black">
-              Place Description
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              {{ fieldsByLang[currentLang].placeDescription }}
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-
-          <v-expansion-panel>
-            <v-expansion-panel-title color="primary" class="font-weight-black">
-              Heritage Value
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              {{ fieldsByLang[currentLang].heritageValue }}
-              <div>
-                <v-expansion-panels class="pt-5">
-                  <v-expansion-panel>
-                    <v-expansion-panel-title
-                      color="#BDBDBD"
-                      class="font-weight-black"
-                    >
-                      Character Defining Elements
-                    </v-expansion-panel-title>
-                    <v-expansion-panel-text>
-                      <ul>
-                        <li
-                          v-for="(
-                            item, index
-                          ) in currentPlace?.heritageValues?.find(
-                            (v) => v.title === 'Character Defining Elements'
-                          )?.content"
-                          :key="index"
-                        >
-                          {{ item }}
-                        </li>
-                      </ul>
-                    </v-expansion-panel-text>
-                  </v-expansion-panel>
-                  <v-expansion-panel>
-                    <v-expansion-panel-title
-                      color="#BDBDBD"
-                      class="font-weight-black"
-                    >
-                      Description of Boundaries
-                    </v-expansion-panel-title>
-                    <v-expansion-panel-text>
-                      <ul>
-                        <li
-                          v-for="(
-                            item, index
-                          ) in currentPlace?.heritageValues?.find(
-                            (v) => v.title === 'Description of Boundaries'
-                          )?.content"
-                          :key="index"
-                        >
-                          {{ item }}
-                        </li>
-                      </ul>
-                    </v-expansion-panel-text>
-                  </v-expansion-panel>
-                  <v-expansion-panel>
-                    <v-expansion-panel-title
-                      color="#BDBDBD"
-                      class="font-weight-black"
-                    >
-                      Cultural History
-                    </v-expansion-panel-title>
-                    <v-expansion-panel-text>
-                      {{ currentPlace?.culturalHistory }}
-                    </v-expansion-panel-text>
-                  </v-expansion-panel>
-                </v-expansion-panels>
-              </div>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-
-          <v-expansion-panel>
-            <v-expansion-panel-title color="primary" class="font-weight-black">
-              Historical Sources
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <div
-                v-for="(source, index) in currentPlace?.historicalSources"
-                :key="index"
-              >
-                <div class="text-subtitle-1">{{ source.title }}</div>
-                <ul>
-                  <li v-for="(item, i) in source.content" :key="i">
-                    {{ item }}
-                  </li>
-                </ul>
-              </div>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </v-col>
-    </v-row>
-  </v-container>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
 </template>
 
 <script>
-// import PrintButton from "../components/PrintButton";
-// import MapLoader from "../components/MapLoader";
-// import BasicMap from "@/modules/components/BasicMap";
-
 import PlaceLocationMap from "@/modules/map/components/PlaceLocationMap.vue";
+import PlaceGallery from "../components/PlaceGallery.vue";
+import PlaceHeader from "../components/PlaceHeader.vue";
+import PlaceInfo from "../components/PlaceInfo.vue";
 import { fetchPlaceById } from "../services/placesApi";
 
 export default {
   name: "PlacesForm",
+  components: {
+    PlaceHeader,
+    PlaceGallery,
+    PlaceLocationMap,
+    PlaceInfo,
+  },
   props: {
     placeId: {
       type: [String, Number],
@@ -248,17 +97,11 @@ export default {
       },
     },
   },
-  components: {
-    // BasicMap,
-    //MapLoader,
-    // PrintButton,
-    PlaceLocationMap,
-  },
   data: () => ({
-    currentLang: "En",
+    currentLang: "EN",
     panel: [0, 1, 2, 3],
     fieldsByLang: {
-      En: {
+      EN: {
         placeDescription: "",
         heritageValue: "",
         characterDef: "",
@@ -279,27 +122,22 @@ export default {
     longitude: "",
     recognitionDate: "",
     designations: "",
-    selectedImage: null,
     photos: [1, 2, 3, 4],
     infoLoaded: false,
     loading: false,
     error: null,
     currentPlace: null,
+    windowWidth: window.innerWidth,
   }),
   computed: {
     currentPlaceId() {
       return this.placeId;
     },
-    printData() {
-      return {
-        primaryName: this.primaryName,
-        communityName: this.communityName,
-        latitude: this.latitude,
-        longitude: this.longitude,
-        recognitionDate: this.recognitionDate,
-        designations: this.designations,
-        ...this.fieldsByLang[this.currentLang],
-      };
+    isMobile() {
+      return this.windowWidth < 600;
+    },
+    mapHeight() {
+      return this.windowWidth < 600 ? "300" : "500";
     },
   },
   watch: {
@@ -311,6 +149,12 @@ export default {
         }
       },
     },
+  },
+  mounted() {
+    window.addEventListener("resize", this.handleResize);
+  },
+  beforeUnmount() {
+    window.removeEventListener("resize", this.handleResize);
   },
   methods: {
     async fetchPlaceDetails() {
@@ -346,16 +190,16 @@ export default {
         }, {});
 
         // Map language fields
-        this.fieldsByLang.En = {
+        this.fieldsByLang.EN = {
           placeDescription: place.description,
-          heritageValue: place.description, // Using description as heritage value for now
+          heritageValue: place.description,
           characterDef: heritageValues.characterdefiningelements || "",
           descBound: heritageValues.descriptionofboundaries || "",
           additionalInfo: place.culturalHistory || "",
         };
 
         // For now, using English content for French
-        this.fieldsByLang.Fr = { ...this.fieldsByLang.En };
+        this.fieldsByLang.Fr = { ...this.fieldsByLang.EN };
 
         this.infoLoaded = true;
       } catch (error) {
@@ -365,22 +209,42 @@ export default {
         this.loading = false;
       }
     },
-    photoURL(index) {
-      return `http://register.yukonhistoricplaces.ca/Images/Places/${this.currentPlaceId}/${index}.jpg`;
-    },
-    handleClick(lang) {
+    handleLangChange(lang) {
       this.currentLang = lang;
     },
-    lang(lang) {
-      this.currentLang = lang;
+    handleResize() {
+      this.windowWidth = window.innerWidth;
+    },
+    handlePrint() {
+      window.print();
     },
   },
 };
 </script>
 
-<style>
-/* Custom CSS for the query builder */
+<style scoped>
+.places-form {
+  min-height: 100vh;
+}
+
 .button {
   background-color: #0097a9 !important;
+  color: white !important;
+}
+
+@media print {
+  .button {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .text-h4 {
+    font-size: 1.5rem !important;
+  }
+
+  .text-h5 {
+    font-size: 1.25rem !important;
+  }
 }
 </style>
