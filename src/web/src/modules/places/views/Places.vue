@@ -1,6 +1,6 @@
 <template>
   <div class="places-list">
-    <PlaceHeader :current-lang="currentLang" :place-name="'Historic Places'" />
+    <!-- <PlaceHeader :current-lang="currentLang" :place-name="'Historic Places'" /> -->
     <v-container>
       <v-row>
         <v-col cols="12">
@@ -12,7 +12,7 @@
               {{ photoCountText }}
             </h1>
             <div class="d-flex flex-column flex-sm-row gap-4 pt-4">
-              <v-select
+              <!-- <v-select
                 v-model="selectedLocation"
                 :items="locations"
                 label="Filter by Location"
@@ -21,7 +21,7 @@
                 class="flex-grow-1"
                 density="comfortable"
                 style="min-width: 200px; max-width: 400px"
-              ></v-select>
+              ></v-select> -->
             </div>
           </div>
         </v-col>
@@ -50,7 +50,7 @@
       </v-row>
       <v-row v-else>
         <v-col
-          v-for="(item, i) in filteredPlaces"
+          v-for="(item, i) in placesList"
           :key="`photo-${i}`"
           cols="12"
           sm="6"
@@ -58,13 +58,20 @@
           lg="3"
         >
           <place-card
-            :image-url="photoURL(item.id)"
-            :title="item.community"
-            :subtitle="item.name"
+            :image-url="photoURL(item.placeId)"
+            :title="item.name"
+            :subtitle="item.location"
             @click="handleClick(item)"
           />
+          <!-- <place-card
+            :image-url="item.thumbnail"
+            :title="item.communityName"
+            :subtitle="item.primaryName"
+            @click="handleClick(item)"
+          /> -->
         </v-col>
       </v-row>
+
       <v-row class="mb-2" v-if="!loading">
         <v-col>
           <div class="text-center">
@@ -81,10 +88,9 @@
 </template>
 
 <script setup>
+import PlaceCard from "@/modules/places/components/PlaceCard.vue";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import PlaceCard from "../components/PlaceCard.vue";
-import PlaceHeader from "../components/PlaceHeader.vue";
 import { fetchPlaces } from "../services/placesApi";
 
 const router = useRouter();
@@ -120,76 +126,86 @@ const selectedFilters = ref([]);
 const selectedLocation = ref(null);
 
 // Computed
-const totalPlaces = computed(() => placesList.value.length);
+// const totalPlaces = computed(() => placesList.value.length);
 
-const locations = computed(() => {
-  return [...new Set(placesList.value.map((place) => place.location))];
-});
+// const locations = computed(() => {
+//   if (!placesList.value || !Array.isArray(placesList.value)) {
+//     return [];
+//   }
+//   // Extract unique community names from the places list
+//   const uniqueLocations = new Set(
+//     placesList.value
+//       .map((place) => place.communityName || place.location)
+//       .filter(Boolean) // Remove null/undefined values
+//   );
+//   return Array.from(uniqueLocations).sort();
+// });
 
-const filteredPlaces = computed(() => {
-  if (!selectedLocation.value) {
-    return placesList.value;
-  }
-  return placesList.value.filter(
-    (place) => place.location === selectedLocation.value
-  );
-});
+// const filteredPlaces = computed(() => {
+//   if (!selectedLocation.value) {
+//     return placesList.value;
+//   }
+//   return placesList.value.filter(
+//     (place) =>
+//       (place.communityName || place.location) === selectedLocation.value
+//   );
+// });
 
-const sortByName = computed(() => {
-  return placesList.value
-    .slice()
-    .sort((a, b) =>
-      !a.name || !b.name
-        ? 0
-        : a.name.toLowerCase() > b.name.toLowerCase()
-        ? 1
-        : b.name.toLowerCase() > a.name.toLowerCase()
-        ? -1
-        : 0
-    );
-});
+// const sortByName = computed(() => {
+//   return placesList.value
+//     .slice()
+//     .sort((a, b) =>
+//       !a.name || !b.name
+//         ? 0
+//         : a.name.toLowerCase() > b.name.toLowerCase()
+//         ? 1
+//         : b.name.toLowerCase() > a.name.toLowerCase()
+//         ? -1
+//         : 0
+//     );
+// });
 
-const sortByRating = computed(() => {
-  return placesList.value
-    .slice()
-    .sort((a, b) =>
-      !a.rating || !b.rating
-        ? 0
-        : a.rating > b.rating
-        ? 1
-        : b.rating > a.rating
-        ? -1
-        : 0
-    );
-});
+// const sortByRating = computed(() => {
+//   return placesList.value
+//     .slice()
+//     .sort((a, b) =>
+//       !a.rating || !b.rating
+//         ? 0
+//         : a.rating > b.rating
+//         ? 1
+//         : b.rating > a.rating
+//         ? -1
+//         : 0
+//     );
+// });
 
-const sortByAge = computed(() => {
-  return placesList.value
-    .slice()
-    .sort((a, b) =>
-      !a.recognitionDate || !b.recognitionDate
-        ? 0
-        : a.recognitionDate > b.recognitionDate
-        ? 1
-        : b.recognitionDate > a.recognitionDate
-        ? -1
-        : 0
-    );
-});
+// const sortByAge = computed(() => {
+//   return placesList.value
+//     .slice()
+//     .sort((a, b) =>
+//       !a.recognitionDate || !b.recognitionDate
+//         ? 0
+//         : a.recognitionDate > b.recognitionDate
+//         ? 1
+//         : b.recognitionDate > a.recognitionDate
+//         ? -1
+//         : 0
+//     );
+// });
 
-const queryBuilderEmpty = computed(() => {
-  return (
-    !queryBuilder.value.children || queryBuilder.value.children.length === 0
-  );
-});
+// const queryBuilderEmpty = computed(() => {
+//   return (
+//     !queryBuilder.value.children || queryBuilder.value.children.length === 0
+//   );
+// });
 
 const photoCountText = computed(() => {
   return totalLength.value ? `(${totalLength.value})` : "(0)";
 });
 
-const showFiltersText = computed(() => {
-  return showFilterSection.value ? "Hide Filters" : "Show Filters";
-});
+// const showFiltersText = computed(() => {
+//   return showFilterSection.value ? "Hide Filters" : "Show Filters";
+// });
 
 // Methods
 const photoURL = (placeId) => {
@@ -206,9 +222,36 @@ const handleClick = (place) => {
 const getDataFromApi = async () => {
   loading.value = true;
   try {
-    const places = await fetchPlaces();
-    placesList.value = places;
-    totalLength.value = places.length;
+    const places = await fetchPlaces(page.value);
+
+    // Convert Buffer data to base64 data URLs using browser-compatible methods
+    placesList.value = places.data.map(({ ThumbFile, ...place }) => {
+      let thumbnailUrl = "";
+      if (ThumbFile && ThumbFile.data) {
+        try {
+          // Convert array of numbers to Uint8Array
+          const uint8Array = new Uint8Array(ThumbFile.data);
+
+          // Convert to base64 using a more reliable method
+          const base64 = btoa(
+            Array.from(uint8Array)
+              .map((byte) => String.fromCharCode(byte))
+              .join("")
+          );
+
+          thumbnailUrl = `data:image/jpeg;base64,${base64}`;
+        } catch (error) {
+          console.error("Error converting image data:", error);
+        }
+      }
+
+      return {
+        ...place,
+        thumbnail: thumbnailUrl,
+      };
+    });
+    totalLength.value = places.meta.item_count;
+    numberOfPages.value = places.meta.page_count;
   } catch (error) {
     console.error("Error fetching places:", error);
     error.value = "Failed to load places. Please try again later.";
@@ -221,42 +264,42 @@ const runQuery = () => {
   getDataFromApi();
 };
 
-const buildQueryBody = () => {
-  queryBody.value = { query: [] };
-  if (search.value) {
-    queryBody.value.query.push({
-      field: "featureName",
-      operator: "contains",
-      value: search.value,
-    });
-  }
-  if (queryBuilder.value.children) {
-    queryBuilder.value.children.forEach((x) => {
-      let rule = {};
-      rule.field = x.query.rule;
-      if (rule.field == "legacyBatchInfo") {
-        rule.operator =
-          x.query.operator == "includes" ? "contains" : "notcontains";
-        rule.value = x.query.value;
-      } else {
-        rule.operator = x.query.operator == "includes" ? "in" : "notin";
-        rule.value = x.query.value.join(",");
-      }
-      queryBody.value.query.push(rule);
-    });
-  }
-  queryBody.value.page = page.value;
-};
+// const buildQueryBody = () => {
+//   queryBody.value = { query: [] };
+//   if (search.value) {
+//     queryBody.value.query.push({
+//       field: "featureName",
+//       operator: "contains",
+//       value: search.value,
+//     });
+//   }
+//   if (queryBuilder.value.children) {
+//     queryBuilder.value.children.forEach((x) => {
+//       let rule = {};
+//       rule.field = x.query.rule;
+//       if (rule.field == "legacyBatchInfo") {
+//         rule.operator =
+//           x.query.operator == "includes" ? "contains" : "notcontains";
+//         rule.value = x.query.value;
+//       } else {
+//         rule.operator = x.query.operator == "includes" ? "in" : "notin";
+//         rule.value = x.query.value.join(",");
+//       }
+//       queryBody.value.query.push(rule);
+//     });
+//   }
+//   queryBody.value.page = page.value;
+// };
 
-const handleFilterChange = (newFilters) => {
-  selectedFilters.value = newFilters;
-  runQuery();
-};
+// const handleFilterChange = (newFilters) => {
+//   selectedFilters.value = newFilters;
+//   runQuery();
+// };
 
-const handleLocationChange = (location) => {
-  selectedLocation.value = location;
-  filterText.value = location ? `in ${location}` : "";
-};
+// const handleLocationChange = (location) => {
+//   selectedLocation.value = location;
+//   filterText.value = location ? `in ${location}` : "";
+// };
 
 // Watchers
 watch(
@@ -267,7 +310,7 @@ watch(
   { deep: true }
 );
 
-watch(page, () => {
+watch(page, (newPage) => {
   getDataFromApi();
 });
 
@@ -282,5 +325,15 @@ onMounted(() => {
 <style scoped>
 .v-col {
   transition: all 0.3s ease;
+}
+
+.debug-output {
+  background-color: #f5f5f5;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 </style>

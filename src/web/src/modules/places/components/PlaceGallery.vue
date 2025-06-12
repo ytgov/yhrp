@@ -91,7 +91,7 @@ export default {
   },
   methods: {
     photoURL(index) {
-      return `http://register.yukonhistoricplaces.ca/Images/Places/${this.placeId}/${index}.jpg`;
+      return `https://yhis.gov.yk.ca/api/register/images/${this.placeId}/${index}.jpg`;
     },
     openFullscreen(index) {
       this.currentPhotoIndex = index;

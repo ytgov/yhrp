@@ -2,7 +2,6 @@
  * Places API Service
  * Handles all API interactions for the Places module
  */
-import mockPlaces from "../data/mock/places.json";
 
 // Types
 /**
@@ -36,63 +35,96 @@ import mockPlaces from "../data/mock/places.json";
  * @property {number} meta.page_count - Total number of pages
  */
 
+import { apiBaseUrl } from "../../../config";
+
+// Use our backend API endpoint
+export const API_BASE_URL = `${apiBaseUrl}/api/register`;
+
 /**
- * Transform raw place data into the format expected by the UI
- * @param {Object} place - Raw place data from mock
+ * Transform raw place data from the API into the format expected by the UI
+ * @param {Object} place - Raw place data from API
  * @returns {Place} Transformed place data
  */
 function transformPlace(place) {
-  // Ensure we have a valid placeId
-  const placeId = place.placeId || place.id;
-  if (!placeId) {
-    console.warn("Missing placeId in place data:", place);
-  }
-
+  // The API returns fields like id, primaryName, latitude, longitude, etc.
   return {
-    placeId: placeId,
-    id: placeId, // Add id for backward compatibility
-    name: place.name,
-    location: place.location,
-    description: place.description,
-    coordinates: place.coordinates,
+    placeId: place.id,
+    id: place.id, // For backward compatibility
+    name: place.primaryName || place.name,
+    location: place.communityName || place.location,
+    description: place.description || "",
+    coordinates: [place.latitude, place.longitude],
     designations: place.designations || [],
-    heritageValues: (place.heritageValues || []).map((value) => ({
-      title: value.title,
-      items: Array.isArray(value.content) ? value.content : [value.content],
-    })),
-    culturalHistory: place.culturalHistory,
-    historicalSources: (place.historicalSources || []).map((source) => ({
-      title: source.title,
-      items: Array.isArray(source.content) ? source.content : [source.content],
-    })),
+    heritageValues: place.heritageValues || [],
+    culturalHistory: place.culturalHistory || "",
+    historicalSources: place.historicalSources || [],
+    ThumbFile: place.ThumbFile || null,
   };
 }
 
 /**
  * Fetch places with pagination
- * @param {Object} params - Query parameters
- * @param {number} params.page - Page number
- * @param {number} params.pageSize - Items per page
- * @param {string} [params.search] - Search query
+ * @param {number} page - Page number (1-based)
  * @returns {Promise<PlacesResponse>}
  */
-export async function fetchPlaces() {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  return mockPlaces.map(transformPlace);
+export async function fetchPlaces(page = 1) {
+  try {
+    const url = `${API_BASE_URL}?page=${page}`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to fetch places: ${response.status} - ${errorText}`
+      );
+    }
+
+    // Check content type
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error(`Expected JSON response but got ${contentType}`);
+    }
+
+    const data = await response.json();
+    return {
+      data: (data.data || []).map(transformPlace),
+      meta: data.meta || {
+        page: page,
+        page_size: 12,
+        item_count: data.data?.length || 0,
+        page_count: Math.ceil((data.data?.length || 0) / 12),
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching places:", error);
+    throw error;
+  }
 }
 
 /**
- * Fetch a single place by ID
- * @param {string} id - Place ID
+ * Fetch a single place by ID (from the paginated list, since no /:id endpoint exists)
+ * @param {string|number} id - Place ID
  * @returns {Promise<Place>}
  */
 export async function fetchPlaceById(id) {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  const place = mockPlaces.find((p) => p.placeId === parseInt(id));
-  if (!place) {
-    throw new Error("Place not found");
+  try {
+    // Fetch all places and find the one with the matching id
+    // (This is not efficient, but the API does not provide a /:id endpoint)
+    let page = 1;
+    let found = null;
+    let pageCount = 1;
+    do {
+      const { data, meta } = await fetchPlaces(page);
+      found = data.find((p) => p.placeId === parseInt(id));
+      pageCount = meta.page_count;
+      page++;
+    } while (!found && page <= pageCount);
+    if (!found) {
+      throw new Error("Place not found");
+    }
+    return found;
+  } catch (error) {
+    console.error("Error fetching place by ID:", error);
+    throw error;
   }
-  return transformPlace(place);
 }
