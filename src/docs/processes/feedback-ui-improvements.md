@@ -35,7 +35,54 @@ This document tracks the feedback received and the planned improvements for the 
 
 ## API
 
-- [ ] Confirm all API calls use root: `https://yhis.gov.yk.ca/api/register/`
+- [x] Confirm all API calls use root: `https://yhis.gov.yk.ca/api/register/`
+- [x] Implement proper pagination handling in frontend and backend
+- [x] Handle image data conversion from Buffer to base64 for thumbnails
+
+---
+
+## Frontend Vue Components Update Plan
+
+- [x] **PlaceCard.vue**
+
+  - [x] Update `imageUrl` prop to use direct image URL from API
+  - [x] Map title and subtitle to correct fields (`name` and `location`)
+  - [x] Implement proper click handling for navigation
+
+- [ ] **PlaceInfo.vue**
+
+  - [ ] Update props to match the real API response structure (e.g., `placeDescription`, `heritageValue`, `culturalHistory`, `historicalSources`).
+  - [ ] Adjust rendering logic if the API response structure differs from the current mock data.
+
+- [ ] **PlaceHeader.vue**
+
+  - [ ] Ensure the `placeName` prop is correctly populated from the real API response (e.g., using `primaryName`).
+
+- [ ] **PlaceGallery.vue**
+
+  - [ ] Update the `photoURL` method to use the correct URL structure for fetching images from the real API.
+  - [ ] Ensure the `photos` prop is correctly populated from the API response.
+
+- [x] **Places.vue**
+
+  - [x] Implement proper pagination with v-pagination component
+  - [x] Add loading states and error handling
+  - [x] Update image handling to use direct URLs
+  - [x] Clean up debug code and console logs
+
+- [ ] **Testing**
+  - [ ] Test each component to ensure it correctly displays data from the real API.
+  - [ ] Verify that images, descriptions, and other details are rendered correctly.
+
+---
+
+## Recent Changes
+
+1. Updated Places.vue to use direct image URLs instead of base64 thumbnails
+2. Implemented proper pagination handling in both frontend and backend
+3. Cleaned up debug code and console logs
+4. Fixed image display in PlaceCard component
+5. Updated field mapping to match API response structure
 
 ---
 

@@ -69,6 +69,24 @@
           />
         </v-col>
       </v-row>
+
+      <!-- Debug section -->
+      <v-row>
+        <v-col cols="12">
+          <v-expansion-panels>
+            <v-expansion-panel>
+              <v-expansion-panel-title
+                >Debug: Raw API Data</v-expansion-panel-title
+              >
+              <v-expansion-panel-text>
+                <pre class="debug-output">{{
+                  JSON.stringify(currentPlace, null, 2)
+                }}</pre>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </v-col>
+      </v-row>
     </v-container>
   </div>
 </template>
@@ -232,8 +250,21 @@ export default {
   color: white !important;
 }
 
+.debug-output {
+  background-color: #f5f5f5;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 @media print {
   .button {
+    display: none;
+  }
+  .debug-output {
     display: none;
   }
 }
