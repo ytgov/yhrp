@@ -126,7 +126,7 @@ registerRouter.get(
         return res.status(404).send("Photo not found");
       })
       .catch((err) => {
-        console.error(err);
+        console.error("Error fetching photo:", err);
         return res.status(404).send("Photo not found");
       });
   }

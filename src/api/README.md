@@ -4,6 +4,11 @@
 
 This directory contains the backend API implementation for the YHRP Site Registry Viewer.
 
+## Remote API Endpoint
+
+- The production/remote API is available at: `https://yhis.gov.yk.ca/api/register/`
+- All remote integration and contract tests should use this base URL.
+
 ## Directory Structure
 
 ```
