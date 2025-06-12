@@ -73,6 +73,7 @@ This document tracks the feedback received and the planned improvements for the 
   - [x] Add loading states and error handling
   - [x] Update image handling to use direct URLs
   - [x] Clean up debug code and console logs
+  - [ ] Fix broken photo display on Places.vue
 
 - [ ] **Testing**
   - [ ] Test each component to ensure it correctly displays data from the real API.

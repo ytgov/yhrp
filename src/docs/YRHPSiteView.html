@@ -1,0 +1,152 @@
+<html>
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+<!-- Load Leaflet from CDN -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+crossorigin=""></script>
+
+<!-- Load Esri Leaflet from CDN -->
+<script src="https://unpkg.com/esri-leaflet@3.0.2/dist/esri-leaflet.js"
+integrity="sha512-myckXhaJsP7Q7MZva03Tfme/MSF5a6HC2xryjAM4FxPLHGqlh5VALCbywHnzs2uPoF/4G/QVXyYDDSkp5nPfig=="
+crossorigin=""></script>
+
+</head>
+  
+<style>  
+  #map { height: 500px}
+</style>
+
+<body>
+  <div id="app">
+    <v-app>
+      <v-main>
+        <v-container class="mx-40">
+          <v-row>
+            <v-col cols='10'>
+              <h1>{{site}}</h1>
+
+            </v-col>
+            <v-col cols = '1'>
+              <a
+              href="#"
+            >Francais</a> <!-- Changes the page to use french translation-->
+              
+            </v-col>
+            <v-col cols='1'>
+              <v-icon large> mdi-printer </v-icon> <!-- Create print friendly view in HTML so everything prints out nothing not expanded-->
+              <v-icon large> mdi-share </v-icon>  <!-- share URL to copy to whatever platform-->
+            </v-col>
+          </v-row>
+  
+          <v-row>
+            <v-col cols="8">
+          <v-card >
+            <v-carousel cycle height= "500">
+              <v-carousel-item
+                v-for="(photo,i) in photos"
+                :key="i"
+                :src="photo.src"
+                reverse-transition="fade-transition"
+                transition="fade-transition"
+              ></v-carousel-item>
+            </v-carousel> <!-- everytime the image changes it bumps the user to the top of the screen, need to fix so that doesn't happen. Annoying when trying to read the boundary description-->
+          </v-card>
+        </v-col>
+        <v-col cols= "4">
+          <v-card color= #BDBDBD class="mx-auto">
+            <div id="map"></div>
+          </v-card>
+        </v-col>
+      </v-row>
+  <v-row>
+    <v-col>
+      <h4>{{teaser}}</h4>
+    </v-col>
+  </v-row>
+      <v-row>
+        <v-col cols = "12">
+          <v-expansion-panels  v-model="panel" multiple>
+            <v-expansion-panel
+              v-for="(item,i) in items"
+              :key="i"
+            >
+              <v-expansion-panel-header  color= #BDBDBD class="font-weight-black">
+                {{item.title}}
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                {{item.text}}
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </v-col>
+      </v-row>
+</v-container>
+
+      </v-main>
+    </v-app>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script>
+
+    new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+    data () {
+        return {
+            items: [
+              //
+          { title: 'Designation', text: 'Designation Level: Territorial     Designation Date: August 06, 2010'}, //designations and recognition date from https://test.heritage.ynet.gov.yk.ca/api/register reformat so stacked text
+          { title: 'Place Description', text: 'Fort Selkirk Historic Site is contained within Lot 1021, Plan 2008-0123, a 50 hectare site in central Yukon, on a terrace bank of the Yukon River near the mouth of the Pelly River. The site has archaeological evidence of late prehistoric use and occupation overlain by archaeological resources, standing structures and artifacts remaining from the historic settlement dating from 1852.'},
+          // placeDescriptionEn or placeDescriptionFr from https://test.heritage.ynet.gov.yk.ca/api/register/32 (32=id)
+          { title: 'Heritage Value', text: 'The Selkirk First Nation Final Agreement requires that Fort Selkirk be designated as a Yukon Historic Site to commemorate its heritage significance to all people of the Yukon. Fort Selkirk is set in a pristine, river valley rich in natural resources and surrounded by a mountainous, boreal landscape with a dynamic geological record. There is an intangible, aesthetic and emotional attraction to the site that exudes a sense of community secured within a rugged and visually striking environment. Fort Selkirk illustrates the unique contribution and combination of different cultures and natural environment that has helped form the social, economic and political fabric of the territory. The site also illustrates the historic trading economy, the transportation development of the Yukon, the sovereignty of Canada, the early expansion of the church and community life in a northern isolated area. Fort Selkirk is central to the homeland of the Northern Tutchone and their cultural traditions such as game harvesting, trade and travel. This place has been a traditional harvesting and gathering site for thousands of years. Its importance as a place for meeting and trading between First Nations is evidenced by a network of traditional trails and archaeological artifacts. It is the first place where the Northern Tutchone people encountered and hosted colonists from afar. The site was given its English name by Robert Campbell of the Hudsons Bay Company, who established a trading post here in 1852. The aboriginal name for the place has been lost over time. Although short-lived, the post signified the beginning of an era as a Yukon centre of commerce and communication with the outside world. It continued as a hub of land, river and later, air transportation until the middle of the 20th century.'},
+          //heritageValueEn or HeritageValueFr from https://test.heritage.ynet.gov.yk.ca/api/register/32
+          { title: 'Character Definition', text: '37 standing, historic structures, their components and their relationship with each other in a linear arrangement facing the Yukon River.  Fenestration, roof styles and floor plans of the standing buildings. Wood frame windows and doors, interior finishing and exterior finishes such as roof and wall cladding, log wall construction. Two well maintained cemeteries.  Archaeological evidence of prehistoric and historic use and occupation.  A collection of prehistoric and historic artifacts. A combination of natural and culturally modified landscape features including the open, grassy meadow surrounding the historic town site, the vestiges of the historic and pre-historic trails, and the rugged uncultivated riverbank'},
+          //characterDefEn or characterDefEn from https://test.heritage.ynet.gov.yk.ca/api/register/32
+          { title: 'Additional Information', text: 'Robert Campbell established a Hudson Bay Company trading post nearby in 1848. In early 1852, he moved the post to its current location. Resenting the interference of the Hudsons Bay Company with their traditional trade with interior Athabaskan First Nations, Chilkat Tlingit First Nation warriors attacked and looted the post that summer on Saturday, August 21, 1852. The fort was rebuilt about 40 years later and became an important supply point along the Yukon River. At age 28, under the command of Inspector John Douglas Moodie, Francis Joseph Fitzgerald was the first person of European descent to chart an overland route from Edmonton to Fort Selkirk, Yukon via northern British Columbia and the Pelly River (1897). The voyage took eleven months, having covered about 1,000 miles. As a result of this achievement, Fitzgerald was promoted corporal in 1899. Fort Selkirk was essentially abandoned by the mid-1950s after the Klondike Highway bypassed it and Yukon River traffic died down.'},
+          // additionalInfoEn or additionInfoFr from https://test.heritage.ynet.gov.yk.ca/api/register/32
+          { title: 'Description of Boundaries', text: 'Lot 1021, Plan 2008-0123 LTO YT'},
+          // descBoundEn or decBoundFr from https://test.heritage.ynet.gov.yk.ca/api/register/32 
+            ],
+      panel: [0,1,2,3],
+      photos: [
+          {
+            src: 'http://register.yukonhistoricplaces.ca/Images/Places/1170/1.jpg',
+          },
+          {
+            src: 'http://register.yukonhistoricplaces.ca/Images/Places/1170/2.JPG',
+          },
+          {
+            src: 'http://register.yukonhistoricplaces.ca/Images/Places/1170/3.JPG',
+          },
+          {
+            src: 'http://register.yukonhistoricplaces.ca/Images/Places/1170/4.jpg',
+          },
+          {
+            src: 'http://register.yukonhistoricplaces.ca/Images/Places/1170/5.jpg',
+          },    // from reference a specific photo https://test.heritage.ynet.gov.yk.ca/api/register/32/photos/077857A0-B6FE-415A-811A-011473EF7BB3 where the last number is rowId
+        ],
+        site: 'Fort Selkirk', //primaryName from https://test.heritage.ynet.gov.yk.ca/api/register
+        coordinates: [62.7748, -137.3877], //latitude & longitude from https://test.heritage.ynet.gov.yk.ca/api/register
+        teaser: 'Fort Selkirk is a former trading post on the Yukon River at the confluence of the Pelly River in Yukon. For many years it was home to the Selkirk First Nation (Northern Tutchone).', //teaserEnglish from https://test.heritage.ynet.gov.yk.ca/api/register
+        }
+    }
+    })
+
+var map = L.map('map').setView([62.7748, -137.3877], 8);  //sets map centre and zoom scale.  Use lat and long from above.
+var marker = L.marker([62.7748, -137.3877], ).addTo(map);
+L.esri.basemapLayer('Topographic').addTo(map);
+
+   
+  </script>
+
+</body>
+</html>
