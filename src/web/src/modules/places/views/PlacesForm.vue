@@ -160,7 +160,7 @@ import PlaceLocationMap from "@/modules/map/components/PlaceLocationMap.vue";
 import PlaceDesignation from "../components/PlaceDesignation.vue";
 import PlaceGallery from "../components/PlaceGallery.vue";
 import PlaceHeader from "../components/PlaceHeader.vue";
-import { API_BASE_URL, fetchPlaceById } from "../services/placesApi";
+import { fetchPlaceById, fetchPlacePhotos } from "../services/placesApi";
 
 export default {
   name: "PlacesForm",
@@ -229,14 +229,7 @@ export default {
     },
     async fetchPhotos() {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/${this.currentPlaceId}/photos`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch photos");
-        }
-        const data = await response.json();
-        this.photos = data.data || [];
+        this.photos = await fetchPlacePhotos(this.currentPlaceId);
       } catch (error) {
         console.error("Error fetching photos:", error);
         this.error = "Failed to load photos. Please try again later.";
