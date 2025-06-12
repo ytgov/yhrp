@@ -30,7 +30,9 @@ export const AUTH_AUDIENCE = import.meta.env.VITE_AUTH_AUDIENCE;
 
 export const environment = process.env.NODE_ENV;
 export const apiBaseUrl =
-  process.env.NODE_ENV == "production" ? "" : "http://localhost:3000";
+  process.env.NODE_ENV == "production"
+    ? "https://yhis.gov.yk.ca/api"
+    : "http://localhost:3000";
 export const applicationUrl =
   process.env.VUE_APP_FRONTEND_URL || "http://localhost:8080";
 
