@@ -20,31 +20,15 @@
           </v-breadcrumbs>
         </v-col>
         <v-col cols="auto">
-          <div class="language-switcher">
-            <v-tooltip text="English" location="bottom">
-              <template v-slot:activator="{ props }">
-                <span
-                  v-bind="props"
-                  class="text-body-1 font-weight-bold cursor-pointer"
-                  :class="{ 'active-lang': currentLang === 'EN' }"
-                  @click="handleLangChange('EN')"
-                  >EN</span
-                >
-              </template>
-            </v-tooltip>
-            <span class="mx-2">|</span>
-            <v-tooltip text="Français" location="bottom">
-              <template v-slot:activator="{ props }">
-                <span
-                  v-bind="props"
-                  class="text-body-1 font-weight-bold cursor-pointer"
-                  :class="{ 'active-lang': currentLang === 'FR' }"
-                  @click="handleLangChange('FR')"
-                  >FR</span
-                >
-              </template>
-            </v-tooltip>
-          </div>
+          <v-btn
+            class="button mx-1"
+            @click="$emit('print')"
+            color="primary"
+            variant="flat"
+          >
+            <v-icon left>mdi-printer</v-icon>
+            <span class="ml-2">Print</span>
+          </v-btn>
         </v-col>
       </v-row>
     </v-container>
@@ -55,11 +39,6 @@
 export default {
   name: "PlaceHeader",
   props: {
-    currentLang: {
-      type: String,
-      required: true,
-      validator: (value) => ["EN", "FR"].includes(value),
-    },
     placeName: {
       type: String,
       default: "",
@@ -85,11 +64,7 @@ export default {
       ];
     },
   },
-  methods: {
-    handleLangChange(lang) {
-      this.$emit("lang-change", lang);
-    },
-  },
+  methods: {},
 };
 </script>
 
