@@ -58,7 +58,7 @@
           lg="3"
         >
           <place-card
-            :image-url="photoURL(item.placeId)"
+            :image-url="photoURL(item)"
             :title="item.name"
             :subtitle="item.location"
             @click="handleClick(item)"
@@ -208,53 +208,33 @@ const photoCountText = computed(() => {
 // });
 
 // Methods
-const photoURL = (placeId) => {
-  return `http://register.yukonhistoricplaces.ca/Images/Places/${placeId}/1.jpg`;
+const photoURL = (place) => {
+  if (place.ThumbFile?.data) {
+    return `data:image/jpeg;base64,${toBase64(place.ThumbFile.data)}`;
+  }
+  return "";
+};
+
+const toBase64 = (arr) => {
+  return btoa(arr.reduce((data, byte) => data + String.fromCharCode(byte), ""));
 };
 
 const handleClick = (place) => {
   router.push({
     name: "placeView",
-    params: { placeId: place.placeId || place.id },
+    params: { placeId: place.placeId },
   });
 };
 
 const getDataFromApi = async () => {
   loading.value = true;
   try {
-    const places = await fetchPlaces(page.value);
-
-    // Convert Buffer data to base64 data URLs using browser-compatible methods
-    placesList.value = places.data.map(({ ThumbFile, ...place }) => {
-      let thumbnailUrl = "";
-      if (ThumbFile && ThumbFile.data) {
-        try {
-          // Convert array of numbers to Uint8Array
-          const uint8Array = new Uint8Array(ThumbFile.data);
-
-          // Convert to base64 using a more reliable method
-          const base64 = btoa(
-            Array.from(uint8Array)
-              .map((byte) => String.fromCharCode(byte))
-              .join("")
-          );
-
-          thumbnailUrl = `data:image/jpeg;base64,${base64}`;
-        } catch (error) {
-          console.error("Error converting image data:", error);
-        }
-      }
-
-      return {
-        ...place,
-        thumbnail: thumbnailUrl,
-      };
-    });
-    totalLength.value = places.meta.item_count;
-    numberOfPages.value = places.meta.page_count;
-  } catch (error) {
-    console.error("Error fetching places:", error);
-    error.value = "Failed to load places. Please try again later.";
+    const response = await fetchPlaces(page.value);
+    placesList.value = response.places;
+    totalLength.value = response.total;
+    numberOfPages.value = Math.ceil(response.total / response.pageSize);
+  } catch (err) {
+    error.value = err.message;
   } finally {
     loading.value = false;
   }

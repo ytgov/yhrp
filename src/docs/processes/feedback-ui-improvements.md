@@ -23,13 +23,16 @@ This document tracks the feedback received and the planned improvements for the 
 ## Place Form
 
 - [ ] Fix carousel so switching pictures does not scroll to top
-- [ ] Add teaser line under photo and map
-- [ ] Change map background to ESRI Topographic base ([ArcGIS Leaflet docs](https://developers.arcgis.com/esri-leaflet/maps/change-the-basemap-style/))
-- [ ] Center the point in the middle of the map
-- [ ] Move print button to right-hand side
-- [ ] Only include elements/fields shown in the provided mock-up
-- [ ] Remove navigation between sections; allow scrolling
+- [x] Add teaser line under photo and map
+- [x] Change map background to ESRI Topographic base ([ArcGIS Leaflet docs](https://developers.arcgis.com/esri-leaflet/maps/change-the-basemap-style/))
+- [x] Center the point in the middle of the map
+- [x] Move print button to right-hand side
+- [x] Only include elements/fields shown in the provided mock-up
+- [x] Remove navigation between sections; allow scrolling
 - [ ] Ensure secondary title displays place name (not address)
+- [x] Flattened PlaceForm layout and improved text formatting
+- [x] Print button is now in the app bar, right-aligned
+- [x] Print button spacing improved
 
 ---
 
@@ -51,17 +54,18 @@ This document tracks the feedback received and the planned improvements for the 
 
 - [ ] **PlaceInfo.vue**
 
-  - [ ] Update props to match the real API response structure (e.g., `placeDescription`, `heritageValue`, `culturalHistory`, `historicalSources`).
-  - [ ] Adjust rendering logic if the API response structure differs from the current mock data.
+  - [x] Adjust rendering logic if the API response structure differs from the current mock data.
 
-- [ ] **PlaceHeader.vue**
+- [x] **PlaceHeader.vue**
 
-  - [ ] Ensure the `placeName` prop is correctly populated from the real API response (e.g., using `primaryName`).
+  - [x] Ensure the `placeName` prop is correctly populated from the real API response (e.g., using `primaryName`).
+  - [x] Move print button to app bar, remove language selector from header.
+  - [x] Add spacing between print icon and text.
 
 - [ ] **PlaceGallery.vue**
 
-  - [ ] Update the `photoURL` method to use the correct URL structure for fetching images from the real API.
-  - [ ] Ensure the `photos` prop is correctly populated from the API response.
+  - [x] Update the `photoURL` method to use the correct URL structure for fetching images from the real API.
+  - [x] Ensure the `photos` prop is correctly populated from the API response.
 
 - [x] **Places.vue**
 
@@ -83,14 +87,22 @@ This document tracks the feedback received and the planned improvements for the 
 3. Cleaned up debug code and console logs
 4. Fixed image display in PlaceCard component
 5. Updated field mapping to match API response structure
+6. Moved print button to app bar and removed language selector from header
+7. Flattened PlaceForm layout and improved text formatting
+8. Added spacing between print icon and text in app bar
+9. Ensured historical sources and other formatted text respect original spacing and line breaks
+10. Started ESRI map implementation with proper layer configuration
+11. Removed unused map layer options to simplify the interface
+12. Implemented Photo model and updated PlaceGallery component to use it
+13. Fixed image loading and display in PlaceGallery component
+14. Updated API response handling for photos and metadata
 
 ---
 
 ## Notes
 
 - Awaiting eServices footer standards and updated homepage verbiage
-- Awaiting mock-up for place form layout
-- Reference: Feedback received [date]
+- Reference: Feedback received June 10, 2024
 
 ---
 
