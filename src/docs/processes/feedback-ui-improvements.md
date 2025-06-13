@@ -15,7 +15,7 @@ This document tracks the feedback received and the planned improvements for the 
 
 ## Home Page
 
-- [ ] Remove the blue mobile region (previously linked to custom app)
+- [x] Remove the blue mobile region (previously linked to custom app)
 - [ ] Update homepage verbiage (pending new text)
 
 ---
