@@ -11,9 +11,7 @@ switch (process.env.NODE_ENV) {
 
 export const environment = process.env.NODE_ENV;
 export const apiBaseUrl =
-  process.env.NODE_ENV == "production"
-    ? "/api/register"
-    : "http://localhost:3000";
+  process.env.NODE_ENV == "production" ? "/" : "http://localhost:3000";
 export const applicationUrl =
   process.env.VUE_APP_FRONTEND_URL || "http://localhost:8080";
 
