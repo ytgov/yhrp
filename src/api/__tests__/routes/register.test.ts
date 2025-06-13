@@ -1,7 +1,7 @@
 import express from "express";
 import "jest";
 import request from "supertest";
-import { RegisterController } from "../../controllers/register-controller";
+import { RegisterController } from "../../controllers/place-controller";
 import {
   DescriptionService,
   Photo,
@@ -9,7 +9,7 @@ import {
   PhotoService,
   Place,
   RegisterService,
-} from "../../services/register-service";
+} from "../../services/place-service";
 
 // Mock implementations for testing
 class MockRegisterService implements RegisterService {

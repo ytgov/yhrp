@@ -1,2 +1,2 @@
 export * from "./data-routes";
-export * from "./register-routes";
+export * from "./place-routes";

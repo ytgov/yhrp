@@ -1,6 +1,6 @@
 import cors from "cors";
 import express, { Request, Response } from "express";
-import registerRouter from "./routes/register-routes";
+import registerRouter from "./routes/place-routes";
 import { doHealthCheck } from "./utils/healthCheck";
 
 const app = express();
