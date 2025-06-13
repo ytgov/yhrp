@@ -45,6 +45,10 @@ This document tracks the feedback received and the planned improvements for the 
   - [x] Extract Place model to separate file
   - [x] Move photo fetching to placesApi service
   - [x] Improve photo URL generation in Place model
+- [x] Implement caching system for API responses
+  - [x] Add 15-minute TTL cache for all API responses
+  - [x] Implement cache-aware fetch wrapper
+  - [x] Cache place listings, details, and photos
 
 ---
 
@@ -93,29 +97,33 @@ This document tracks the feedback received and the planned improvements for the 
 
 ## Recent Changes
 
-1. Refactored Place model and API service for better organization
+1. Implemented caching system for API responses
+   - Added 15-minute TTL cache using node-cache
+   - Created cache-aware fetch wrapper
+   - Implemented caching for place listings, details, and photos
+2. Refactored Place model and API service for better organization
    - Extracted Place model to separate file
    - Moved photo fetching to placesApi service
    - Improved photo URL generation in Place model
-2. Enhanced desktop navbar
+3. Enhanced desktop navbar
    - Added French language toggle text
    - Updated menu icon to hamburger style
    - Increased menu icon size
-3. Removed unused yarn.lock file (project uses npm)
-4. Updated Places.vue to use direct image URLs instead of base64 thumbnails
-5. Implemented proper pagination handling in both frontend and backend
-6. Cleaned up debug code and console logs
-7. Fixed image display in PlaceCard component
-8. Updated field mapping to match API response structure
-9. Moved print button to app bar and removed language selector from header
-10. Flattened PlaceForm layout and improved text formatting
-11. Added spacing between print icon and text in app bar
-12. Ensured historical sources and other formatted text respect original spacing and line breaks
-13. Started ESRI map implementation with proper layer configuration
-14. Removed unused map layer options to simplify the interface
-15. Implemented Photo model and updated PlaceGallery component to use it
-16. Fixed image loading and display in PlaceGallery component
-17. Updated API response handling for photos and metadata
+4. Removed unused yarn.lock file (project uses npm)
+5. Updated Places.vue to use direct image URLs instead of base64 thumbnails
+6. Implemented proper pagination handling in both frontend and backend
+7. Cleaned up debug code and console logs
+8. Fixed image display in PlaceCard component
+9. Updated field mapping to match API response structure
+10. Moved print button to app bar and removed language selector from header
+11. Flattened PlaceForm layout and improved text formatting
+12. Added spacing between print icon and text in app bar
+13. Ensured historical sources and other formatted text respect original spacing and line breaks
+14. Started ESRI map implementation with proper layer configuration
+15. Removed unused map layer options to simplify the interface
+16. Implemented Photo model and updated PlaceGallery component to use it
+17. Fixed image loading and display in PlaceGallery component
+18. Updated API response handling for photos and metadata
 
 ---
 

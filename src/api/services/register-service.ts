@@ -1,83 +1,89 @@
-export interface Place {
-  id: number;
-  name: string;
-  recognitionDate: Date;
-  status: string;
-  placeDescriptionEn?: string;
-  placeDescriptionFr?: string;
-  heritageValueEn?: string;
-  heritageValueFr?: string;
-  characterDefEn?: string;
-  characterDefFr?: string;
-  descBoundEn?: string;
-  descBoundFr?: string;
-  additionalInfoEn?: string;
-  additionalInfoFr?: string;
-}
+import NodeCache from "node-cache";
 
-export interface Photo {
-  id: number;
-  url: string;
-  caption: string;
-}
+// Cache configuration - items expire after 15 minutes
+const cache = new NodeCache({ stdTTL: 900 });
 
-export interface PhotoFile {
-  file: Buffer;
-}
+const BASE_URL = "https://yhis.gov.yk.ca/api/register";
 
-export interface Description {
-  type: number;
-  descriptionText: string;
-}
+export class RegisterService {
+  private async fetchWithCache<T>(url: string, cacheKey: string): Promise<T> {
+    // Check cache first
+    const cachedData = cache.get<T>(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
 
-export interface RegisterService {
-  getRegisterAll(_skip: number, _take: number): Promise<Place[]>;
-  getPlaceInRegisterCount(): Promise<number>;
-  getRegisterById(_id: number): Promise<Place | null>;
-}
+    const response = await fetch(url);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to fetch data: ${response.status} - ${errorText}`
+      );
+    }
 
-export interface DescriptionService {
-  getForPlace(_id: number): Promise<Description[]>;
-}
+    // Check content type
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error(`Expected JSON response but got ${contentType}`);
+    }
 
-export interface PhotoService {
-  getAllForPlace(_id: number): Promise<Photo[]>;
-  getFileById(_id: string): Promise<PhotoFile | null>;
-}
-
-// TODO: Implement actual service with database calls
-export class RegisterServiceImpl implements RegisterService {
-  async getRegisterAll(_skip: number, _take: number): Promise<Place[]> {
-    // TODO: Implement actual database query
-    throw new Error("Not implemented");
+    const data = (await response.json()) as T;
+    cache.set(cacheKey, data);
+    return data;
   }
 
-  async getPlaceInRegisterCount(): Promise<number> {
-    // TODO: Implement actual database query
-    throw new Error("Not implemented");
+  async getPlaces(page: number = 1): Promise<any> {
+    const url = `${BASE_URL}/?page=${page}`;
+    return this.fetchWithCache(url, `places_page_${page}`);
   }
 
-  async getRegisterById(_id: number): Promise<Place | null> {
-    // TODO: Implement actual database query
-    throw new Error("Not implemented");
+  async getPlaceDetails(id: string): Promise<any> {
+    const url = `${BASE_URL}/${id}`;
+    return this.fetchWithCache(url, `place_${id}`);
+  }
+
+  async getPlacePhotos(id: string): Promise<any> {
+    const url = `${BASE_URL}/${id}/photos`;
+    return this.fetchWithCache(url, `place_photos_${id}`);
+  }
+
+  async getPhoto(
+    id: string,
+    photoId: string
+  ): Promise<{ buffer: Buffer; contentType: string }> {
+    const url = `${BASE_URL}/${id}/photos/${photoId}`;
+    const cacheKey = `photo_${id}_${photoId}`;
+
+    // Check cache first
+    const cachedPhoto = cache.get<{ buffer: Buffer; contentType: string }>(
+      cacheKey
+    );
+    if (cachedPhoto) {
+      return cachedPhoto;
+    }
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to fetch photo: ${response.status} - ${errorText}`
+      );
+    }
+
+    const contentType = response.headers.get("content-type");
+    if (!contentType) {
+      throw new Error("No content type received from photo endpoint");
+    }
+
+    const imageBuffer = await response.arrayBuffer();
+    const photoData = {
+      buffer: Buffer.from(imageBuffer),
+      contentType,
+    };
+
+    cache.set(cacheKey, photoData);
+    return photoData;
   }
 }
 
-export class DescriptionServiceImpl implements DescriptionService {
-  async getForPlace(_id: number): Promise<Description[]> {
-    // TODO: Implement actual database query
-    throw new Error("Not implemented");
-  }
-}
-
-export class PhotoServiceImpl implements PhotoService {
-  async getAllForPlace(_id: number): Promise<Photo[]> {
-    // TODO: Implement actual database query
-    throw new Error("Not implemented");
-  }
-
-  async getFileById(_id: string): Promise<PhotoFile | null> {
-    // TODO: Implement actual file retrieval
-    throw new Error("Not implemented");
-  }
-}
+export const registerService = new RegisterService();
