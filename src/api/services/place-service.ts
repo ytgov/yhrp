@@ -18,12 +18,13 @@ interface ApiResponse<T> {
 export class PlaceService {
   private async fetchWithCache<T>(url: string, cacheKey: string): Promise<T> {
     // Check cache first
-    // const cachedData = cache.get<T>(cacheKey);
+    const cachedData = cache.get<T>(cacheKey);
+    if (cachedData) {
+      console.log(`[Cache Hit] ${cacheKey}`);
+      return cachedData;
+    }
+    console.log(`[Cache Miss] ${cacheKey}`);
 
-    // if (cachedData) {
-    //   console.log("cache Hit", cachedData)
-    //   return cachedData;
-    // }
     const response = await fetch(url);
     if (!response.ok) {
       const errorText = await response.text();
@@ -40,6 +41,7 @@ export class PlaceService {
 
     const data = (await response.json()) as T;
     cache.set(cacheKey, data);
+    console.log(`[Cache Set] ${cacheKey}`);
     return data;
   }
 
