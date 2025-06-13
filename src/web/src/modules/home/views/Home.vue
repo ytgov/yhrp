@@ -41,7 +41,7 @@
       </v-row>
 
       <!-- Mobile Notice -->
-      <v-row class="mb-8">
+      <!-- <v-row class="mb-8">
         <v-col cols="12" md="8" class="mx-auto">
           <v-alert color="info" variant="tonal" class="d-flex align-center">
             <v-icon start icon="mdi-cellphone" class="mr-2"></v-icon>
@@ -52,7 +52,7 @@
             </div>
           </v-alert>
         </v-col>
-      </v-row>
+      </v-row> -->
 
       <!-- Features Section -->
       <v-row class="mb-8">
