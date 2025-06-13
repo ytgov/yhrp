@@ -44,16 +44,15 @@ describe("Remote Register API", () => {
     });
   });
 
-  // The following tests are commented out because these endpoints do not exist on the remote API
-  /*
   describe("GET /:id", () => {
-    it("should return place details with descriptions", async () => {
+    it("should return place details", async () => {
       const response = await request(BASE_URL).get("/1");
 
       expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty("data");
-      expect(response.body.data).toHaveProperty("placeDescriptionEn");
-      expect(response.body.data).toHaveProperty("placeDescriptionFr");
+      expect(response.body).toHaveProperty("id");
+      expect(response.body).toHaveProperty("name");
+      expect(response.body).toHaveProperty("placeDescriptionEn");
+      expect(response.body).toHaveProperty("placeDescriptionFr");
     });
 
     it("should return 404 for non-existent place", async () => {
@@ -83,6 +82,8 @@ describe("Remote Register API", () => {
     });
   });
 
+  // The following tests are commented out because these endpoints do not exist on the remote API
+  /*
   describe("GET /:id/photos/:photoId", () => {
     it("should return photo file", async () => {
       const response = await request(BASE_URL).get("/1/photos/1");
