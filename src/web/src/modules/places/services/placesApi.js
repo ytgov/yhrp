@@ -34,7 +34,7 @@ import { Place } from "../models/Place";
 import { apiBaseUrl } from "../../../config";
 
 // Use our backend API endpoint
-export const API_BASE_URL = `${apiBaseUrl}/register`;
+export const API_BASE_URL = `${apiBaseUrl}/api/register`;
 
 // Flag to toggle between mock and real API data
 const USE_MOCK_DATA = false;
