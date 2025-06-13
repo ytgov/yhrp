@@ -140,13 +140,9 @@ export const fetchPlacePhotos = async (id) => {
     }
     const data = await response.json();
 
-    // Convert buffer data to base64 URLs
+    // Convert buffer data to base64 URLs and preserve all fields
     return (data.data || []).map((photo) => ({
-      id: photo.id,
-      placeId: id,
-      featureName: photo.featureName,
-      caption: photo.caption,
-      comments: photo.comments,
+      ...photo, // Preserve all original fields
       imageUrl: bufferToBase64(photo.ThumbFile?.data),
     }));
   } catch (error) {
