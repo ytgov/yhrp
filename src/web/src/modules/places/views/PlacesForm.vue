@@ -28,7 +28,7 @@
       <template v-else-if="placeData">
         <v-row>
           <v-col cols="12">
-            <h1 class="text-h4 mb-2">{{ placeData.location }}</h1>
+            <h1 class="text-h4 mb-2">{{ placeData.name }}</h1>
           </v-col>
         </v-row>
 
