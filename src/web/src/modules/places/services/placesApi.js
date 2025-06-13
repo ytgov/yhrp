@@ -40,6 +40,18 @@ export const API_BASE_URL = `${apiBaseUrl}/api/register`;
 const USE_MOCK_DATA = false;
 
 /**
+ * Convert buffer data to base64 URL
+ * @param {Array<number>} buffer - The buffer data
+ * @returns {string} Base64 data URL
+ */
+const bufferToBase64 = (buffer) => {
+  if (!buffer) return "";
+  return `data:image/jpeg;base64,${btoa(
+    buffer.reduce((data, byte) => data + String.fromCharCode(byte), "")
+  )}`;
+};
+
+/**
  * Fetch a list of places with pagination
  * @param {number} page - Page number (1-based)
  * @param {number} pageSize - Number of items per page
@@ -118,7 +130,7 @@ export const fetchPlaceById = async (id) => {
 /**
  * Fetch photos for a place by ID
  * @param {number} id - Place ID
- * @returns {Promise<Array>} Array of photo objects
+ * @returns {Promise<Array>} Array of photo objects with base64 URLs
  */
 export const fetchPlacePhotos = async (id) => {
   try {
@@ -127,7 +139,16 @@ export const fetchPlacePhotos = async (id) => {
       throw new Error(`Failed to fetch photos for place ${id}`);
     }
     const data = await response.json();
-    return data.data || [];
+
+    // Convert buffer data to base64 URLs
+    return (data.data || []).map((photo) => ({
+      id: photo.id,
+      placeId: id,
+      featureName: photo.featureName,
+      caption: photo.caption,
+      comments: photo.comments,
+      imageUrl: bufferToBase64(photo.ThumbFile?.data),
+    }));
   } catch (error) {
     console.error(`Error fetching photos for place ${id}:`, error);
     throw error;

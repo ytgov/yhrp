@@ -91,7 +91,7 @@
 import PlaceCard from "@/modules/places/components/PlaceCard.vue";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import { fetchPlaces } from "../services/placesApi";
+import { fetchPlacePhotos, fetchPlaces } from "../services/placesApi";
 
 const router = useRouter();
 
@@ -109,6 +109,7 @@ const page_size = ref(12);
 const placesList = ref([]);
 const loading = ref(false);
 const error = ref(null);
+const photoUrls = ref(new Map()); // Store photo URLs
 const queryRules = ref([]);
 const queryBuilder = ref({ children: [] });
 const queryLabels = ref({
@@ -209,14 +210,20 @@ const photoCountText = computed(() => {
 
 // Methods
 const photoURL = (place) => {
-  if (place.ThumbFile?.data) {
-    return `data:image/jpeg;base64,${toBase64(place.ThumbFile.data)}`;
-  }
-  return "";
+  return photoUrls.value.get(place.id) || "";
 };
 
-const toBase64 = (arr) => {
-  return btoa(arr.reduce((data, byte) => data + String.fromCharCode(byte), ""));
+const loadPhotoUrls = async () => {
+  for (const place of placesList.value) {
+    try {
+      const photos = await fetchPlacePhotos(place.id);
+      if (photos && photos.length > 0) {
+        photoUrls.value.set(place.id, photos[0].imageUrl);
+      }
+    } catch (error) {
+      console.error(`Error loading photo for place ${place.id}:`, error);
+    }
+  }
 };
 
 const handleClick = (place) => {
@@ -233,6 +240,7 @@ const getDataFromApi = async () => {
     placesList.value = response.places;
     totalLength.value = response.total;
     numberOfPages.value = Math.ceil(response.total / response.pageSize);
+    await loadPhotoUrls(); // Load photo URLs after getting places
   } catch (err) {
     error.value = err.message;
   } finally {

@@ -1,166 +1,150 @@
 <template>
   <div class="place-gallery">
-    <v-card>
-      <v-carousel
-        cycle
-        :height="carouselHeight"
-        hide-delimiter-background
-        show-arrows="hover"
-        class="gallery-carousel"
+    <v-carousel
+      v-if="photos.length > 0"
+      :show-arrows="photos.length > 1"
+      hide-delimiter-background
+      delimiter-icon="mdi-circle"
+      height="400"
+      class="rounded-lg"
+    >
+      <v-carousel-item
+        v-for="photo in photos"
+        :key="photo.id"
+        :src="photo.imageUrl"
+        cover
+        @click="openFullscreen(photo)"
       >
-        <v-carousel-item
-          v-for="(photo, i) in photoModels"
-          :key="i"
-          :src="photo.base64Image"
-          reverse-transition="fade-transition"
-          transition="fade-transition"
-          @click="openFullscreen(i)"
-        >
-          <template v-slot:placeholder>
-            <v-row class="fill-height ma-0" align="center" justify="center">
-              <v-progress-circular
-                indeterminate
-                color="primary"
-              ></v-progress-circular>
-            </v-row>
-          </template>
-          <div v-if="isLoading" class="loading-overlay">
-            <v-progress-circular
-              indeterminate
-              color="primary"
-            ></v-progress-circular>
-          </div>
-          <div class="carousel-caption">
-            <div class="caption-title">{{ photo.displayName }}</div>
-            <div class="caption-text">{{ photo.displayCaption }}</div>
-          </div>
-        </v-carousel-item>
-      </v-carousel>
-    </v-card>
+        <div class="photo-caption" v-if="photo.caption">
+          {{ photo.caption }}
+        </div>
+      </v-carousel-item>
+    </v-carousel>
+
+    <div v-else class="no-photos">
+      <v-icon size="64" color="grey">mdi-image-off</v-icon>
+      <p>No photos available</p>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div v-if="loading" class="loading-overlay">
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    </div>
 
     <!-- Fullscreen Viewer -->
-    <v-dialog
-      v-model="fullscreenViewer"
-      fullscreen
-      :scrim="false"
-      transition="dialog-bottom-transition"
-    >
+    <v-dialog v-model="fullscreen" fullscreen>
       <v-card>
         <v-toolbar dark color="primary">
-          <v-btn icon dark @click="fullscreenViewer = false">
+          <v-btn icon @click="fullscreen = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
-          <v-toolbar-title
-            >Photo {{ currentPhotoIndex + 1 }} of
-            {{ photoModels.length }}</v-toolbar-title
-          >
-          <v-spacer></v-spacer>
+          <v-toolbar-title>Photo Gallery</v-toolbar-title>
         </v-toolbar>
-        <v-img
-          :src="currentPhotoURL"
-          contain
+
+        <v-carousel
+          v-model="currentPhotoIndex"
+          :show-arrows="photos.length > 1"
+          hide-delimiter-background
+          delimiter-icon="mdi-circle"
           height="100%"
-          class="fullscreen-image"
-        ></v-img>
+        >
+          <v-carousel-item
+            v-for="photo in photos"
+            :key="photo.id"
+            :src="photo.imageUrl"
+            cover
+          >
+            <div class="photo-caption" v-if="photo.caption">
+              {{ photo.caption }}
+            </div>
+          </v-carousel-item>
+        </v-carousel>
       </v-card>
     </v-dialog>
   </div>
 </template>
 
 <script>
-import { PhotoModel } from "../models/Photo";
+import { onMounted, ref } from "vue";
+import { fetchPlacePhotos } from "../services/placesApi";
 
 export default {
   name: "PlaceGallery",
   props: {
     placeId: {
-      type: [String, Number],
+      type: [Number, String],
       required: true,
     },
-    photos: {
-      type: Array,
-      default: () => [],
-    },
   },
-  data: () => ({
-    fullscreenViewer: false,
-    currentPhotoIndex: 0,
-    windowWidth: window.innerWidth,
-    isLoading: true,
-  }),
-  computed: {
-    carouselHeight() {
-      return this.windowWidth < 600 ? "300" : "500";
-    },
-    currentPhotoURL() {
-      return this.photoModels[this.currentPhotoIndex]?.base64Image || "";
-    },
-    photoModels() {
-      return this.photos.map((photo) => new PhotoModel(photo));
-    },
-  },
-  mounted() {
-    window.addEventListener("resize", this.handleResize);
-    this.loadImages();
-  },
-  beforeUnmount() {
-    window.removeEventListener("resize", this.handleResize);
-  },
-  methods: {
-    openFullscreen(index) {
-      this.currentPhotoIndex = index;
-      this.fullscreenViewer = true;
-    },
-    handleResize() {
-      this.windowWidth = window.innerWidth;
-    },
-    loadImages() {
-      this.isLoading = true;
-      Promise.all(
-        this.photoModels.map((photo) => {
-          return new Promise((resolve) => {
-            const img = new Image();
-            img.onload = () => resolve();
-            img.src = photo.base64Image;
-          });
-        })
-      ).then(() => {
-        this.isLoading = false;
-      });
-    },
+  setup(props) {
+    const photos = ref([]);
+    const loading = ref(true);
+    const fullscreen = ref(false);
+    const currentPhotoIndex = ref(0);
+
+    const loadPhotos = async () => {
+      try {
+        loading.value = true;
+        const photoData = await fetchPlacePhotos(props.placeId);
+        photos.value = photoData;
+      } catch (error) {
+        console.error("Error loading photos:", error);
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    const openFullscreen = (photo) => {
+      const index = photos.value.findIndex((p) => p.id === photo.id);
+      if (index !== -1) {
+        currentPhotoIndex.value = index;
+        fullscreen.value = true;
+      }
+    };
+
+    onMounted(() => {
+      loadPhotos();
+    });
+
+    return {
+      photos,
+      loading,
+      fullscreen,
+      currentPhotoIndex,
+      openFullscreen,
+    };
   },
 };
 </script>
 
 <style scoped>
 .place-gallery {
+  position: relative;
   width: 100%;
+  height: 400px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-.gallery-carousel {
-  cursor: pointer;
-}
-
-.fullscreen-image {
-  background-color: black;
-}
-
-.carousel-caption {
+.photo-caption {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(0, 0, 0, 0.5);
+  padding: 16px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
   color: white;
-  padding: 8px;
+  font-size: 0.9rem;
 }
 
-.caption-title {
-  font-weight: bold;
-}
-
-.caption-text {
-  font-size: 0.9em;
+.no-photos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
 }
 
 .loading-overlay {
@@ -172,13 +156,11 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
+  background-color: rgba(255, 255, 255, 0.8);
   z-index: 1;
 }
 
-@media (max-width: 600px) {
-  .gallery-carousel {
-    border-radius: 0;
-  }
+.v-carousel-item {
+  cursor: pointer;
 }
 </style>

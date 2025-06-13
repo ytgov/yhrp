@@ -110,23 +110,11 @@ export class PhotoModel {
   }
 
   /**
-   * Converts the binary data to a base64 string for image display
-   * @returns {string} Base64 encoded image data URL
+   * Gets the URL for the photo
+   * @returns {string} URL for the photo
    */
-  get base64Image() {
-    if (!this.ThumbFile?.data) return "";
-    return `data:image/jpeg;base64,${this.toBase64(this.ThumbFile.data)}`;
-  }
-
-  /**
-   * Converts a binary array to a base64 string
-   * @param {number[]} arr - Array of bytes
-   * @returns {string} Base64 encoded string
-   */
-  toBase64(arr) {
-    return btoa(
-      arr.reduce((data, byte) => data + String.fromCharCode(byte), "")
-    );
+  get imageUrl() {
+    return `/api/register/${this.placeId}/photos/${this.id}`;
   }
 
   /**
