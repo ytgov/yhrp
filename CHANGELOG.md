@@ -28,6 +28,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added custom markdown parser for historic places data (this could be replaced by a library or removed down the road)
 - Added support for nested sections in markdown parsing
 - Added proper handling of heritage values and historical sources
+- Added 15-minute TTL caching system for API responses using node-cache
+- Added cache-aware fetch wrapper for improved performance
+- Added Photo model for better image handling
+- Added French language toggle text to desktop navbar
+- Added teaser line under photo and map in place form
 
 ### Changed
 
@@ -69,6 +74,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensured all API responses use consistent error handling and type-checked data.
 - Improved map popup styling and content handling
 - Optimized map layer control UI with smaller buttons and icons
+- Refactored Place model and API service for better organization:
+  - Extracted Place model to separate file
+  - Moved photo fetching to placesApi service
+  - Improved photo URL generation in Place model
+- Enhanced desktop navbar:
+  - Updated menu icon to hamburger style
+  - Increased menu icon size for better visibility
+- Updated Places.vue to use direct image URLs instead of base64 thumbnails
+- Moved print button to app bar and removed language selector from header
+- Flattened PlaceForm layout and improved text formatting
+- Added spacing between print icon and text in app bar
+- Changed map background to ESRI Topographic base layer
+- Centered point in the middle of the map
+- Removed navigation between sections in place form to allow scrolling
+- Updated field mapping to match API response structure
+- Improved image loading and display in PlaceGallery component
+- Updated API response handling for photos and metadata
 
 ### Removed
 
@@ -81,6 +103,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed old web directories.
 - Floating label from map marker in favor of a popup
 - Redundant popup content initialization
+- Removed unused yarn.lock file (project uses npm)
+- Removed unused map layer options to simplify the interface
+- Removed debug code and console logs
+- Removed blue mobile region from homepage (previously linked to custom app)
 
 ### Fixed
 
@@ -96,6 +122,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed heritage values section parsing in markdown
 - Fixed subsection title formatting in markdown parser
 - Fixed data transformation for Places API service
+- Fixed broken photo display on Places.vue
+- Fixed image display in PlaceCard component
+- Fixed image loading and display in PlaceGallery component
+- Ensured historical sources and other formatted text respect original spacing and line breaks
 
 ## [Previous Version]
 

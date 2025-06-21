@@ -17,6 +17,7 @@ This document tracks the feedback received and the planned improvements for the 
 
 - [x] Remove the blue mobile region (previously linked to custom app)
 - [ ] Update homepage verbiage (pending new text)
+- [ ] Set homepage carosel to use API calls
 
 ---
 
@@ -81,7 +82,7 @@ This document tracks the feedback received and the planned improvements for the 
   - [x] Add loading states and error handling
   - [x] Update image handling to use direct URLs
   - [x] Clean up debug code and console logs
-  - [ ] Fix broken photo display on Places.vue
+  - [x] Fix broken photo display on Places.vue
 
 - [x] **DesktopNavbar.vue**
 
