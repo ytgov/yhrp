@@ -1,4 +1,6 @@
-const API_BASE_URL = "/api/register";
+import { apiBaseUrl } from "../config";
+
+const API_BASE_URL = `${apiBaseUrl}/register`;
 
 /**
  * Fetches a paginated list of register places

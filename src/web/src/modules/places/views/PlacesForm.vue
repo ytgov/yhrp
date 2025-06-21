@@ -1,84 +1,166 @@
 <template>
-  <div class="places-form">
+  <div class="fill-height">
     <PlaceHeader
       :current-lang="currentLang"
-      :place-name="currentPlace?.name"
+      :place-name="placeData?.name"
       @lang-change="handleLangChange"
+      @print="handlePrint"
     />
 
     <v-container>
-      <v-row>
-        <v-col cols="12">
-          <h1 class="text-h4 mb-2">{{ communityName }}</h1>
-          <div class="d-flex justify-end">
-            <v-btn
-              v-if="!isMobile"
-              class="button mx-1"
-              @click="handlePrint"
-              color="primary"
-              variant="flat"
-            >
-              Print
-            </v-btn>
-          </div>
+      <v-row v-if="loading">
+        <v-col cols="12" class="text-center">
+          <v-progress-circular
+            indeterminate
+            color="primary"
+          ></v-progress-circular>
         </v-col>
       </v-row>
 
-      <v-row>
-        <v-col cols="12" md="8">
-          <PlaceGallery :place-id="currentPlaceId" :photos="photos" />
-        </v-col>
-        <v-col cols="12" md="4">
-          <v-card color="#BDBDBD" class="mx-auto" :height="mapHeight">
-            <PlaceLocationMap
-              :latitude="latitude"
-              :longitude="longitude"
-              :place-name="primaryName"
-            />
-          </v-card>
-        </v-col>
-      </v-row>
+      <template v-else-if="error">
+        <v-row>
+          <v-col cols="12" class="text-center">
+            <v-alert type="error">{{ error }}</v-alert>
+          </v-col>
+        </v-row>
+      </template>
 
-      <v-row>
-        <v-col cols="12">
-          <h4 class="text-h5">{{ primaryName }}</h4>
-          <div class="text-subtitle-1">
-            {{ currentPlace?.constructionPeriod }}
-          </div>
-        </v-col>
-      </v-row>
+      <template v-else-if="placeData">
+        <v-row>
+          <v-col cols="12">
+            <h1 class="text-h4 mb-2">{{ placeData.name }}</h1>
+          </v-col>
+        </v-row>
 
-      <v-row>
-        <v-col cols="12">
-          <PlaceInfo
-            :designations="currentPlace?.designations || []"
-            :place-description="fieldsByLang[currentLang].placeDescription"
-            :heritage-value="fieldsByLang[currentLang].heritageValue"
-            :character-defining-elements="
-              currentPlace?.heritageValues?.find(
-                (v) => v.title === 'Character Defining Elements'
-              )?.content || []
-            "
-            :boundaries="
-              currentPlace?.heritageValues?.find(
-                (v) => v.title === 'Description of Boundaries'
-              )?.content || []
-            "
-            :cultural-history="currentPlace?.culturalHistory"
-            :historical-sources="currentPlace?.historicalSources || []"
-          />
-        </v-col>
-      </v-row>
+        <v-row>
+          <v-col cols="12" md="8">
+            <PlaceGallery :place-id="currentPlaceId" :photos="photos" />
+          </v-col>
+          <v-col cols="12" md="4">
+            <v-card color="#BDBDBD" class="mx-auto" :height="mapHeight">
+              <PlaceLocationMap
+                :latitude="placeData.coordinates[0]"
+                :longitude="placeData.coordinates[1]"
+                :place-name="placeData.name"
+              />
+            </v-card>
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col cols="12">
+            <h4 class="text-subtitle-1 mb-4">
+              {{
+                placeData.description ||
+                placeData.teaserEnglish ||
+                placeData.placeDescriptionEn ||
+                ""
+              }}
+            </h4>
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col cols="12">
+            <v-expansion-panels multiple>
+              <v-expansion-panel>
+                <v-expansion-panel-title class="bg-grey-lighten-4"
+                  >Designation</v-expansion-panel-title
+                >
+                <v-expansion-panel-text>
+                  <div class="preformatted">
+                    <strong>Level:</strong>
+                    {{ placeData.designations[0]?.level || "" }}<br />
+                    <strong>Date:</strong>
+                    {{ placeData.designations[0]?.date || "" }}
+                  </div>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+              <v-expansion-panel>
+                <v-expansion-panel-title class="bg-grey-lighten-4"
+                  >Place Description</v-expansion-panel-title
+                >
+                <v-expansion-panel-text>
+                  <div class="preformatted">
+                    {{ placeData.placeDescriptionEn }}
+                  </div>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+              <v-expansion-panel>
+                <v-expansion-panel-title class="bg-grey-lighten-4"
+                  >Heritage Value</v-expansion-panel-title
+                >
+                <v-expansion-panel-text>
+                  <div class="preformatted">
+                    {{ placeData.heritageValueEn }}
+                  </div>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+              <v-expansion-panel>
+                <v-expansion-panel-title class="bg-grey-lighten-4"
+                  >Character Definition</v-expansion-panel-title
+                >
+                <v-expansion-panel-text>
+                  <div class="preformatted">
+                    {{ placeData.characterDefEn }}
+                  </div>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+              <v-expansion-panel>
+                <v-expansion-panel-title class="bg-grey-lighten-4"
+                  >Additional Information</v-expansion-panel-title
+                >
+                <v-expansion-panel-text>
+                  <div class="preformatted">
+                    {{ placeData.additionalInfoEn }}
+                  </div>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+              <v-expansion-panel>
+                <v-expansion-panel-title class="bg-grey-lighten-4"
+                  >Description of Boundaries</v-expansion-panel-title
+                >
+                <v-expansion-panel-text>
+                  <div class="preformatted">
+                    {{ placeData.descBoundEn }}
+                  </div>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+            </v-expansion-panels>
+          </v-col>
+        </v-row>
+
+        <!-- Debug section -->
+        <v-row>
+          <v-col cols="12">
+            <v-expansion-panels>
+              <v-expansion-panel>
+                <v-expansion-panel-title class="bg-grey-lighten-4"
+                  >Debug: Raw API Data</v-expansion-panel-title
+                >
+                <v-expansion-panel-text>
+                  <pre
+                    class="pa-4 rounded bg-grey-lighten-3 text-body-2"
+                    style="white-space: pre-wrap; word-break: break-word"
+                  >
+                    {{ JSON.stringify(placeData, null, 2) }}
+                  </pre>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+            </v-expansion-panels>
+          </v-col>
+        </v-row>
+      </template>
     </v-container>
   </div>
 </template>
 
 <script>
 import PlaceLocationMap from "@/modules/map/components/PlaceLocationMap.vue";
+import PlaceDesignation from "../components/PlaceDesignation.vue";
 import PlaceGallery from "../components/PlaceGallery.vue";
 import PlaceHeader from "../components/PlaceHeader.vue";
-import PlaceInfo from "../components/PlaceInfo.vue";
-import { fetchPlaceById } from "../services/placesApi";
+import { fetchPlaceById, fetchPlacePhotos } from "../services/placesApi";
 
 export default {
   name: "PlacesForm",
@@ -86,7 +168,7 @@ export default {
     PlaceHeader,
     PlaceGallery,
     PlaceLocationMap,
-    PlaceInfo,
+    PlaceDesignation,
   },
   props: {
     placeId: {
@@ -99,34 +181,10 @@ export default {
   },
   data: () => ({
     currentLang: "EN",
-    panel: [0, 1, 2, 3],
-    fieldsByLang: {
-      EN: {
-        placeDescription: "",
-        heritageValue: "",
-        characterDef: "",
-        descBound: "",
-        additionalInfo: "",
-      },
-      Fr: {
-        placeDescription: "",
-        heritageValue: "",
-        characterDef: "",
-        descBound: "",
-        additionalInfo: "",
-      },
-    },
-    primaryName: "",
-    communityName: "",
-    latitude: "",
-    longitude: "",
-    recognitionDate: "",
-    designations: "",
-    photos: [1, 2, 3, 4],
-    infoLoaded: false,
+    photos: [],
     loading: false,
     error: null,
-    currentPlace: null,
+    placeData: null,
     windowWidth: window.innerWidth,
   }),
   computed: {
@@ -146,6 +204,7 @@ export default {
       handler(newId) {
         if (newId) {
           this.fetchPlaceDetails();
+          this.fetchPhotos();
         }
       },
     },
@@ -160,53 +219,20 @@ export default {
     async fetchPlaceDetails() {
       this.loading = true;
       try {
-        const place = await fetchPlaceById(this.currentPlaceId);
-        this.currentPlace = place;
-
-        // Map basic information
-        this.primaryName = place.name;
-        this.communityName = place.location;
-        this.latitude = place.coordinates[0];
-        this.longitude = place.coordinates[1];
-
-        // Map designations
-        this.designations = place.designations
-          .map((designation) => ({
-            level: designation.level,
-            date: designation.date,
-            bylaw: designation.bylaw,
-            reasons: designation.reasons.join(", "),
-          }))
-          .join("\n");
-
-        // Map heritage values
-        const heritageValues = place.heritageValues.reduce((acc, value) => {
-          acc[value.title.toLowerCase().replace(/\s+/g, "")] = Array.isArray(
-            value.content
-          )
-            ? value.content.join("\n")
-            : value.content;
-          return acc;
-        }, {});
-
-        // Map language fields
-        this.fieldsByLang.EN = {
-          placeDescription: place.description,
-          heritageValue: place.description,
-          characterDef: heritageValues.characterdefiningelements || "",
-          descBound: heritageValues.descriptionofboundaries || "",
-          additionalInfo: place.culturalHistory || "",
-        };
-
-        // For now, using English content for French
-        this.fieldsByLang.Fr = { ...this.fieldsByLang.EN };
-
-        this.infoLoaded = true;
+        this.placeData = await fetchPlaceById(this.currentPlaceId);
       } catch (error) {
         console.error("Error fetching place details:", error);
         this.error = "Failed to load place details. Please try again later.";
       } finally {
         this.loading = false;
+      }
+    },
+    async fetchPhotos() {
+      try {
+        this.photos = await fetchPlacePhotos(this.currentPlaceId);
+      } catch (error) {
+        console.error("Error fetching photos:", error);
+        this.error = "Failed to load photos. Please try again later.";
       }
     },
     handleLangChange(lang) {
@@ -223,28 +249,7 @@ export default {
 </script>
 
 <style scoped>
-.places-form {
-  min-height: 100vh;
-}
-
-.button {
-  background-color: #0097a9 !important;
-  color: white !important;
-}
-
-@media print {
-  .button {
-    display: none;
-  }
-}
-
-@media (max-width: 600px) {
-  .text-h4 {
-    font-size: 1.5rem !important;
-  }
-
-  .text-h5 {
-    font-size: 1.25rem !important;
-  }
+.preformatted {
+  white-space: pre-line;
 }
 </style>

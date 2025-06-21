@@ -1,95 +1,78 @@
 import express from "express";
 import "jest";
 import request from "supertest";
-import { RegisterController } from "../../controllers/register-controller";
-import {
-  DescriptionService,
-  Photo,
-  PhotoFile,
-  PhotoService,
-  Place,
-  RegisterService,
-} from "../../services/register-service";
+import { PlaceController } from "../../controllers/place-controller";
 
-// Mock implementations for testing
-class MockRegisterService implements RegisterService {
-  async getRegisterAll(_skip: number, _take: number): Promise<Place[]> {
-    return [
-      {
-        id: 1,
-        name: "Sample Place",
-        recognitionDate: new Date(),
-        status: "active",
-      },
-    ];
-  }
-
-  async getPlaceInRegisterCount(): Promise<number> {
-    return 100;
-  }
-
-  async getRegisterById(id: number): Promise<Place | null> {
-    if (id === 999) {
-      return null;
-    }
+// Mock implementation for testing
+class MockPlaceService {
+  async getPlaces(page: number = 1) {
     return {
-      id,
+      data: [
+        {
+          id: 1,
+          name: "Sample Place",
+          description: "Sample description",
+          latitude: 60.72,
+          longitude: -135.05,
+          photos: [],
+        },
+      ],
+      meta: {
+        page,
+        page_size: 12,
+        item_count: 100,
+        page_count: 9,
+      },
+    };
+  }
+
+  async getPlaceDetails(id: string | number) {
+    if (parseInt(String(id)) === 999) return null;
+    return {
+      id: 1,
       name: "Sample Place",
-      recognitionDate: new Date(),
-      status: "active",
+      description: "Sample description",
+      latitude: 60.72,
+      longitude: -135.05,
+      photos: [],
+      placeDescriptionEn: "Sample description",
+      placeDescriptionFr: "FRENCH: Sample description",
     };
   }
-}
 
-class MockDescriptionService implements DescriptionService {
-  async getForPlace(_id: number) {
-    return [
-      {
-        type: 5,
-        descriptionText: "Sample description",
-      },
-    ];
-  }
-}
-
-class MockPhotoService implements PhotoService {
-  async getAllForPlace(_id: number): Promise<Photo[]> {
-    return [
-      {
-        id: 1,
-        url: "sample-url",
-        caption: "Sample photo",
-      },
-    ];
-  }
-
-  async getFileById(_id: string): Promise<PhotoFile | null> {
+  async getPlacePhotos(id: string | number) {
+    if (parseInt(String(id)) === 999) return { data: [], meta: {} };
     return {
-      file: Buffer.from("sample-image-data"),
+      data: [
+        {
+          id: 1,
+          url: "sample-url",
+          ThumbFile: { data: [1, 2, 3], base64: "abc" },
+        },
+      ],
+      meta: {},
+    };
+  }
+
+  async getPhoto(id: string | number) {
+    if (parseInt(String(id)) === 999) throw new Error("Not found");
+    return {
+      buffer: Buffer.from("sample-image-data"),
+      contentType: "image/jpg",
     };
   }
 }
 
-// Get base URL from environment variable or use default
 const BASE_URL = process.env.API_BASE_URL || "/api/register";
 
-describe("Register Router", () => {
+describe("Place Router", () => {
   let app: express.Application;
 
   beforeEach(() => {
     app = express();
-    // Override the default services with mocks
-    const mockRegisterService = new MockRegisterService();
-    const mockDescriptionService = new MockDescriptionService();
-    const mockPhotoService = new MockPhotoService();
-
-    // Create a new router with mocked services
+    const mockPlaceService = new MockPlaceService();
+    const controller = new PlaceController(mockPlaceService as any);
     const testRouter = express.Router();
-    const controller = new RegisterController(
-      mockRegisterService,
-      mockDescriptionService,
-      mockPhotoService
-    );
 
     // Simple validation middleware for testing
     const validatePage = (
@@ -107,11 +90,7 @@ describe("Register Router", () => {
       return;
     };
 
-    testRouter.get(
-      "/",
-      validatePage,
-      controller.getRegisterPlaces.bind(controller)
-    );
+    testRouter.get("/", validatePage, controller.getPlaces.bind(controller));
     testRouter.get("/:id", controller.getPlaceDetails.bind(controller));
     testRouter.get("/:id/photos", controller.getPlacePhotos.bind(controller));
     testRouter.get(
@@ -123,7 +102,7 @@ describe("Register Router", () => {
   });
 
   describe("GET /", () => {
-    it("should return paginated register places", async () => {
+    it("should return paginated places", async () => {
       const response = await request(app).get(BASE_URL).query({ page: 1 });
 
       expect(response.status).toBe(200);
@@ -147,13 +126,14 @@ describe("Register Router", () => {
   });
 
   describe("GET /:id", () => {
-    it("should return place details with descriptions", async () => {
+    it("should return place details", async () => {
       const response = await request(app).get(`${BASE_URL}/1`);
 
       expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty("data");
-      expect(response.body.data).toHaveProperty("placeDescriptionEn");
-      expect(response.body.data).toHaveProperty("placeDescriptionFr");
+      expect(response.body).toHaveProperty("id");
+      expect(response.body).toHaveProperty("name");
+      expect(response.body).toHaveProperty("placeDescriptionEn");
+      expect(response.body).toHaveProperty("placeDescriptionFr");
     });
 
     it("should return 404 for non-existent place", async () => {

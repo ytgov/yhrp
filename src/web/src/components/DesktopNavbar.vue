@@ -20,10 +20,11 @@
     <v-spacer></v-spacer>
 
     <div class="d-flex align-center">
+      <span class="text-subtitle-1 font-weight-medium">Français</span>
       <v-divider class="mr-5" vertical inset></v-divider>
 
       <v-btn variant="text" size="large" color="primary">
-        <v-icon>mdi-dots-vertical</v-icon>
+        <v-icon size="30">mdi-menu</v-icon>
         <NavMenu />
       </v-btn>
     </div>

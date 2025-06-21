@@ -20,7 +20,7 @@
           <span class="detail-value">{{ designation.bylaw }}</span>
         </div>
 
-        <div class="reasons-section mt-3">
+        <div v-if="designation.reasons.length > 0" class="reasons-section mt-3">
           <div class="detail-label mb-2">Reasons:</div>
           <ul class="reasons-list">
             <li
@@ -44,6 +44,14 @@ export default {
     designations: {
       type: Array,
       required: true,
+      validator: (value) => {
+        return value.every(
+          (designation) =>
+            designation.level &&
+            typeof designation.level === "string" &&
+            Array.isArray(designation.reasons)
+        );
+      },
     },
   },
 };

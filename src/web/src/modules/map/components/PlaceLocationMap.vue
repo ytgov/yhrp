@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import * as esriLeaflet from "esri-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { nextTick, onMounted, ref, watch } from "vue";
@@ -42,16 +43,24 @@ export default {
     let map = null;
     let marker = null;
     let currentBaseLayer = null;
-    const currentLayer = ref("streets");
+    const currentLayer = ref("esri-topo");
 
     const baseLayers = [
       {
-        id: "streets",
-        name: "Streets",
+        id: "esri-topo",
+        name: "Topographic",
         icon: "mdi-map",
-        url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        attribution: "© OpenStreetMap contributors",
+        esri: true,
+        attribution:
+          "Tiles © Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012",
       },
+      // {
+      //   id: "streets",
+      //   name: "Streets",
+      //   icon: "mdi-map",
+      //   url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      //   attribution: "© OpenStreetMap contributors",
+      // },
       {
         id: "satellite",
         name: "Satellite",
@@ -69,26 +78,53 @@ export default {
     ];
 
     const changeBaseLayer = (layerId) => {
+      console.log("changeBaseLayer called with:", layerId);
       const layer = baseLayers.find((l) => l.id === layerId);
       if (layer && map) {
         if (currentBaseLayer) {
+          console.log("Removing current base layer");
           map.removeLayer(currentBaseLayer);
         }
-        currentBaseLayer = L.tileLayer(layer.url, {
-          attribution: layer.attribution,
-        }).addTo(map);
+        if (layer.esri) {
+          console.log("ESRI Leaflet available:", !!esriLeaflet);
+          if (!esriLeaflet) {
+            console.error("ESRI Leaflet not loaded");
+            return;
+          }
+          console.log("Adding ESRI base layer");
+          currentBaseLayer = esriLeaflet
+            .basemapLayer("Topographic", {
+              attribution: layer.attribution,
+            })
+            .addTo(map);
+        } else {
+          console.log("Adding standard tile layer");
+          currentBaseLayer = L.tileLayer(layer.url, {
+            attribution: layer.attribution,
+          }).addTo(map);
+        }
         currentLayer.value = layerId;
       }
     };
 
     const initMap = () => {
-      if (!mapContainer.value) return;
+      console.log("initMap called");
+      if (!mapContainer.value) {
+        console.error("mapContainer is null");
+        return;
+      }
 
+      console.log(
+        "Initializing map with coordinates:",
+        props.latitude,
+        props.longitude
+      );
       // Initialize the map
       map = L.map(mapContainer.value).setView(
         [props.latitude, props.longitude],
         13
       );
+      console.log("Map initialized:", map);
 
       // Create custom icon
       const customIcon = L.divIcon({
@@ -110,9 +146,11 @@ export default {
           className: "custom-popup",
           closeButton: false,
         });
+      console.log("Marker added:", marker);
 
       // Set initial base layer
-      changeBaseLayer("streets");
+      console.log("Setting initial base layer");
+      changeBaseLayer("esri-topo");
       console.log("centerMapOnMarker");
       centerMapOnMarker();
     };

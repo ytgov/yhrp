@@ -33,7 +33,7 @@
         <v-window v-model="activeTab" class="content-window">
           <!-- Designation Tab -->
           <v-window-item value="designation">
-            <PlaceDesignation :designations="designations" />
+            <PlaceDesignation :designations="place.designations" />
           </v-window-item>
 
           <!-- Description Tab -->
@@ -41,7 +41,7 @@
             <div class="content-section">
               <h3 class="text-h6 mb-4">Place Description</h3>
               <div class="description-content">
-                {{ placeDescription }}
+                {{ place.description }}
               </div>
             </div>
           </v-window-item>
@@ -51,16 +51,16 @@
             <div class="content-section">
               <h3 class="text-h6 mb-4">Heritage Value</h3>
               <div class="heritage-value-content">
-                <div class="mb-4">{{ heritageValue }}</div>
+                <div class="mb-4">{{ place.heritageValueEn }}</div>
 
                 <!-- Character Defining Elements -->
-                <div class="mb-4">
+                <div v-if="place.heritageValues.length > 0" class="mb-4">
                   <div class="text-subtitle-1 font-weight-bold mb-2">
                     Character Defining Elements
                   </div>
                   <ul>
                     <li
-                      v-for="(item, index) in characterDefiningElements"
+                      v-for="(item, index) in place.heritageValues[0].items"
                       :key="index"
                     >
                       {{ item }}
@@ -68,24 +68,12 @@
                   </ul>
                 </div>
 
-                <!-- Description of Boundaries -->
-                <div class="mb-4">
-                  <div class="text-subtitle-1 font-weight-bold mb-2">
-                    Description of Boundaries
-                  </div>
-                  <ul>
-                    <li v-for="(item, index) in boundaries" :key="index">
-                      {{ item }}
-                    </li>
-                  </ul>
-                </div>
-
                 <!-- Cultural History -->
-                <div class="mb-4">
+                <div v-if="place.culturalHistory" class="mb-4">
                   <div class="text-subtitle-1 font-weight-bold mb-2">
                     Cultural History
                   </div>
-                  <div>{{ culturalHistory }}</div>
+                  <div>{{ place.culturalHistory }}</div>
                 </div>
               </div>
             </div>
@@ -97,22 +85,11 @@
               <h3 class="text-h6 mb-4">Historical Sources</h3>
               <div class="sources-list">
                 <div
-                  v-for="(source, index) in historicalSources"
+                  v-for="(source, index) in place.historicalSources"
                   :key="index"
                   class="source-item mb-4"
                 >
-                  <div class="text-subtitle-1 font-weight-bold mb-2">
-                    {{ source.title }}
-                  </div>
-                  <ul class="source-content-list">
-                    <li
-                      v-for="(item, i) in source.content"
-                      :key="i"
-                      class="source-content-item"
-                    >
-                      {{ item }}
-                    </li>
-                  </ul>
+                  {{ source }}
                 </div>
               </div>
             </div>
@@ -132,32 +109,8 @@ export default {
     PlaceDesignation,
   },
   props: {
-    designations: {
-      type: Array,
-      required: true,
-    },
-    placeDescription: {
-      type: String,
-      required: true,
-    },
-    heritageValue: {
-      type: String,
-      required: true,
-    },
-    characterDefiningElements: {
-      type: Array,
-      default: () => [],
-    },
-    boundaries: {
-      type: Array,
-      default: () => [],
-    },
-    culturalHistory: {
-      type: String,
-      default: "",
-    },
-    historicalSources: {
-      type: Array,
+    place: {
+      type: Object,
       required: true,
     },
   },

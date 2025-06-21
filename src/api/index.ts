@@ -1,9 +1,22 @@
 import cors from "cors";
 import express, { Request, Response } from "express";
-import * as config from "./config/app-config";
+import registerRouter from "./routes/place-routes";
 import { doHealthCheck } from "./utils/healthCheck";
 
 const app = express();
+const port = process.env.PORT || 3000;
+
+// // Add detailed request logging middleware
+// app.use((req: Request, _res: Response, next) => {
+//   console.log("\n=== Incoming Request ===");
+//   console.log(`Time: ${new Date().toISOString()}`);
+//   console.log(`Method: ${req.method}`);
+//   console.log(`URL: ${req.url}`);
+//   console.log(`Headers:`, req.headers);
+//   console.log(`Query:`, req.query);
+//   console.log("=======================\n");
+//   next();
+// });
 
 app.use(express.json()); // for parsing application/json
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -29,14 +42,17 @@ app.use(express.urlencoded({ extended: true })); // for parsing application/x-ww
 //   })
 // );
 
-// very basic CORS setup
+// Enable CORS with detailed logging
 app.use(
   cors({
-    origin: config.FRONTEND_URL,
-    optionsSuccessStatus: 200,
-    credentials: true,
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+// Mount the register routes
+app.use("/api/register", registerRouter);
 
 app.get("/api/healthCheck", (_req: Request, res: Response) => {
   doHealthCheck(res);
@@ -52,6 +68,7 @@ app.use((_req: Request, res: Response) => {
   res.sendFile(__dirname + baseWebPath + "/index.html");
 });
 
-app.listen(config.API_PORT, () => {
-  console.log(`API listenting on port ${config.API_PORT}`);
+app.listen(port, () => {
+  console.log(`\nAPI server listening on port ${port}`);
+  console.log(`Server URL: http://localhost:${port}`);
 });
