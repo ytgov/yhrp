@@ -1,4 +1,5 @@
 import NodeCache from "node-cache";
+import { RegisterPlace } from "../models/register-place.model";
 
 // Cache configuration - items expire after 15 minutes
 const cache = new NodeCache({ stdTTL: 900 });
@@ -45,9 +46,15 @@ export class PlaceService {
     return data;
   }
 
-  async getPlaceAll(skip: number, take: number): Promise<ApiResponse<any>> {
+  async getPlaceAll(
+    skip: number,
+    take: number
+  ): Promise<ApiResponse<RegisterPlace>> {
     const url = `${BASE_URL}/?skip=${skip}&take=${take}`;
-    return this.fetchWithCache(url, `places_${skip}_${take}`);
+    return this.fetchWithCache<ApiResponse<RegisterPlace>>(
+      url,
+      `places_${skip}_${take}`
+    );
   }
 
   async getPlaceInPlaceCount(): Promise<number> {
@@ -55,18 +62,18 @@ export class PlaceService {
     return this.fetchWithCache(url, "place_count");
   }
 
-  async getPlaceById(id: number): Promise<any> {
+  async getPlaceById(id: number): Promise<RegisterPlace> {
     const url = `${BASE_URL}/${id}`;
-    return this.fetchWithCache(url, `place_${id}`);
+    return this.fetchWithCache<RegisterPlace>(url, `place_${id}`);
   }
 
-  async getPlaces(page: number = 1): Promise<ApiResponse<any>> {
+  async getPlaces(page: number = 1): Promise<ApiResponse<RegisterPlace>> {
     const skip = (page - 1) * 12;
     const take = 12;
     return this.getPlaceAll(skip, take);
   }
 
-  async getPlaceDetails(id: string): Promise<any> {
+  async getPlaceDetails(id: string): Promise<RegisterPlace> {
     return this.getPlaceById(parseInt(id));
   }
 

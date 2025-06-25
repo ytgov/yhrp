@@ -1,46 +1,25 @@
 import { Request, Response } from "express";
 import {
   ErrorResponse,
-  RegisterPlaceResponse,
+  RegisterPlacesResponse,
 } from "../models/api-response.model";
+import { RegisterPlace } from "../models/register-place.model";
 import { PlaceService } from "../services/place-service";
-
-interface ApiResponse<T> {
-  data: T[];
-  meta: {
-    page: number;
-    page_size: number;
-    item_count: number;
-    page_count: number;
-  };
-}
 
 export class PlaceController {
   constructor(private placeService: PlaceService) {}
 
   async getPlaces(
     req: Request,
-    res: Response<ApiResponse<any> | ErrorResponse>
+    res: Response<RegisterPlacesResponse | ErrorResponse>
   ) {
     try {
       const page = parseInt(req.query.page as string) || 1;
-      const response: ApiResponse<any> = await this.placeService.getPlaces(
-        page
-      );
+      const response: RegisterPlacesResponse =
+        await this.placeService.getPlaces(page);
+      console.log(response.data);
 
-      const places = response.data.map((place: any) => ({
-        id: place.id,
-        name: place.name,
-        description: place.description,
-        latitude: place.latitude,
-        longitude: place.longitude,
-        photos: place.photos,
-      }));
-
-      res.json({
-        data: places,
-        meta: response.meta,
-      });
+      res.json(response);
     } catch (error) {
       console.error("Error fetching places:", error);
       res.status(500).json({ error: "Failed to fetch places" });
@@ -49,11 +28,11 @@ export class PlaceController {
 
   async getPlaceDetails(
     req: Request,
-    res: Response<RegisterPlaceResponse | ErrorResponse>
+    res: Response<RegisterPlace | ErrorResponse>
   ) {
     try {
       const { id } = req.params;
-      const data = await this.placeService.getPlaceDetails(id);
+      const data: RegisterPlace = await this.placeService.getPlaceDetails(id);
 
       if (!data) {
         return res.status(404).json({ error: "Place not found" });
@@ -71,7 +50,7 @@ export class PlaceController {
 
   async getPlacePhotos(
     req: Request,
-    res: Response<ApiResponse<any> | ErrorResponse>
+    res: Response<{ data: any[]; meta: any } | ErrorResponse>
   ) {
     try {
       const { id } = req.params;
@@ -81,9 +60,7 @@ export class PlaceController {
         return res.status(404).json({ error: "Place not found" });
       }
 
-      const response: ApiResponse<any> = await this.placeService.getPlacePhotos(
-        id
-      );
+      const response = await this.placeService.getPlacePhotos(id);
 
       // Format the photos to include ThumbFile with data
       const formattedPhotos = response.data.map((photo: any) => ({
