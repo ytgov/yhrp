@@ -21,6 +21,8 @@ import * as esriLeaflet from "esri-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { nextTick, onMounted, ref, watch } from "vue";
+import { createTealPinMarker } from "../utils/markerDefinitions";
+import "../utils/markerStyles.css";
 
 export default {
   name: "PlaceLocationMap",
@@ -126,20 +128,9 @@ export default {
       );
       console.log("Map initialized:", map);
 
-      // Create custom icon
-      const customIcon = L.divIcon({
-        className: "custom-marker",
-        html: `
-          <div class="marker-pin"></div>
-        `,
-        iconSize: [25, 35],
-        iconAnchor: [12.5, 35],
-        popupAnchor: [0, -35],
-      });
-
-      // Add marker with custom icon
+      // Add marker with shared teal pin icon
       marker = L.marker([props.latitude, props.longitude], {
-        icon: customIcon,
+        icon: createTealPinMarker(),
       })
         .addTo(map)
         .bindPopup("", {
@@ -151,8 +142,6 @@ export default {
       // Set initial base layer
       console.log("Setting initial base layer");
       changeBaseLayer("esri-topo");
-      console.log("centerMapOnMarker");
-      centerMapOnMarker();
     };
 
     const centerMapOnMarker = () => {
@@ -241,35 +230,7 @@ export default {
   font-size: 18px !important;
 }
 
-:deep(.custom-marker) {
-  position: relative;
-}
-
-:deep(.marker-pin) {
-  width: 25px;
-  height: 25px;
-  border-radius: 50% 50% 50% 0;
-  background: #0097a9;
-  position: absolute;
-  transform: rotate(-45deg);
-  left: 50%;
-  top: 50%;
-  margin: -12.5px 0 0 -12.5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-:deep(.marker-pin::after) {
-  content: "";
-  width: 11px;
-  height: 11px;
-  position: absolute;
-  background: #fff;
-  border-radius: 50%;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
+/* Popup Styles for PlaceLocationMap */
 :deep(.custom-popup .leaflet-popup-content-wrapper) {
   background: #0097a9;
   color: white;
