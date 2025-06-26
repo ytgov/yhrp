@@ -83,6 +83,7 @@ export const fetchPlaces = async (page = 1, pageSize = 12) => {
     }
 
     const data = await response.json();
+    console.log("data", data);
     return {
       places: data.data.map((place) => Place.fromApi(place)),
       total: data.meta.item_count,

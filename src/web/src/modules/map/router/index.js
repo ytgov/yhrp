@@ -1,5 +1,4 @@
-import Maps from "../views/Maps.vue";
-import BasicMap from "../components/BasicMap.vue";
+import LeafletMap from "../components/LeafletMap.vue";
 
 export default [
   {
@@ -17,7 +16,7 @@ export default [
       {
         path: "",
         name: "Map",
-        component: BasicMap,
+        component: LeafletMap,
       },
     ],
   },

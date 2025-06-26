@@ -32,6 +32,13 @@ const searchByYHSIId = async (id) => {
   return null;
 };
 
+// Check if user has access to certain map features
+const userInRole = () => {
+  // For now, all features are visible to all users
+  // This can be updated later to check actual user roles
+  return true;
+};
+
 export function useMapService() {
   return {
     loading,
@@ -39,5 +46,6 @@ export function useMapService() {
     bookmarks,
     loadToken,
     searchByYHSIId,
+    userInRole,
   };
 }

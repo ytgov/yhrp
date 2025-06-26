@@ -2,14 +2,16 @@
 
 ## Purpose and Responsibilities
 
-The Map module is responsible for map visualization and related interactions within the YHRP Site Registry Viewer. It provides reusable components and services for displaying, interacting with, and managing map data using ArcGIS/Esri APIs.
+The Map module is responsible for map visualization and related interactions within the YHRP Site Registry Viewer. It provides reusable components and services for displaying, interacting with, and managing map data using Leaflet and ESRI Leaflet APIs.
 
 ## Directory Structure & Key Files
 
 - **components/**
 
-  - `AdvancedMap.vue`: Feature-rich map component with sidebar tabs (Layers, Basemap, Legend), ArcGIS widgets, and popups for sites and airplane crashes.
-  - `BasicMap.vue`: Simpler map component with sidebar tabs (Communities, Basemap, Legend), supports bookmarks and site popups.
+  - `LeafletMap.vue`: **Primary map component** - Feature-rich Leaflet-based map with sidebar tabs (Communities, Basemap, Legend), base layer switching, community bookmarks, and feature layers for historic sites and crash sites.
+  - `PlaceLocationMap.vue`: Leaflet-based component for displaying individual place locations with custom markers and popups.
+  - `AdvancedMap.vue`: **Legacy ESRI-based component** - Previously used for feature-rich map functionality (now replaced by LeafletMap).
+  - `BasicMap.vue`: **Legacy ESRI-based component** - Previously used for simpler map functionality (now replaced by LeafletMap).
   - `__tests__/`: _(Currently empty; no component tests present)_
 
 - **views/**
@@ -18,8 +20,7 @@ The Map module is responsible for map visualization and related interactions wit
 
 - **services/**
 
-  - `map-service.js`: Provides state and logic for map features (e.g., loading tokens, bookmarks, search stub). Exposes a composable for use in components. Eventually this should
-    contain the API logic to surface data to the maps
+  - `map-service.js`: Provides state and logic for map features (e.g., loading tokens, bookmarks, search stub, user role checking). Exposes a composable for use in components. Eventually this should contain the API logic to surface data to the maps.
   - `__tests__/map-service.test.js`: Unit tests for the map service, focusing on bookmarks and data structure.
 
 - **data/**
@@ -27,18 +28,58 @@ The Map module is responsible for map visualization and related interactions wit
   - `communityBookmarks.js`: Static data file with map bookmarks for Yukon communities, used for quick navigation.
 
 - **router/**
-  - `index.js`: Defines the `/map` route, rendering the `BasicMap` component by default.
+  - `index.js`: Defines the `/map` route, rendering the `LeafletMap` component by default.
+
+## Map Implementation
+
+### Current Implementation: LeafletMap.vue
+
+The primary map component now uses **Leaflet** with **ESRI Leaflet** for enhanced functionality:
+
+#### Key Features
+
+- **Base Layer Switching**: ESRI Topographic (default), ESRI Streets, Satellite, Terrain
+- **Community Bookmarks**: Interactive list with click-to-navigate functionality
+- **Feature Layers**:
+  - Historic sites (teal markers)
+  - Airplane crash sites (orange markers)
+- **Rich Popups**: Detailed site information with "View Details" buttons
+- **Responsive Sidebar**: Tabs for Communities, Basemap, and Legend
+- **Custom Styling**: Professional appearance with consistent branding
+
+#### Technical Stack
+
+- **Leaflet**: Core mapping library for performance and flexibility
+- **ESRI Leaflet**: ESRI service integration for base layers and feature services
+- **Vue 3 Composition API**: Modern component structure
+- **Vuetify**: UI components for sidebar and controls
+
+#### Benefits Over Previous ESRI Implementation
+
+- **Better Performance**: Smaller bundle size and faster loading
+- **Improved Maintainability**: Simpler codebase with better documentation
+- **Enhanced Flexibility**: Easy customization and multiple tile providers
+- **Mobile Friendly**: Better touch interaction support
+
+### Legacy Components
+
+The following components are maintained for reference but are no longer actively used:
+
+- `AdvancedMap.vue`: ESRI-based implementation with complex widget integration
+- `BasicMap.vue`: ESRI-based implementation with basic functionality
 
 ## API Integration Points
 
 - All API calls related to map data fetching and updates are handled in the `services/` directory.
 - Search by YHSI ID is stubbed and will be implemented when the API is ready.
+- Feature layers connect to ESRI services for historic sites and crash sites.
 
 ## Dependencies
 
 - Vue.js
 - Vue Router
-- ArcGIS/Esri JavaScript API (via `esri-loader`)
+- Leaflet (via `leaflet` package)
+- ESRI Leaflet (via `esri-leaflet` package)
 - Vuetify (for UI components)
 
 ## Setup Instructions
@@ -49,17 +90,31 @@ The Map module is responsible for map visualization and related interactions wit
    ```
 2. Import and use map components in your views as needed.
 3. Update or add new services in the `services/` directory for API integration.
-4. To add new bookmarks, update `data/communityBookmarks.js`.
 
----
+## Migration Notes
 
-For more details on module structure and conventions, see the main project documentation.
+### From ESRI to Leaflet
 
-## Future Work
+The module has been migrated from ESRI ArcGIS JavaScript API to Leaflet for better performance and maintainability. Key changes include:
 
-- **Migrate from esri-loader**: esri-loader is deprecated. Move to a supported ArcGIS integration method or alternative mapping library.
-- **Explore alternative mapping components**: Investigate and potentially add mapping components based on Leaflet or other open-source mapping libraries.
-- **Implement full API integration**: Complete the stubbed API logic in `map-service.js` for dynamic data.
-- **Add component tests**: Expand test coverage, especially for map components.
-- **Enhance accessibility and performance**: Review and improve accessibility and performance of map features.
-- **Ensure API notifications are surfaced**: Make sure that API errors and status messages are displayed to users via popups or notifications for better user feedback.
+- **Replaced**: `AdvancedMap.vue` and `BasicMap.vue` with `LeafletMap.vue`
+- **Maintained**: All existing functionality including bookmarks, layers, and popups
+- **Enhanced**: Better performance, simpler codebase, and improved customization options
+
+### Configuration
+
+- **Center**: Yukon Territory (60.45, -135.5)
+- **Default Zoom**: 6
+- **Base Layer**: ESRI Topographic
+- **Markers**: Custom styled circle markers
+
+## Future Enhancements
+
+Potential improvements for the map module include:
+
+- Search functionality with geocoding
+- Marker clustering for large datasets
+- Custom marker icons
+- Layer filtering and controls
+- Export functionality
+- Advanced popup customization

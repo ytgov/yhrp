@@ -5,7 +5,7 @@ export class Place {
   constructor(data) {
     this.placeId = data.id;
     this.id = data.id; // For backward compatibility
-    this.name = data.primaryName || data.name || "";
+    this.name = this._toProperCase(data.primaryName || data.name || "");
     this.location = data.communityName || data.location || "";
     this.description = data.placeDescriptionEn || "";
     this.coordinates = [
@@ -34,6 +34,40 @@ export class Place {
     this.descBoundFr = data.descBoundFr || "";
     this.additionalInfoEn = data.additionalInfoEn || "";
     this.additionalInfoFr = data.additionalInfoFr || "";
+  }
+
+  /**
+   * Convert text to proper case (first letter of each word capitalized)
+   * @private
+   */
+  _toProperCase(text) {
+    if (!text) return "";
+
+    return text
+      .toLowerCase()
+      .split(" ")
+      .map((word) => {
+        // Handle special cases like "of", "the", "and" in the middle of titles
+        const smallWords = [
+          "of",
+          "the",
+          "and",
+          "or",
+          "but",
+          "in",
+          "on",
+          "at",
+          "to",
+          "for",
+          "with",
+          "by",
+        ];
+        if (smallWords.includes(word)) {
+          return word;
+        }
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      })
+      .join(" ");
   }
 
   /**

@@ -37,6 +37,29 @@ This document tracks the feedback received and the planned improvements for the 
 
 ---
 
+## Map System
+
+- [x] Convert to Leaflet-based map system
+  - [x] Create new LeafletMap component to replace ESRI-based maps
+  - [x] Implement base layer switching (Topographic, Streets, Satellite, Terrain)
+  - [x] Add community bookmarks functionality
+  - [x] Implement feature layers for historic sites and crash sites
+  - [x] Add rich popup content with site details
+  - [x] Update map router to use new LeafletMap component
+  - [x] Maintain all existing functionality while improving performance
+
+---
+
+## Text Formatting
+
+- [x] Implement proper case formatting for place names
+  - [x] Add `_toProperCase()` method to Place model
+  - [x] Handle special cases (articles like "of", "the", "and")
+  - [x] Apply proper case to place names in constructor
+  - [x] Ensure first and last words are capitalized
+
+---
+
 ## API
 
 - [x] Confirm all API calls use root: `https://yhis.gov.yk.ca/api/register/`
@@ -90,6 +113,16 @@ This document tracks the feedback received and the planned improvements for the 
   - [x] Update menu icon to hamburger style
   - [x] Increase menu icon size for better visibility
 
+- [x] **LeafletMap.vue** (New Component)
+
+  - [x] Replace ESRI-based map components with Leaflet implementation
+  - [x] Implement base layer switching functionality
+  - [x] Add community bookmarks with navigation
+  - [x] Create feature layers for historic sites and crash sites
+  - [x] Add rich popup content with site details
+  - [x] Implement responsive sidebar with tabs
+  - [x] Add legend showing marker types
+
 - [ ] **Testing**
   - [ ] Test each component to ensure it correctly displays data from the real API.
   - [ ] Verify that images, descriptions, and other details are rendered correctly.
@@ -98,33 +131,56 @@ This document tracks the feedback received and the planned improvements for the 
 
 ## Recent Changes
 
-1. Implemented caching system for API responses
+1. **Leaflet Map Migration**
+
+   - Created new LeafletMap component to replace ESRI-based maps
+   - Implemented base layer switching (Topographic, Streets, Satellite, Terrain)
+   - Added community bookmarks functionality with interactive navigation
+   - Created feature layers for historic sites (teal) and crash sites (orange)
+   - Added rich popup content with site details and "View Details" buttons
+   - Updated map router to use new LeafletMap component
+   - Added userInRole method to map service for feature access control
+
+2. **Text Case Improvements**
+
+   - Added `_toProperCase()` method to Place model
+   - Implemented proper case formatting for place names
+   - Handled special cases for articles (of, the, and, etc.)
+   - Applied proper case to place names in constructor
+
+3. **Documentation Updates**
+
+   - Created comprehensive Leaflet migration plan document
+   - Updated feedback tracking with new completed tasks
+   - Documented technical implementation details
+
+4. Implemented caching system for API responses
    - Added 15-minute TTL cache using node-cache
    - Created cache-aware fetch wrapper
    - Implemented caching for place listings, details, and photos
-2. Refactored Place model and API service for better organization
+5. Refactored Place model and API service for better organization
    - Extracted Place model to separate file
    - Moved photo fetching to placesApi service
    - Improved photo URL generation in Place model
-3. Enhanced desktop navbar
+6. Enhanced desktop navbar
    - Added French language toggle text
    - Updated menu icon to hamburger style
    - Increased menu icon size
-4. Removed unused yarn.lock file (project uses npm)
-5. Updated Places.vue to use direct image URLs instead of base64 thumbnails
-6. Implemented proper pagination handling in both frontend and backend
-7. Cleaned up debug code and console logs
-8. Fixed image display in PlaceCard component
-9. Updated field mapping to match API response structure
-10. Moved print button to app bar and removed language selector from header
-11. Flattened PlaceForm layout and improved text formatting
-12. Added spacing between print icon and text in app bar
-13. Ensured historical sources and other formatted text respect original spacing and line breaks
-14. Started ESRI map implementation with proper layer configuration
-15. Removed unused map layer options to simplify the interface
-16. Implemented Photo model and updated PlaceGallery component to use it
-17. Fixed image loading and display in PlaceGallery component
-18. Updated API response handling for photos and metadata
+7. Removed unused yarn.lock file (project uses npm)
+8. Updated Places.vue to use direct image URLs instead of base64 thumbnails
+9. Implemented proper pagination handling in both frontend and backend
+10. Cleaned up debug code and console logs
+11. Fixed image display in PlaceCard component
+12. Updated field mapping to match API response structure
+13. Moved print button to app bar and removed language selector from header
+14. Flattened PlaceForm layout and improved text formatting
+15. Added spacing between print icon and text in app bar
+16. Ensured historical sources and other formatted text respect original spacing and line breaks
+17. Started ESRI map implementation with proper layer configuration
+18. Removed unused map layer options to simplify the interface
+19. Implemented Photo model and updated PlaceGallery component to use it
+20. Fixed image loading and display in PlaceGallery component
+21. Updated API response handling for photos and metadata
 
 ---
 
@@ -132,6 +188,8 @@ This document tracks the feedback received and the planned improvements for the 
 
 - Awaiting eServices footer standards and updated homepage verbiage
 - Reference: Feedback received June 10, 2024
+- Leaflet migration provides better performance and maintainability
+- Text case improvements enhance readability and professionalism
 
 ---
 
