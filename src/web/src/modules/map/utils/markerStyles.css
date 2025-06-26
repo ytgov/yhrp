@@ -1,0 +1,113 @@
+/* Shared Marker Styles
+ *
+ * This file contains all CSS styles for custom markers used across map components.
+ * Import this file in any component that uses the shared marker definitions.
+ */
+
+/* Teal Pin Marker Styles */
+.custom-marker {
+  position: relative;
+}
+
+.marker-pin {
+  width: 25px;
+  height: 25px;
+  border-radius: 50% 50% 50% 0;
+  background: #0097a9;
+  position: absolute;
+  transform: rotate(-45deg);
+  left: 50%;
+  top: 50%;
+  margin: -12.5px 0 0 -12.5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.marker-pin::after {
+  content: "";
+  width: 11px;
+  height: 11px;
+  position: absolute;
+  background: #fff;
+  border-radius: 50%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Place Marker Styles (for future use) */
+.custom-place-marker {
+  position: relative;
+}
+
+.place-marker-pin {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #4caf50;
+  border: 3px solid #2e7d32;
+  position: relative;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.place-marker-inner {
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Historic Site Marker Styles (for future use) */
+.custom-historic-site-marker {
+  position: relative;
+}
+
+.historic-site-marker-pin {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #0097a9;
+  border: 3px solid #007a8a;
+  position: relative;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.historic-site-marker-inner {
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Crash Site Marker Styles (for future use) */
+.custom-crash-site-marker {
+  position: relative;
+}
+
+.crash-site-marker-pin {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ff5722;
+  border: 3px solid #d84315;
+  position: relative;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.crash-site-marker-inner {
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
