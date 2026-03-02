@@ -63,15 +63,17 @@ YHRP provides citizens with access to the Yukon Register of Historic Places - a 
 
 ## Bilingual Support
 
-The application supports English and French. The YHSI API returns bilingual content in paired fields:
+The application supports English and French. Users can toggle language via the navbar.
 
-- `placeDescriptionEn` / `placeDescriptionFr`
-- `heritageValueEn` / `heritageValueFr`
-- `characterDefEn` / `characterDefFr`
-- `descBoundEn` / `descBoundFr`
-- `additionalInfoEn` / `additionalInfoFr`
+**Two types of bilingual content:**
 
-See the [YHSI register router](https://github.com/ytgov/yhsi/blob/main/api/routes/register-router.ts) for the API implementation details.
+1. **API Content** - Place descriptions come from YHIS with paired fields (`*En` / `*Fr`)
+2. **UI Strings** - Labels and buttons are managed in a CSV file
+
+**For translators and developers:** See [src/docs/translations.md](src/docs/translations.md) for:
+- How to add new translated labels
+- Working with translation services
+- CSV file format and workflow
 
 ## Project Structure
 
