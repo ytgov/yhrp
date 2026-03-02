@@ -77,16 +77,16 @@ _totoProperCase(text) {
 
 3. **Feature Layers**
 
-   - Historic sites layer (teal markers)
-   - Airplane crash sites layer (orange markers)
-   - Rich popup content with site details
-   - "View Details" buttons linking to site pages
+   - Places layer with teal pin markers (from places API)
+   - Rich popup content with place details
+   - "View Details" buttons linking to place pages
+   - Image thumbnails from place photos
+   - Proper case formatting for place names
 
 4. **UI Components**
-   - Sidebar with tabs (Communities, Basemap, Legend)
-   - Settings button for sidebar toggle
-   - Legend showing marker types
+   - Layer control buttons (Topographic, Satellite, Terrain)
    - Responsive design
+   - Clean, modern interface
 
 #### Popup System Improvements ✅
 
@@ -108,6 +108,13 @@ _totoProperCase(text) {
 - Place name in Title Case
 - "View Details" button linking to place details page
 - Clean, modern design with proper shadows and spacing
+
+**Technical Details**:
+
+- **Image handling**: Uses `photoUrls` Map to cache and display place photos
+- **Title formatting**: Leverages the `_toProperCase()` method from Place model
+- **Button styling**: Inline styles with hover-friendly design
+- **Responsive design**: Adapts to different screen sizes
 
 #### CSS Organization Improvements ✅
 
@@ -159,23 +166,18 @@ _totoProperCase(text) {
 
 ### Map Configuration
 
-- **Center**: Yukon Territory (60.45, -135.5)
+- **Center**: Yukon Territory (64.8255, -135.0)
 - **Default Zoom**: 6
 - **Base Layer**: ESRI Topographic
-- **Markers**: Custom styled circle markers
+- **Markers**: Custom teal pin markers with popup content
 
 ### Feature Layer Configuration
 
 ```javascript
-// Historic Sites
-url: `${MAPS_URL}/sites/0`;
-color: "#0097a9";
-radius: 6;
-
-// Crash Sites
-url: `${MAPS_URL}/sites/1`;
-color: "#ff5722";
-radius: 6;
+// Places Layer
+source: placesApi.fetchPlaces()
+marker: createTealPinMarker()
+popup: HTML content with image, title, and button
 ```
 
 ### Known Issues and Future Improvements
@@ -236,18 +238,18 @@ currentBaseLayer = esriLeaflet.Vector.vectorBasemapLayer("ArcGIS:Topographic", {
 ### Manual Testing Checklist
 
 - [ ] Map loads correctly on page load
-- [ ] Base layer switching works for all options
-- [ ] Community bookmarks navigate to correct locations
-- [ ] Feature layers display with correct styling
-- [ ] Popups show correct information
-- [ ] "View Details" buttons work correctly
-- [ ] Sidebar opens/closes properly
+- [ ] Base layer switching works for all options (Topographic, Satellite, Terrain)
+- [ ] Places markers display with correct teal pin styling
+- [ ] Popups show correct information (image, title, button)
+- [ ] "View Details" buttons work correctly and open in new tab
+- [ ] Layer control buttons are properly positioned and styled
 - [ ] Responsive design works on different screen sizes
-- [ ] Popup images display correctly
-- [ ] Popup titles show in proper case
+- [ ] Popup images display correctly from photo URLs
+- [ ] Popup titles show in proper case (Title Case)
 - [ ] Popup styling matches design (white background, card-like appearance)
-- [ ] Button colors use Yukon Government theme colors
+- [ ] Button colors use Yukon Government theme colors (yg_blue: #0097a9)
 - [ ] Popup close functionality works properly
+- [ ] Map centers correctly on Yukon Territory
 
 ### Text Case Testing
 

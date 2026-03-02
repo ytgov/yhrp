@@ -1,99 +1,102 @@
-# State Management Cleanup Plan
+# State Management
 
-## Overview
+## Philosophy
 
-This plan outlines the steps to remove unnecessary state management and implement a simpler architecture using Vue 3's Composition API. The application will use local component state and services for data management.
+YHRP uses a **service-based architecture** instead of global state management libraries. This keeps the codebase simple and appropriate for a read-only data display application.
 
-## Current State
+## Why No Vuex/Pinia?
 
-- [x] Removed all store files from `web/src/stores/`:
-  - [x] `ApiStore.js`
-  - [x] `AuthStore.js`
-  - [x] `NotificationStore.js`
-  - [x] `UserStore.js`
-- [x] Removed Pinia dependency and imports
-- [x] Successfully refactored components to use Composition API:
-  - [x] Created `notificationService.js` for notification handling
-  - [x] Created `apiService.js` for API calls
-  - [x] Removed user-related functionality
-  - [x] Removed SecureAPI component
-  - [x] Updated map components to remove store dependencies
-- [x] Implemented environment variable based ArcGIS token loading
-- [x] Restored 22 community bookmarks with original UTM coordinates
-- [x] Removed map store in favor of service-based approach
-- [x] Added placeholder image for missing photos
-- [x] Updated URL configurations for API endpoints
-- [x] Added and passed tests for API service error handling and map bookmarks (using kebab-case for test files)
-- [x] Removed token handling test (endpoint is in use and not mocked)
+This application:
+- Displays read-only data from an external API
+- Has no complex state that needs to be shared globally
+- Has no user accounts or session state
+- Has simple, linear data flow
 
-## Next Steps
+Global state management would add unnecessary complexity.
 
-### Phase 1: API Client Implementation (Completed)
+## Current Approach
 
-- [x] Create API client service using native `fetch`
-- [x] Implement response caching
-- [x] Add error handling
+### Local Component State
 
-### Phase 2: Component Refactoring (In Progress)
+Each component manages its own state using Vue 3's Composition API:
 
-- [x] Remove store dependencies from components
-- [x] Implement local state management
-- [x] Update map components to use services
-- [x] Implement proper token loading for map components via environment variables
-- [x] Add placeholder image for missing photos
-- [x] Add tests for map service (bookmarks)
-- [ ] Future: Implement search functionality (currently using placeholder)
+```javascript
+const data = ref([]);
+const loading = ref(false);
+const error = ref(null);
+```
 
-### Phase 3: Cleanup and Optimization
+### Services for API Calls
 
-- [x] Remove unused store files
-- [x] Clean up dependencies
-- [x] Add tests for new services (API service error handling)
-- [ ] Update build configuration
-- [ ] Document new architecture
+API integration is handled by service modules that export functions:
 
-## Implementation Plan
+```javascript
+// In services/placesApi.js
+export const fetchPlaces = async (page = 1) => {
+  const response = await fetch(`${API_BASE_URL}?page=${page}`);
+  return response.json();
+};
 
-- [x] Remove store files
-- [x] Create notification service
-- [x] Create API service
-- [x] Remove user functionality
-- [x] Update components to use new services
-- [x] Implement token loading via environment variables
-- [x] Restore community bookmarks
-- [x] Remove map store and implement service-based approach
-- [x] Add placeholder image for missing photos
-- [x] Add tests
-- [ ] Update build configuration
-- [ ] Add documentation
-- [ ] Performance optimization
-- [ ] Future: Implement search functionality
+// In component
+import { fetchPlaces } from "../services/placesApi";
+const places = await fetchPlaces(1);
+```
 
-## Testing Strategy
+### Props and Events for Component Communication
 
-- [x] Unit tests for services (API service error handling, map bookmarks)
-- [ ] Component tests for refactored components
-- [ ] Integration tests for API calls
-- [ ] Map component tests (future: more coverage)
-- [x] Test files use kebab-case naming
+Parent-child communication uses standard Vue patterns:
 
-## Success Criteria
+```vue
+<!-- Parent -->
+<PlaceCard 
+  :place="place" 
+  @click="handleCardClick" 
+/>
 
-- [x] No store dependencies
-- [x] Simpler architecture
-- [x] Better error handling
-- [x] Reduced bundle size
-- [x] Environment variables properly configured
-- [x] Placeholder image for missing photos
-- [ ] Improved performance
-- [ ] Complete test coverage
-- [ ] Future: Search functionality implemented
+<!-- Child -->
+<script setup>
+const props = defineProps(['place']);
+const emit = defineEmits(['click']);
+</script>
+```
 
-## Next Actions
+## Data Flow
 
-1. [x] Implement proper token loading for map components
-2. [x] Set up data source for map bookmarks
-3. [x] Add placeholder image for missing photos
-4. [x] Add tests for new services (API service error handling, map bookmarks)
-5. [ ] Update documentation
-6. [ ] Future: Implement search functionality
+```
+┌──────────────────────────────────────────────────────────┐
+│                      View Component                       │
+│                                                          │
+│  ┌─────────┐  calls   ┌─────────────┐  returns  ┌─────┐ │
+│  │ onMount │ ───────▶ │ API Service │ ────────▶ │ ref │ │
+│  └─────────┘          └─────────────┘           └─────┘ │
+│                                                    │     │
+│                                                    ▼     │
+│                                              ┌─────────┐ │
+│                                              │ Template│ │
+│                                              └─────────┘ │
+└──────────────────────────────────────────────────────────┘
+```
+
+## When to Consider Global State
+
+Add Pinia only if the app grows to need:
+- User authentication state
+- Shopping cart or similar cross-page state
+- Complex form data that persists across routes
+- Real-time collaborative features
+
+For this read-only heritage site viewer, local state is sufficient.
+
+## Notification Service
+
+The one piece of "shared" state is the notification service (`src/web/src/services/notificationService.js`), which provides toast notifications:
+
+```javascript
+import { useNotificationService } from "@/services/notificationService";
+
+const { showSuccess, showError } = useNotificationService();
+showSuccess("Place loaded");
+showError("Failed to load data");
+```
+
+Note: This service currently creates new refs per call. If notifications need to work across components, refactor to use module-level shared refs.

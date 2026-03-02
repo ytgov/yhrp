@@ -2,111 +2,119 @@
 
 ## Overview
 
-This document outlines the standardized structure for frontend modules in the YHRP Site Registry Viewer. Each module should follow this structure to maintain consistency and improve maintainability.
+The YHRP frontend uses a feature-based module structure. Each module is self-contained with its own components, views, services, and routes.
 
-## Module Structure
+## Module Location
+
+All modules are in `src/web/src/modules/`
+
+## Standard Module Structure
 
 ```
 module-name/
-├── components/         # Reusable Vue components specific to this module
-│   └── __tests__/     # Component tests
-├── data/              # Static data, constants, and types
-├── services/          # API and business logic services
-│   └── __tests__/     # Service tests
-├── router/            # Vue Router configuration
-├── views/             # Page-level Vue components
-└── README.md          # Module documentation
+├── components/       # Reusable components specific to this module
+├── views/            # Page-level components (1:1 with routes)
+├── services/         # API calls and business logic
+├── router/           # Route definitions (index.js)
+├── models/           # Data models/classes (optional)
+└── data/             # Static data, constants (optional)
 ```
 
-## Directory Purposes
+## Current Modules
 
-### components/
+### home/
+Landing page module.
 
-- Contains reusable Vue components specific to this module
-- Components should be focused and single-responsibility
-- Include component tests in `__tests__` subdirectory
-- Naming convention: `PascalCase.vue`
+```
+home/
+├── components/
+│   └── HeroCarousel.vue    # Featured places carousel
+├── views/
+│   ├── Home.vue            # Landing page
+│   └── NotFound.vue        # 404 page
+└── router/
+    └── index.js            # Route: /
+```
 
-### data/
+### places/
+Historic places browsing and detail views.
 
-- Static data files (e.g., constants, enums, types)
-- Module-specific data structures
-- Naming convention: `kebab-case.js`
+```
+places/
+├── components/
+│   ├── PlaceCard.vue       # Card for places grid
+│   ├── PlaceGallery.vue    # Photo gallery
+│   ├── PlaceHeader.vue     # Detail page header
+│   └── PlaceDesignation.vue # Designation info
+├── views/
+│   ├── Places.vue          # Paginated places list
+│   └── PlacesForm.vue      # Place detail page
+├── services/
+│   └── placesApi.js        # API integration
+├── models/
+│   └── Place.js            # Place data model
+├── router/
+│   └── index.js            # Routes: /places, /places/view/:id
+└── data/
+    ├── places.json         # Sample/fallback data
+    └── mock/               # Mock data for development
+```
 
-### services/
+### map/
+Interactive map views.
 
-- API integration services
-- Business logic services
-- Service tests in `__tests__` subdirectory
-- Naming convention: `kebab-case.js`
-
-### router/
-
-- Vue Router configuration
-- Route definitions
-- Navigation guards
-- Naming convention: `index.js`
-
-### views/
-
-- Page-level Vue components
-- One-to-one mapping with routes
-- Naming convention: `PascalCase.vue`
-
-## Implementation Plan
-
-### 1. Map Module
-
-Current structure is mostly aligned with the standard. Required changes:
-
-- Add README.md
-- Move `Migration Tasks.md` content to README.md
-- Ensure consistent naming in all directories
-
-### 2. Places Module
-
-Current structure needs updates:
-
-- Remove empty `migration` directory
-- Add `services` directory for API integration
-- Add README.md
-- Ensure consistent naming in all directories
-
-### 3. Home Module
-
-Current structure needs updates:
-
-- Remove empty `store` directory
-- Add `data` and `services` directories
-- Add README.md
-- Ensure consistent naming in all directories
+```
+map/
+├── components/
+│   ├── LeafletMap.vue      # Full-page map with all places
+│   └── PlaceLocationMap.vue # Single place location map
+├── utils/
+│   ├── markerDefinitions.js # Shared marker icons
+│   └── markerStyles.css     # Marker styling
+└── router/
+    └── index.js            # Route: /map
+```
 
 ## Naming Conventions
 
-### Files
+| Type | Convention | Example |
+|------|------------|---------|
+| Vue Components | PascalCase | `PlaceCard.vue` |
+| Views | PascalCase | `Places.vue` |
+| Services | camelCase | `placesApi.js` |
+| Router | index.js | `router/index.js` |
+| Models | PascalCase | `Place.js` |
 
-- Vue Components: `PascalCase.vue`
-- JavaScript Files: `kebab-case.js`
-- Test Files: `kebab-case.test.js`
+## Adding a New Module
 
-### Components
+1. Create module folder in `src/web/src/modules/`
+2. Add router/index.js with route definitions
+3. Import routes in `src/web/src/router.js`:
+   ```javascript
+   import newModuleRoutes from "@/modules/new-module/router";
+   
+   const routes = [
+     {
+       path: "/",
+       children: [
+         ...homeRoutes,
+         ...placesRoutes,
+         ...mapRoutes,
+         ...newModuleRoutes,  // Add here
+       ],
+     },
+   ];
+   ```
 
-- Component Names: `PascalCase`
-- Component Files: `PascalCase.vue`
-- Component Tests: `PascalCase.test.js`
+## Shared Resources
 
-### Services
+Components used across multiple modules go in `src/web/src/components/`:
+- `AppNavbar.vue` - Main navigation
+- `DesktopNavbar.vue` - Desktop nav
+- `MobileNavbar.vue` - Mobile nav
+- `NavMenu.vue` - Navigation menu
+- `Notifications.vue` - Toast notifications
 
-- Service Names: `kebab-case`
-- Service Files: `kebab-case.js`
-- Service Tests: `kebab-case.test.js`
-
-## Documentation
-
-Each module should include a README.md file with:
-
-- Module purpose and responsibilities
-- Key components and their roles
-- API integration points
-- Dependencies
-- Setup instructions
+Layouts go in `src/web/src/layouts/`:
+- `Default.vue` - Standard layout with navbar
+- `Blank.vue` - Minimal layout (used as route wrapper)

@@ -1,79 +1,112 @@
 # Application Overview
 
-This is a Vue.js-based web application template designed for internal services. The application follows a client-server architecture with a Vue.js frontend and an Express.js backend.
+## Purpose
+
+The Yukon Register of Historic Places (YHRP) is a public-facing web application that provides access to the official register of designated heritage sites in Yukon, Canada. It serves as a read-only viewer for data maintained in the Yukon Heritage Information System (YHIS).
+
+**Key characteristics:**
+- Bilingual (English and French)
+- Read-only public access
+- No authentication required
+
+**Upstream API:** https://github.com/ytgov/yhsi
 
 ## Architecture
 
-### Backend (src/api)
+### System Overview
 
-- Built with Express.js and TypeScript
-- Key features:
-  - RESTful API endpoints
-  - CORS configuration
-  - Security middleware (helmet)
-  - Health check endpoint
-  - Static file serving for the frontend
-  - Environment-based configuration
-  - Authentication support (commented out in current version)
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   Vue 3 SPA     │────▶│  Express Proxy  │────▶│   YHIS API      │
+│   (Frontend)    │     │   (Backend)     │     │  (Government)   │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+                               │
+                               ▼
+                        ┌─────────────────┐
+                        │  node-cache     │
+                        │  (15 min TTL)   │
+                        └─────────────────┘
+```
 
-### Frontend (src/web-vue2)
+### Frontend (src/web/)
 
-- Built with Vue.js 2.x
-- Key features:
-  - Vue Router for navigation
-  - Vuex for state management
-  - Vuetify for UI components
-  - Leaflet for map functionality
-  - PDF generation capabilities (jspdf)
-  - Coordinate system support (proj4, utm-latlng)
+Built with Vue 3 and Vuetify 3, the frontend is a single-page application with:
 
-## Development Setup
+- **Composition API** - All components use `<script setup>` syntax
+- **Service-based data fetching** - No global state management
+- **Leaflet maps** - Interactive mapping for place locations
+- **Responsive design** - Works on desktop and mobile
 
-- Requires Node.js and NPM
-- Development environment runs on port 8080
-- Separate development servers for frontend and backend
-- Environment variables required for configuration
+**Key modules:**
+- `home` - Landing page with featured places
+- `places` - List view and detail pages
+- `map` - Full-screen interactive map
 
-## Key Dependencies
+### Backend (src/api/)
 
-### Backend
+An Express.js server (TypeScript) that acts as a caching proxy:
 
-- Express.js - Web framework
-- CORS - Cross-origin resource sharing
-- Helmet - Security headers
-- Express-session - Session management
-- Express-openid-connect - Authentication
+- **Proxies requests** to the government YHIS API
+- **Caches responses** for 15 minutes to reduce load
+- **Serves static files** (compiled frontend) in production
+- **Single deployment** - Frontend and backend in one container
 
-### Frontend
+**API Endpoints:**
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/register` | Paginated list of places |
+| `GET /api/register/:id` | Single place details |
+| `GET /api/register/:id/photos` | Photos for a place |
+| `GET /api/register/:id/photos/:photoId` | Single photo file |
 
-- Vue.js 2.6.11 - Core framework
-- Vue Router 3.5.3 - Navigation
-- Vuex 3.4.0 - State management
-- Vuetify 2.5.12 - UI component framework
-- Leaflet 1.7.1 - Map functionality
-- Axios - HTTP client
-- jsPDF - PDF generation
+## Data Flow
 
-## Security Features
+1. **User visits page** → Vue router loads appropriate view
+2. **View mounts** → Calls service function (e.g., `fetchPlaces()`)
+3. **Service calls** → Local Express API (`/api/register/...`)
+4. **Express checks cache** → Returns cached data if valid
+5. **Cache miss** → Fetches from YHIS API, caches response
+6. **Data returned** → Vue component renders content
 
-- CORS configuration
-- Helmet security headers
-- Environment variable management
-- Authentication support (currently commented out)
+## Key Technologies
 
-## Build and Deployment
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| Frontend | Vue 3 | UI framework |
+| UI Components | Vuetify 3 | Material Design components |
+| Maps | Leaflet | Interactive maps |
+| Backend | Express.js | API server |
+| Language | TypeScript | Type-safe backend |
+| Caching | node-cache | In-memory response cache |
+| Build | Vite | Frontend bundling |
+| Deployment | Docker | Containerization |
 
-- Docker support for containerization
-- Separate build scripts for API and web components
-- Environment-specific configurations (development, test, production)
+## Bilingual Content
 
-## Notable Features
+The application supports English and French. The YHSI API returns content in paired fields:
 
-- Map integration (Leaflet)
-- PDF generation capabilities
-- Coordinate system conversion
-- Responsive UI (Vuetify)
-- State management (Vuex)
-- Client-side routing
+| Content Type | English Field | French Field |
+|--------------|---------------|--------------|
+| Place Description | `placeDescriptionEn` | `placeDescriptionFr` |
+| Heritage Value | `heritageValueEn` | `heritageValueFr` |
+| Character Definition | `characterDefEn` | `characterDefFr` |
+| Boundary Description | `descBoundEn` | `descBoundFr` |
+| Additional Info | `additionalInfoEn` | `additionalInfoFr` |
 
-This appears to be a template for building web applications with a focus on mapping and data visualization capabilities, with built-in support for PDF generation and coordinate system handling. The application is designed to be secure and configurable for different environments.
+The frontend displays content based on the user's language selection, typically stored in component state as `currentLang` (`'EN'` or `'FR'`).
+
+**API Reference:** See [register-router.ts](https://github.com/ytgov/yhsi/blob/main/api/routes/register-router.ts) in the YHSI repo for how bilingual fields are populated.
+
+## Security Considerations
+
+- **Read-only** - No user input is written to any database
+- **CORS enabled** - Configured for expected origins
+- **No authentication** - Public data, no login required
+- **Caching** - Reduces exposure to upstream API issues
+
+## Performance
+
+- **15-minute cache** - Reduces calls to government API
+- **Lazy loading** - Routes loaded on demand
+- **Image optimization** - Thumbnails served from API
+- **Single container** - Minimizes deployment complexity

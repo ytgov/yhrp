@@ -1,0 +1,313 @@
+# YHRP Codebase Rules and Skills
+
+## Project Context
+
+This is the **Yukon Register of Historic Places (YHRP)** - a public website for browsing heritage sites in Yukon, Canada. It's a simple read-only application that:
+- Fetches data from the government YHIS API
+- Displays places in a list and on maps
+- Shows detailed information about each place
+- Supports **English and French** (bilingual)
+
+Keep changes minimal and focused. This is a government public information site, not a complex application.
+
+## External API Reference
+
+The backend proxies data from the **Yukon Heritage Information System (YHSI)** API.
+
+**Source code reference:** https://github.com/ytgov/yhsi/blob/main/api/routes/register-router.ts
+
+**Live API:** https://yhis.gov.yk.ca/api/register
+
+---
+
+## Bilingual Support (English/French)
+
+The application supports both English and French. The API returns bilingual fields:
+
+| English Field | French Field |
+|---------------|--------------|
+| `placeDescriptionEn` | `placeDescriptionFr` |
+| `heritageValueEn` | `heritageValueFr` |
+| `characterDefEn` | `characterDefFr` |
+| `descBoundEn` | `descBoundFr` |
+| `additionalInfoEn` | `additionalInfoFr` |
+
+**Current state:** French translations are placeholders (prefixed with "FRENCH:"). Real translations will come from the YHIS system.
+
+**Implementation pattern:**
+```vue
+<template>
+  <div>{{ currentLang === 'FR' ? place.placeDescriptionFr : place.placeDescriptionEn }}</div>
+</template>
+
+<script setup>
+const currentLang = ref('EN'); // or 'FR'
+</script>
+```
+
+When adding new text content, always consider both languages.
+
+---
+
+## Architecture Rules
+
+### Frontend (src/web/)
+
+**Framework**: Vue 3 with Composition API and Vuetify 3
+
+**Vuetify MCP Server**: This project has the Vuetify MCP server enabled. Use it to look up component APIs and best practices.
+
+**Component Style**: Always use `<script setup>` syntax for new components:
+```vue
+<script setup>
+import { ref, computed, onMounted } from "vue";
+
+const data = ref([]);
+const loading = ref(false);
+</script>
+```
+
+**State Management**: NO global state libraries (no Pinia, no Vuex). Use:
+- Local component state with `ref()` and `reactive()`
+- Services for API calls
+- Props/emits for parent-child communication
+
+**API Calls**: Use the service in `src/web/src/modules/places/services/placesApi.js`:
+```javascript
+import { fetchPlaces, fetchPlaceById, fetchPlacePhotos } from "../services/placesApi";
+```
+
+**Maps**: Use Leaflet (NOT ESRI/ArcGIS). Reference `LeafletMap.vue` or `PlaceLocationMap.vue` for patterns.
+
+### Backend (src/api/)
+
+**Framework**: Express.js with TypeScript
+
+**Pattern**: Controller → Service → External API
+- Controllers handle HTTP request/response
+- Services contain business logic and caching
+- Use dependency injection for testability
+
+**Caching**: All external API calls go through `PlaceService.fetchWithCache()` which uses node-cache with 15-minute TTL.
+
+---
+
+## File Naming Conventions
+
+| Type | Convention | Example |
+|------|------------|---------|
+| Vue Components | PascalCase.vue | `PlaceCard.vue` |
+| JavaScript files | kebab-case.js | `places-api.js` |
+| TypeScript files | kebab-case.ts | `place-service.ts` |
+| Test files | kebab-case.test.js | `api-service.test.js` |
+| Models (TS) | kebab-case.model.ts | `register-place.model.ts` |
+
+---
+
+## Module Structure
+
+Frontend modules follow this structure:
+```
+modules/[module-name]/
+├── components/     # Reusable components for this module
+├── views/          # Page-level components (1:1 with routes)
+├── services/       # API integration
+├── router/         # Route definitions (index.js)
+└── models/         # Data models/classes (if needed)
+```
+
+---
+
+## Key Files Reference
+
+### Frontend Entry Points
+- `src/web/src/main.js` - App bootstrap
+- `src/web/src/router.js` - Route definitions
+- `src/web/src/plugins/vuetify.js` - Vuetify theme config
+
+### Active Routes
+| Route | View Component |
+|-------|----------------|
+| `/` | `modules/home/views/Home.vue` |
+| `/places` | `modules/places/views/Places.vue` |
+| `/places/view/:placeId` | `modules/places/views/PlacesForm.vue` |
+| `/map` | `modules/map/components/LeafletMap.vue` |
+
+### Backend Entry Points
+- `src/api/index.ts` - Express app setup
+- `src/api/routes/place-routes.ts` - API routes
+- `src/api/services/place-service.ts` - Data fetching + caching
+
+---
+
+## Vuetify Theme Colors
+
+Use these official Yukon Government colors:
+```javascript
+primary: "#0097a9"    // yg_blue - primary actions, links
+yg_moss: "#7A9A01"    // green accent
+yg_zinc: "#24405A"    // dark blue
+yg_twilight: "#512A44" // purple accent
+yg_lichen: "#DC4405"  // orange accent
+yg_sun: "#F2A900"     // yellow accent
+```
+
+---
+
+## Common Patterns
+
+### Loading States in Views
+```vue
+<v-row v-if="loading">
+  <v-col cols="12" class="text-center">
+    <v-progress-circular indeterminate color="primary" />
+  </v-col>
+</v-row>
+<v-row v-else-if="error">
+  <v-col cols="12">
+    <v-alert type="error">{{ error }}</v-alert>
+  </v-col>
+</v-row>
+<template v-else>
+  <!-- Content here -->
+</template>
+```
+
+### Fetching Data on Mount
+```javascript
+const data = ref([]);
+const loading = ref(false);
+const error = ref(null);
+
+const fetchData = async () => {
+  loading.value = true;
+  try {
+    data.value = await fetchPlaces();
+  } catch (err) {
+    error.value = err.message;
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchData();
+});
+```
+
+### Map Markers
+Use the shared teal pin marker from `modules/map/utils/markerDefinitions.js`:
+```javascript
+import { createTealPinMarker } from "../utils/markerDefinitions";
+
+const marker = L.marker([lat, lng], {
+  icon: createTealPinMarker(),
+});
+```
+
+---
+
+## Anti-Patterns to Avoid
+
+1. **NO global state** - Don't add Pinia/Vuex
+2. **NO axios** - Use native `fetch()`
+3. **NO ESRI/ArcGIS** - Use Leaflet for maps
+4. **NO Options API** - Use `<script setup>` Composition API
+5. **NO console.log in production** - Remove debug statements
+6. **NO hardcoded API URLs** - Use config.js or environment variables
+7. **NO direct pushes** to main/uat/prod branches
+8. **NO custom CSS when Vuetify has a solution** - See below
+
+---
+
+## Vuetify: Prefer Native Over Custom CSS
+
+**Always use Vuetify's built-in utilities instead of writing custom CSS.** Custom CSS creates maintenance burden and may conflict with Vuetify's theming.
+
+### Use Vuetify utility classes:
+```vue
+<!-- GOOD: Vuetify spacing utilities -->
+<div class="pa-4 mt-2 mb-4">Content</div>
+
+<!-- BAD: Custom CSS -->
+<div class="my-custom-spacing">Content</div>
+<style>.my-custom-spacing { padding: 16px; margin-top: 8px; }</style>
+```
+
+### Use Vuetify's flex utilities:
+```vue
+<!-- GOOD -->
+<div class="d-flex justify-space-between align-center">
+
+<!-- BAD -->
+<div style="display: flex; justify-content: space-between;">
+```
+
+### Use Vuetify component props:
+```vue
+<!-- GOOD: Use component props -->
+<v-card elevation="2" rounded="lg" color="grey-lighten-4">
+
+<!-- BAD: Override with CSS -->
+<v-card class="custom-card">
+<style>.custom-card { box-shadow: ...; border-radius: ...; }</style>
+```
+
+### Common Vuetify utilities:
+| Purpose | Vuetify Class |
+|---------|---------------|
+| Spacing | `pa-4`, `mt-2`, `mx-auto` |
+| Flex | `d-flex`, `justify-center`, `align-center` |
+| Text | `text-h4`, `text-body-1`, `text-center` |
+| Colors | `bg-primary`, `text-grey-darken-1` |
+| Display | `d-none`, `d-sm-block`, `d-md-flex` |
+| Sizing | `fill-height`, `w-100` |
+
+**When in doubt**, use the Vuetify MCP server to look up the correct approach
+
+---
+
+## Git Workflow
+
+**Branches:**
+- `main` - Development (always deployable)
+- `uat` - User acceptance testing
+- `prod` - Production
+
+**Branch naming:**
+- `feature/description-of-feature`
+- `bugfix/description-of-fix`
+- `hotfix/critical-fix-description`
+
+**Commits:** Use conventional commits format:
+- `feat: add new feature`
+- `fix: resolve bug`
+- `docs: update documentation`
+- `refactor: restructure code`
+- `chore: maintenance tasks`
+
+---
+
+## Testing
+
+**Frontend:** Vitest (in `src/web/`)
+```bash
+npm run test        # Watch mode
+npm run test:run    # Single run
+```
+
+**Backend:** Jest (in `src/api/`)
+```bash
+npm test            # Run all tests
+npm run test:watch  # Watch mode
+```
+
+---
+
+## When Making Changes
+
+1. Keep changes minimal and focused
+2. Don't add unnecessary dependencies
+3. Follow existing patterns in the codebase
+4. Update CHANGELOG.md for user-facing changes
+5. Test both frontend build (`npm run build`) and backend build (`npm run build:api`)

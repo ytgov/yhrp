@@ -1,101 +1,189 @@
-# YHRP Site Registry Viewer
+# Yukon Register of Historic Places (YHRP)
 
-A Vue 3 based web application for viewing and interacting with the YHRP site registry data.
+A public-facing web application for browsing and exploring designated heritage sites throughout Yukon, Canada.
 
-## Overview
+## What This App Does
 
-This application provides a modern interface for accessing and visualizing site registry data from the YHRP API. Built with Vue 3 and Vuetify 3, it offers a responsive and user-friendly experience.
+YHRP provides citizens with access to the Yukon Register of Historic Places - a database of heritage sites maintained by the Yukon Government. Users can:
 
-## Key Features
+- Browse a paginated list of historic places with photos
+- View detailed information about each place (designation, heritage value, boundaries, etc.)
+- See place locations on an interactive map
+- Explore all places on a full-screen map view
+- View content in **English or French** (bilingual)
 
-- Vue 3 with Composition API
-- Vuetify 3 for UI components
-- ArcGIS and Leaflet integration for map visualization
-- Service-based architecture for API integration
-- Responsive design for all device sizes
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Vue 3 Frontend (Vuetify 3)                   │
+│                                                                 │
+│  Routes:                                                        │
+│    /           → Home page with featured places carousel        │
+│    /places     → Paginated grid of all historic places          │
+│    /places/view/:id → Place details with photos & map           │
+│    /map        → Full-screen interactive map                    │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    Express API (Caching Proxy)                  │
+│                                                                 │
+│  Endpoints:                                                     │
+│    GET /api/register          → Paginated places list           │
+│    GET /api/register/:id      → Single place details            │
+│    GET /api/register/:id/photos → Photos for a place            │
+│    GET /api/register/:id/photos/:photoId → Single photo file    │
+│                                                                 │
+│  Features:                                                      │
+│    • 15-minute in-memory cache (node-cache)                     │
+│    • Serves frontend static files in production                 │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              Yukon Heritage Information System (YHSI) API       │
+│              https://yhis.gov.yk.ca/api/register               │
+│                                                                 │
+│  Source: github.com/ytgov/yhsi                                 │
+│  (External government API - source of truth for place data)    │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend Framework | Vue 3 (Composition API) |
+| UI Components | Vuetify 3 |
+| Maps | Leaflet |
+| Backend | Express.js + TypeScript |
+| Caching | node-cache (15-min TTL) |
+| Deployment | Docker (single container) |
+
+## Bilingual Support
+
+The application supports English and French. The YHSI API returns bilingual content in paired fields:
+
+- `placeDescriptionEn` / `placeDescriptionFr`
+- `heritageValueEn` / `heritageValueFr`
+- `characterDefEn` / `characterDefFr`
+- `descBoundEn` / `descBoundFr`
+- `additionalInfoEn` / `additionalInfoFr`
+
+See the [YHSI register router](https://github.com/ytgov/yhsi/blob/main/api/routes/register-router.ts) for the API implementation details.
+
+## Project Structure
+
+```
+yhrp/
+├── src/
+│   ├── api/                    # Express backend
+│   │   ├── controllers/        # Request handlers
+│   │   ├── services/           # Business logic + caching
+│   │   ├── models/             # TypeScript interfaces
+│   │   ├── routes/             # Route definitions
+│   │   └── index.ts            # App entry point
+│   │
+│   ├── web/                    # Vue 3 frontend
+│   │   └── src/
+│   │       ├── modules/        # Feature modules
+│   │       │   ├── home/       # Home page
+│   │       │   ├── places/     # Places list & details
+│   │       │   └── map/        # Map views
+│   │       ├── components/     # Shared components
+│   │       ├── layouts/        # Page layouts
+│   │       ├── plugins/        # Vuetify setup
+│   │       └── services/       # Shared services
+│   │
+│   └── docs/                   # Documentation
+│       ├── architecture/       # Technical docs
+│       ├── processes/          # Dev workflows
+│       └── development/        # Dev guides
+│
+├── Dockerfile                  # Production build
+└── CHANGELOG.md               # Version history
+```
 
 ## Development Setup
 
 ### Prerequisites
 
-- Node.js and NPM
-- Docker (optional, for containerized deployment)
+- Node.js 20+
+- npm
 
-### Local Development
+### Quick Start
 
-1. Clone the repository
-2. Create environment files:
-   ```bash
-   cp src/api/.env src/api/.env.development
-   ```
-3. Configure environment variables (see Environment Variables section)
-4. Start the development servers:
+```bash
+# Install dependencies
+cd src/api && npm install
+cd ../web && npm install
 
-   ```bash
-   # Terminal 1 - API
-   cd src/api
-   npm run start:dev
+# Start development servers (2 terminals)
 
-   # Terminal 2 - Frontend
-   cd src/web
-   npm run start:dev
-   ```
+# Terminal 1 - API (port 3000)
+cd src/api
+npm run start:dev
 
-5. Access the application at http://localhost:8080
+# Terminal 2 - Frontend (port 5173)
+cd src/web
+npm run dev
+```
 
-## Environment Variables
+Access the app at http://localhost:5173
 
-Environment variables should never be checked into the repository!
+### Available Scripts
 
-Required variables:
+**Frontend (`src/web/`):**
+```bash
+npm run dev          # Start dev server
+npm run build        # Production build
+npm run test         # Run tests
+```
 
-- API_PORT=(port for API server)
-- FRONTEND_URL=(service URL from browser)
+**Backend (`src/api/`):**
+```bash
+npm run start:dev    # Start with hot reload
+npm run build:api    # Compile TypeScript
+npm test             # Run tests
+```
 
 ## Deployment
 
 ### Docker Build
 
 ```bash
+# Build image
 docker build -t yhrp-viewer .
-```
 
-### Running in Production
-
-```bash
+# Run container
 docker run -p 8222:3000 -e NODE_ENV=production --restart=on-failure yhrp-viewer
 ```
 
-## Project Structure
-
-- `src/web/` - Vue 3 frontend application
-- `src/api/` - Backend API services
-- `src/docs/` - Project documentation
-  - Migration plans
-  - API schemas
-  - Release process
-  - State management documentation
-
-## Documentation
-
-For detailed information about the project, refer to the documentation in `src/docs/`:
-
-- `architecture/state-management.md` - State management architecture
-- `architecture/caching-strategy.md` - Caching implementation details
-- `development/vue3-migration.md` - Details about the Vue 3 migration
-- `processes/release-process.md` - Release and deployment procedures
-- `processes/branching-strategy.md` - Branch management and workflow
-- `processes/CHANGELOG_GUIDE.md` - Guidelines for maintaining the changelog
-- `CHANGELOG.md` - Version history and changes (in root directory)
+The Docker build:
+1. Compiles the Vue frontend
+2. Compiles the Express backend
+3. Bundles everything into a single Node.js container
+4. Serves frontend as static files from Express
 
 ## Contributing
 
-1. Create a feature branch
-2. Make your changes
-3. Submit a pull request
-4. Ensure all tests pass
-5. Update documentation as needed
+See `src/docs/processes/` for:
+- `branching-strategy.md` - Git workflow
+- `release-process.md` - Release procedures
+- `CHANGELOG_GUIDE.md` - Changelog format
+
+### Branch Naming
+
+- Features: `feature/description`
+- Bugfixes: `bugfix/description`
+- Hotfixes: `hotfix/description`
+- Releases: `release/vX.Y.Z`
+
+### Commit Format
+
+Use conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
 
 ## License
 
-Internal use only - YG Government
+Internal use only - Yukon Government
