@@ -7,7 +7,7 @@
         </div>
       </template>
       <div class="hover-overlay">
-        <v-btn color="white" variant="flat">View Place</v-btn>
+        <v-btn color="white" variant="flat">{{ t(translations.viewPlace) }}</v-btn>
       </div>
     </v-img>
 
@@ -20,6 +20,10 @@
 </template>
 
 <script setup>
+import { useLanguage, translations } from "@/composables/useLanguage";
+
+const { t } = useLanguage();
+
 defineProps({
   imageUrl: {
     type: String,

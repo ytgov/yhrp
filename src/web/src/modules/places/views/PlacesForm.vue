@@ -67,6 +67,7 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import { useDisplay } from "vuetify";
+import { useLanguage, translations } from "@/composables/useLanguage";
 import PlaceLocationMap from "@/modules/map/components/PlaceLocationMap.vue";
 import PlaceGallery from "../components/PlaceGallery.vue";
 import PlaceHeader from "../components/PlaceHeader.vue";
@@ -80,6 +81,7 @@ const props = defineProps({
 });
 
 const { smAndDown } = useDisplay();
+const { t, isEnglish } = useLanguage();
 
 const loading = ref(false);
 const error = ref(null);
@@ -87,14 +89,18 @@ const placeData = ref(null);
 
 const mapHeight = computed(() => (smAndDown.value ? 300 : 500));
 
+const getLocalizedField = (enField, frField) => {
+  if (!placeData.value) return "";
+  return isEnglish.value
+    ? placeData.value[enField] || placeData.value[frField] || ""
+    : placeData.value[frField] || placeData.value[enField] || "";
+};
+
 const placeDescription = computed(() => {
   if (!placeData.value) return "";
-  return (
-    placeData.value.description ||
-    placeData.value.teaserEnglish ||
-    placeData.value.placeDescriptionEn ||
-    ""
-  );
+  return getLocalizedField("placeDescriptionEn", "placeDescriptionFr") ||
+    (isEnglish.value ? placeData.value.teaserEnglish : placeData.value.teaserFrench) ||
+    "";
 });
 
 const expansionPanels = computed(() => {
@@ -102,14 +108,14 @@ const expansionPanels = computed(() => {
   const d = placeData.value.designations?.[0];
   return [
     {
-      title: "Designation",
-      content: d ? `Level: ${d.level || ""}\nDate: ${d.date || ""}` : "",
+      title: t(translations.designation),
+      content: d ? `${t(translations.level)}: ${d.level || ""}\n${t(translations.date)}: ${d.date || ""}` : "",
     },
-    { title: "Place Description", content: placeData.value.placeDescriptionEn || "" },
-    { title: "Heritage Value", content: placeData.value.heritageValueEn || "" },
-    { title: "Character Definition", content: placeData.value.characterDefEn || "" },
-    { title: "Additional Information", content: placeData.value.additionalInfoEn || "" },
-    { title: "Description of Boundaries", content: placeData.value.descBoundEn || "" },
+    { title: t(translations.placeDescription), content: getLocalizedField("placeDescriptionEn", "placeDescriptionFr") },
+    { title: t(translations.heritageValue), content: getLocalizedField("heritageValueEn", "heritageValueFr") },
+    { title: t(translations.characterDefinition), content: getLocalizedField("characterDefEn", "characterDefFr") },
+    { title: t(translations.additionalInformation), content: getLocalizedField("additionalInfoEn", "additionalInfoFr") },
+    { title: t(translations.descriptionOfBoundaries), content: getLocalizedField("descBoundEn", "descBoundFr") },
   ].filter((p) => p.content);
 });
 

@@ -24,7 +24,7 @@
 
     <div v-else class="d-flex flex-column align-center justify-center" style="height: 400px">
       <v-icon size="64" color="grey">mdi-image-off</v-icon>
-      <p class="text-grey mt-2">No photos available</p>
+      <p class="text-grey mt-2">{{ t(translations.noPhotosAvailable) }}</p>
     </div>
 
     <v-card v-if="currentPhoto?.comments" flat class="mt-2">
@@ -41,7 +41,7 @@
       <v-card>
         <v-toolbar color="primary">
           <v-btn icon="mdi-close" @click="fullscreen = false" />
-          <v-toolbar-title>Photo Gallery</v-toolbar-title>
+          <v-toolbar-title>{{ t(translations.photoGallery) }}</v-toolbar-title>
         </v-toolbar>
 
         <v-carousel
@@ -70,7 +70,10 @@
 
 <script setup>
 import { onMounted, ref } from "vue";
+import { useLanguage, translations } from "@/composables/useLanguage";
 import { fetchPlacePhotos } from "../services/placesApi";
+
+const { t } = useLanguage();
 
 const props = defineProps({
   placeId: {

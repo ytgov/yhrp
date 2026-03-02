@@ -4,17 +4,23 @@
 
     <router-link to="/" class="d-flex align-center text-decoration-none ml-10">
       <v-toolbar-title class="font-weight-bold text-h5">
-        {{ applicationName }}
+        {{ t(translations.appName) }}
       </v-toolbar-title>
     </router-link>
 
     <v-spacer />
 
     <div class="d-flex align-center">
-      <span class="text-subtitle-1 font-weight-medium">Français</span>
-      <v-divider class="mx-4" vertical inset />
+      <v-btn
+        variant="text"
+        class="text-subtitle-1 font-weight-medium"
+        @click="toggleLanguage"
+      >
+        {{ isEnglish ? "Français" : "English" }}
+      </v-btn>
+      <v-divider class="mx-2" vertical inset />
 
-      <v-btn variant="text" size="large" color="primary" icon="mdi-menu">
+      <v-btn variant="text" size="large" color="primary">
         <v-icon size="30">mdi-menu</v-icon>
         <NavMenu />
       </v-btn>
@@ -23,8 +29,10 @@
 </template>
 
 <script setup>
-import { applicationName } from "@/config";
+import { useLanguage, translations } from "@/composables/useLanguage";
 import NavMenu from "./NavMenu.vue";
+
+const { isEnglish, toggleLanguage, t } = useLanguage();
 </script>
 
 <style scoped>

@@ -10,9 +10,7 @@
       <v-row gap="0" class="justify-center">
         <v-col cols="12" md="8" class="pa-0">
           <p class="text-h5 font-weight-light mb-2 text-yg_sun">
-            Historic places in the Yukon are a tangible record of the people,
-            events and activities that have shaped our way of life and our
-            environment.
+            {{ t(translations.heroText) }}
           </p>
         </v-col>
       </v-row>
@@ -20,29 +18,22 @@
       <v-row class="my-8">
         <v-col cols="12" md="8" class="mx-auto">
           <p class="text-h6 font-weight-light mb-4">
-            Our historic places represent the technologies, designs and ideas
-            that are the framework of our society and the basis for our future.
+            {{ t(translations.heroSubtext1) }}
           </p>
           <p class="text-body-1">
-            Many places are landmarks within a community, are associated with
-            remarkable people or historical events, or are places that have
-            cultural, social, scientific or architectural significance.
+            {{ t(translations.heroSubtext2) }}
           </p>
           <p class="text-body-1 mt-4">
-            The Register is an online resource of Yukon's historic places that
-            have been designated as historically significant on a municipal,
-            territorial or national level. You can explore Yukon's history by
-            searching our website for historic places by location on a map, in a
-            list or via name.
+            {{ t(translations.heroSubtext3) }}
           </p>
         </v-col>
       </v-row>
 
       <v-row class="mb-8">
         <v-col cols="12" md="8" class="mx-auto">
-          <h2 class="text-h5 mb-4">Explore Historic Places</h2>
+          <h2 class="text-h5 mb-4">{{ t(translations.exploreHistoricPlaces) }}</h2>
           <v-row>
-            <v-col v-for="feature in features" :key="feature.title" cols="12" md="4">
+            <v-col v-for="feature in features" :key="feature.key" cols="12" md="4">
               <v-card class="feature-card h-100" elevation="2">
                 <v-card-item>
                   <template #prepend>
@@ -53,7 +44,7 @@
                 <v-card-text>{{ feature.description }}</v-card-text>
                 <template #actions>
                   <v-btn color="primary" variant="flat" :to="feature.route" block>
-                    {{ feature.title }}
+                    {{ feature.buttonText }}
                   </v-btn>
                 </template>
               </v-card>
@@ -66,8 +57,12 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
+import { useLanguage, translations } from "@/composables/useLanguage";
 import places from "@/modules/places/data/places.json";
 import HeroCarousel from "../components/HeroCarousel.vue";
+
+const { t } = useLanguage();
 
 function getRandomDistinctPlaces(placesList, count) {
   const usedIndexes = new Set();
@@ -90,26 +85,32 @@ function getRandomDistinctPlaces(placesList, count) {
 
 const heroSlides = getRandomDistinctPlaces(places.PlacesList, 5);
 
-const features = [
+const features = computed(() => [
   {
+    key: "map",
     icon: "mdi-map-marker",
-    title: "Map View",
-    description: "Explore historic places on an interactive map. Find locations near you and discover their historical significance.",
+    title: t(translations.mapView),
+    description: t(translations.mapViewDescription),
+    buttonText: t(translations.viewMap),
     route: "/map",
   },
   {
+    key: "list",
     icon: "mdi-format-list-bulleted",
-    title: "List View",
-    description: "Browse through our comprehensive list of historic places. Filter and search to find specific locations or types of sites.",
+    title: t(translations.listView),
+    description: t(translations.listViewDescription),
+    buttonText: t(translations.viewList),
     route: "/places",
   },
   {
+    key: "search",
     icon: "mdi-magnify",
-    title: "Search",
-    description: "Search for specific historic places by name, location, or historical significance.",
+    title: t(translations.search),
+    description: t(translations.searchDescription),
+    buttonText: t(translations.searchPlaces),
     route: "/places",
   },
-];
+]);
 </script>
 
 <style scoped>

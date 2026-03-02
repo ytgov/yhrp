@@ -18,7 +18,7 @@
         <v-col cols="auto">
           <v-btn color="primary" variant="flat" @click="$emit('print')">
             <v-icon start>mdi-printer</v-icon>
-            Print
+            {{ t(translations.print) }}
           </v-btn>
         </v-col>
       </v-row>
@@ -28,6 +28,9 @@
 
 <script setup>
 import { computed } from "vue";
+import { useLanguage, translations } from "@/composables/useLanguage";
+
+const { t } = useLanguage();
 
 const props = defineProps({
   placeName: {
@@ -39,8 +42,8 @@ const props = defineProps({
 defineEmits(["print"]);
 
 const breadcrumbItems = computed(() => [
-  { title: "Home", disabled: false, to: "/" },
-  { title: "Places", disabled: false, to: "/places" },
+  { title: t(translations.home), disabled: false, to: "/" },
+  { title: t(translations.places), disabled: false, to: "/places" },
   { title: props.placeName, disabled: true },
 ]);
 </script>

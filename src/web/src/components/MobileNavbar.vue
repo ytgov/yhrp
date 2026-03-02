@@ -2,13 +2,17 @@
   <v-app-bar color="white" flat height="70" class="border-b-yg_sun">
     <router-link to="/" class="d-flex align-center text-decoration-none ml-4">
       <v-toolbar-title class="font-weight-bold text-h6">
-        {{ applicationName }}
+        {{ t(translations.appName) }}
       </v-toolbar-title>
     </router-link>
 
     <v-spacer />
 
-    <v-btn variant="text" size="large" color="primary" icon="mdi-menu">
+    <v-btn variant="text" size="small" @click="toggleLanguage">
+      {{ isEnglish ? "FR" : "EN" }}
+    </v-btn>
+
+    <v-btn variant="text" size="large" color="primary">
       <v-icon>mdi-menu</v-icon>
       <NavMenu />
     </v-btn>
@@ -16,8 +20,10 @@
 </template>
 
 <script setup>
-import { applicationName } from "@/config";
+import { useLanguage, translations } from "@/composables/useLanguage";
 import NavMenu from "./NavMenu.vue";
+
+const { isEnglish, toggleLanguage, t } = useLanguage();
 </script>
 
 <style scoped>

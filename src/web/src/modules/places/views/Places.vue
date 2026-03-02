@@ -7,7 +7,7 @@
             class="d-flex flex-column flex-sm-row align-sm-center justify-space-between gap-4"
           >
             <h1 class="text-h4 mb-4 mb-sm-0">
-              List of Historic Places {{ photoCountText }}
+              {{ t(translations.listOfHistoricPlaces) }} {{ photoCountText }}
             </h1>
           </div>
         </v-col>
@@ -31,7 +31,7 @@
       </v-row>
       <v-row v-else-if="placesList.length === 0">
         <v-col cols="12" class="text-center">
-          <v-alert type="info" class="mt-4"> No places found </v-alert>
+          <v-alert type="info" class="mt-4">{{ t(translations.noPlacesFound) }}</v-alert>
         </v-col>
       </v-row>
       <v-row v-else>
@@ -68,10 +68,13 @@
 </template>
 
 <script setup>
+import { useLanguage, translations } from "@/composables/useLanguage";
 import PlaceCard from "@/modules/places/components/PlaceCard.vue";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { fetchPlacePhotos, fetchPlaces } from "../services/placesApi";
+
+const { t } = useLanguage();
 
 const router = useRouter();
 
