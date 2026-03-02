@@ -130,26 +130,6 @@
           </v-col>
         </v-row>
 
-        <!-- Debug section -->
-        <v-row>
-          <v-col cols="12">
-            <v-expansion-panels>
-              <v-expansion-panel>
-                <v-expansion-panel-title class="bg-grey-lighten-4"
-                  >Debug: Raw API Data</v-expansion-panel-title
-                >
-                <v-expansion-panel-text>
-                  <pre
-                    class="pa-4 rounded bg-grey-lighten-3 text-body-2"
-                    style="white-space: pre-wrap; word-break: break-word"
-                  >
-                    {{ JSON.stringify(placeData, null, 2) }}
-                  </pre>
-                </v-expansion-panel-text>
-              </v-expansion-panel>
-            </v-expansion-panels>
-          </v-col>
-        </v-row>
       </template>
     </v-container>
   </div>
@@ -157,7 +137,6 @@
 
 <script>
 import PlaceLocationMap from "@/modules/map/components/PlaceLocationMap.vue";
-import PlaceDesignation from "../components/PlaceDesignation.vue";
 import PlaceGallery from "../components/PlaceGallery.vue";
 import PlaceHeader from "../components/PlaceHeader.vue";
 import { fetchPlaceById, fetchPlacePhotos } from "../services/placesApi";
@@ -168,7 +147,6 @@ export default {
     PlaceHeader,
     PlaceGallery,
     PlaceLocationMap,
-    PlaceDesignation,
   },
   props: {
     placeId: {

@@ -17,7 +17,6 @@
 </template>
 
 <script setup>
-import * as esriLeaflet from "esri-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { nextTick, onMounted, onUnmounted, ref } from "vue";
@@ -42,9 +41,8 @@ const baseLayers = [
     id: "esri-topo",
     name: "Topographic",
     icon: "mdi-map",
-    esri: true,
-    attribution:
-      "Tiles © Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012",
+    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: "© OpenStreetMap contributors",
   },
   {
     id: "satellite",
@@ -189,24 +187,10 @@ const changeBaseLayer = (layerId) => {
     map.removeLayer(currentBaseLayer);
   }
 
-  if (layer.esri) {
-    console.log("ESRI Leaflet available:", !!esriLeaflet);
-    if (!esriLeaflet) {
-      console.error("ESRI Leaflet not loaded");
-      return;
-    }
-    console.log("Adding ESRI base layer");
-    currentBaseLayer = esriLeaflet
-      .basemapLayer("Topographic", {
-        attribution: layer.attribution,
-      })
-      .addTo(map);
-  } else {
-    console.log("Adding standard tile layer");
-    currentBaseLayer = L.tileLayer(layer.url, {
-      attribution: layer.attribution,
-    }).addTo(map);
-  }
+  console.log("Adding tile layer");
+  currentBaseLayer = L.tileLayer(layer.url, {
+    attribution: layer.attribution,
+  }).addTo(map);
 
   currentLayer.value = layerId;
 };

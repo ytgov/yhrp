@@ -1,16 +1,8 @@
 export default [
   {
     path: "/places",
-
     component: () => import("@/layouts/Default.vue"),
-    // component: Default,
     children: [
-      // {
-      //   path: "/maps",
-      //   name: "Maps",
-      //   component: Maps,
-      //   meta: { requiresAuth: true },
-      // },
       {
         path: "",
         name: "Places",
@@ -21,7 +13,6 @@ export default [
         name: "placeView",
         component: () => import("../views/PlacesForm.vue"),
         props: true,
-        // meta: { requiresAuth: true },
       },
     ],
   },
