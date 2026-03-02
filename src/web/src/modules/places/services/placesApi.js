@@ -37,7 +37,8 @@ import { apiBaseUrl } from "../../../config";
 export const API_BASE_URL = `${apiBaseUrl}/api/register`;
 
 // Flag to toggle between mock and real API data
-const USE_MOCK_DATA = false;
+// Set to true when YHIS API is unavailable
+const USE_MOCK_DATA = true;
 
 /**
  * Convert buffer data to base64 URL

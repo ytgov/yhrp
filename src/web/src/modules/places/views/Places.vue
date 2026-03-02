@@ -41,7 +41,7 @@
           cols="12"
           sm="6"
           md="4"
-          lg="3"
+          xl="3"
         >
           <place-card
             :image-url="photoURL(item)"

@@ -1,18 +1,14 @@
 <template>
-  <div class="place-header">
+  <div class="bg-white border-b">
     <v-container fluid>
-      <v-row justify="space-between" align="center" class="header-row">
+      <v-row class="align-center justify-space-between py-2 px-4">
         <v-col cols="auto">
-          <v-breadcrumbs
-            :items="breadcrumbItems"
-            divider=">"
-            class="text-grey-darken-1"
-          >
-            <template v-slot:item="{ item }">
+          <v-breadcrumbs :items="breadcrumbItems" divider=">" class="pa-0">
+            <template #item="{ item }">
               <v-breadcrumbs-item
                 :to="item.to"
                 :disabled="item.disabled"
-                class="text-body-2"
+                class="text-body-2 text-grey-darken-1"
               >
                 {{ item.title }}
               </v-breadcrumbs-item>
@@ -20,14 +16,9 @@
           </v-breadcrumbs>
         </v-col>
         <v-col cols="auto">
-          <v-btn
-            class="button mx-1"
-            @click="$emit('print')"
-            color="primary"
-            variant="flat"
-          >
-            <v-icon left>mdi-printer</v-icon>
-            <span class="ml-2">Print</span>
+          <v-btn color="primary" variant="flat" @click="$emit('print')">
+            <v-icon start>mdi-printer</v-icon>
+            Print
           </v-btn>
         </v-col>
       </v-row>
@@ -35,72 +26,27 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "PlaceHeader",
-  props: {
-    placeName: {
-      type: String,
-      default: "",
-    },
+<script setup>
+import { computed } from "vue";
+
+const props = defineProps({
+  placeName: {
+    type: String,
+    default: "",
   },
-  computed: {
-    breadcrumbItems() {
-      return [
-        {
-          title: "Home",
-          disabled: false,
-          to: "/",
-        },
-        {
-          title: "Places",
-          disabled: false,
-          to: "/places",
-        },
-        {
-          title: this.placeName,
-          disabled: true,
-        },
-      ];
-    },
-  },
-  methods: {},
-};
+});
+
+defineEmits(["print"]);
+
+const breadcrumbItems = computed(() => [
+  { title: "Home", disabled: false, to: "/" },
+  { title: "Places", disabled: false, to: "/places" },
+  { title: props.placeName, disabled: true },
+]);
 </script>
 
 <style scoped>
-.place-header {
-  background-color: white;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.header-row {
-  min-height: 44px;
-  padding: 0 16px;
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-
-.active-lang {
-  color: #0097a9;
-}
-
-.language-switcher {
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
-
-@media (max-width: 600px) {
-  .header-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .language-switcher {
-    margin-top: 8px;
-  }
+.border-b {
+  border-bottom: 1px solid rgb(var(--v-theme-on-surface), 0.12);
 }
 </style>

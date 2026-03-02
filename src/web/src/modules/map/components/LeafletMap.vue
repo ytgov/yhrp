@@ -204,8 +204,8 @@ const initMap = async () => {
   }
 
   console.log("Initializing map...");
-  // Initialize the map centered on Yukon
-  map = L.map(mapContainer.value).setView([64.8255, -135.0], 6);
+  // Initialize the map centered on Whitehorse, Yukon
+  map = L.map(mapContainer.value).setView([60.7212, -135.0568], 10);
   console.log("Map initialized:", map);
 
   // Set initial base layer

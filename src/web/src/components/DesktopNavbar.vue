@@ -1,29 +1,20 @@
 <template>
-  <v-app-bar
-    app
-    color="#fff"
-    flat
-    height="70"
-    style="left: 0; border-bottom: 3px #f3b228 solid"
-  >
-    <div>
-      <img src="/yukon.svg" class="logo" height="44" />
-    </div>
-    <div class="pl-10">
-      <router-link to="/" class="d-flex align-center text-decoration-none">
-        <v-toolbar-title>
-          <span class="font-weight-bold text-h5">{{ title }}</span>
-        </v-toolbar-title>
-      </router-link>
-    </div>
+  <v-app-bar color="white" flat height="70" class="border-b-yg_sun">
+    <img src="/yukon.svg" class="ml-8 mt-n2" height="44" alt="Yukon Logo" />
 
-    <v-spacer></v-spacer>
+    <router-link to="/" class="d-flex align-center text-decoration-none ml-10">
+      <v-toolbar-title class="font-weight-bold text-h5">
+        {{ applicationName }}
+      </v-toolbar-title>
+    </router-link>
+
+    <v-spacer />
 
     <div class="d-flex align-center">
       <span class="text-subtitle-1 font-weight-medium">Français</span>
-      <v-divider class="mr-5" vertical inset></v-divider>
+      <v-divider class="mx-4" vertical inset />
 
-      <v-btn variant="text" size="large" color="primary">
+      <v-btn variant="text" size="large" color="primary" icon="mdi-menu">
         <v-icon size="30">mdi-menu</v-icon>
         <NavMenu />
       </v-btn>
@@ -31,21 +22,9 @@
   </v-app-bar>
 </template>
 
-<script>
+<script setup>
 import { applicationName } from "@/config";
 import NavMenu from "./NavMenu.vue";
-
-export default {
-  name: "DesktopNavbar",
-  components: {
-    NavMenu,
-  },
-  computed: {
-    title() {
-      return applicationName;
-    },
-  },
-};
 </script>
 
 <style scoped>
@@ -54,7 +33,7 @@ export default {
   color: inherit;
 }
 
-.logo {
-  margin: -8px 0 0 30px;
+.border-b-yg_sun {
+  border-bottom: 3px solid #f3b228 !important;
 }
 </style>
