@@ -71,3 +71,6 @@ src/api/.env*
 src/web/dist/
 src/web/coverage/
 src/web/.env*
+
+# Generated files
+src/web/src/locales/translations.json

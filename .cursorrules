@@ -59,23 +59,34 @@ const { t, isEnglish } = useLanguage();
 
 ### Adding New UI Labels
 
-1. Open `src/web/src/composables/useLanguage.js`
-2. Find the appropriate category section in the `translations` object
-3. Add your new key:
+Translations are stored in a CSV file that can be shared with translation services.
 
-```javascript
-// In translations object:
-myNewLabel: {
-  en: "English text",
-  fr: "French text",
-},
+1. Edit `src/web/src/locales/translations.csv`:
+
+```csv
+key,en,fr
+myNewLabel,English text,French text
 ```
 
-4. Use in your component:
+2. Rebuild the JSON file:
+
+```bash
+cd src/web
+npm run build:translations
+```
+
+3. Use in your component:
 
 ```vue
 {{ t(translations.myNewLabel) }}
 ```
+
+**Note:** The build and dev scripts automatically run `build:translations`, so you typically only need to run it manually when adding new keys during development.
+
+**CSV Format:**
+- First row is the header: `key,en,fr`
+- Lines starting with `#` are comments (section headers)
+- Values with commas must be quoted: `"text with, comma"`
 
 ### Language Toggle
 

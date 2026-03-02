@@ -3,9 +3,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "build:docker": "vite build --outDir ../api/dist/web/ --emptyOutDir",
+    "dev": "npm run build:translations && vite",
+    "build": "npm run build:translations && vite build",
+    "build:docker": "npm run build:translations && vite build --outDir ../api/dist/web/ --emptyOutDir",
+    "build:translations": "node scripts/build-translations.js",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
