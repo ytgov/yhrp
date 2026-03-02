@@ -22,7 +22,11 @@ The backend proxies data from the **Yukon Heritage Information System (YHSI)** A
 
 ## Bilingual Support (English/French)
 
-The application supports both English and French. The API returns bilingual fields:
+The application supports both English and French. There are two types of bilingual content:
+
+### 1. API Content (Place Data)
+
+The YHIS API returns bilingual field pairs:
 
 | English Field | French Field |
 |---------------|--------------|
@@ -32,20 +36,50 @@ The application supports both English and French. The API returns bilingual fiel
 | `descBoundEn` | `descBoundFr` |
 | `additionalInfoEn` | `additionalInfoFr` |
 
-**Current state:** French translations are placeholders (prefixed with "FRENCH:"). Real translations will come from the YHIS system.
+**Note:** French translations may be placeholders until YHIS system provides real translations.
 
-**Implementation pattern:**
+### 2. UI Strings (Labels, Buttons, Headings)
+
+UI translations are managed in `src/web/src/composables/useLanguage.js`.
+
+**Using the language composable:**
+
 ```vue
 <template>
-  <div>{{ currentLang === 'FR' ? place.placeDescriptionFr : place.placeDescriptionEn }}</div>
+  <h1>{{ t(translations.historicPlaces) }}</h1>
+  <p>{{ isEnglish ? place.placeDescriptionEn : place.placeDescriptionFr }}</p>
 </template>
 
 <script setup>
-const currentLang = ref('EN'); // or 'FR'
+import { useLanguage, translations } from "@/composables/useLanguage";
+
+const { t, isEnglish } = useLanguage();
 </script>
 ```
 
-When adding new text content, always consider both languages.
+### Adding New UI Labels
+
+1. Open `src/web/src/composables/useLanguage.js`
+2. Find the appropriate category section in the `translations` object
+3. Add your new key:
+
+```javascript
+// In translations object:
+myNewLabel: {
+  en: "English text",
+  fr: "French text",
+},
+```
+
+4. Use in your component:
+
+```vue
+{{ t(translations.myNewLabel) }}
+```
+
+### Language Toggle
+
+Users can switch languages via the navbar button. Preference is stored in localStorage and persists across sessions.
 
 ---
 

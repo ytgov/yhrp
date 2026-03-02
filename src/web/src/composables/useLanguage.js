@@ -1,3 +1,55 @@
+/**
+ * Language/Localization Composable
+ *
+ * This application supports English and French (bilingual).
+ *
+ * == HOW LOCALIZATION WORKS ==
+ *
+ * 1. UI STRINGS (buttons, labels, menu items):
+ *    - Defined in the `translations` object at the bottom of this file
+ *    - Each key has { en: "English text", fr: "French text" }
+ *    - Used via: t(translations.keyName)
+ *
+ * 2. API CONTENT (place descriptions, heritage values, etc.):
+ *    - The YHIS API returns paired fields: *En and *Fr suffixes
+ *    - Example: placeDescriptionEn, placeDescriptionFr
+ *    - Components use isEnglish/isFrench to pick the right field
+ *
+ * == ADDING NEW UI LABELS ==
+ *
+ * 1. Add a new entry to the `translations` object:
+ *
+ *    myNewLabel: {
+ *      en: "English text here",
+ *      fr: "French text here",
+ *    },
+ *
+ * 2. Use it in your component:
+ *
+ *    import { useLanguage, translations } from "@/composables/useLanguage";
+ *    const { t } = useLanguage();
+ *
+ *    // In template:
+ *    {{ t(translations.myNewLabel) }}
+ *
+ * == USING API BILINGUAL CONTENT ==
+ *
+ * For content from the API with *En/*Fr field pairs:
+ *
+ *    import { useLanguage } from "@/composables/useLanguage";
+ *    const { isEnglish } = useLanguage();
+ *
+ *    // In template or computed:
+ *    {{ isEnglish ? place.placeDescriptionEn : place.placeDescriptionFr }}
+ *
+ *    // Or with fallback:
+ *    const description = computed(() =>
+ *      isEnglish.value
+ *        ? place.placeDescriptionEn || place.placeDescriptionFr
+ *        : place.placeDescriptionFr || place.placeDescriptionEn
+ *    );
+ */
+
 import { computed, ref, watch } from "vue";
 
 const STORAGE_KEY = "yhrp-language";
@@ -9,6 +61,17 @@ watch(currentLanguage, (lang) => {
   localStorage.setItem(STORAGE_KEY, lang);
 });
 
+/**
+ * Composable for managing language state and translations
+ *
+ * @returns {Object} Language utilities
+ * @returns {Ref<string>} currentLanguage - Current language code ("en" or "fr")
+ * @returns {ComputedRef<boolean>} isEnglish - True if current language is English
+ * @returns {ComputedRef<boolean>} isFrench - True if current language is French
+ * @returns {Function} setLanguage - Set language to specific code
+ * @returns {Function} toggleLanguage - Toggle between English and French
+ * @returns {Function} t - Translate a key from translations object
+ */
 export function useLanguage() {
   const isEnglish = computed(() => currentLanguage.value === "en");
   const isFrench = computed(() => currentLanguage.value === "fr");
@@ -23,8 +86,13 @@ export function useLanguage() {
     currentLanguage.value = currentLanguage.value === "en" ? "fr" : "en";
   };
 
-  const t = (translations) => {
-    return translations[currentLanguage.value] || translations.en || "";
+  /**
+   * Get translated string for current language
+   * @param {Object} translationObj - Object with { en: string, fr: string }
+   * @returns {string} Translated string (falls back to English if French missing)
+   */
+  const t = (translationObj) => {
+    return translationObj[currentLanguage.value] || translationObj.en || "";
   };
 
   return {
@@ -37,7 +105,21 @@ export function useLanguage() {
   };
 }
 
+/**
+ * UI Translations
+ *
+ * All user-facing UI strings in both English and French.
+ * Organized by category for easier maintenance.
+ *
+ * To add a new translation:
+ * 1. Find the appropriate category section below
+ * 2. Add your key with { en: "...", fr: "..." }
+ * 3. Use it via: t(translations.yourKey)
+ */
 export const translations = {
+  // ============================================
+  // APP & NAVIGATION
+  // ============================================
   appName: {
     en: "Yukon Register of Historic Places",
     fr: "Répertoire des lieux patrimoniaux du Yukon",
@@ -54,10 +136,18 @@ export const translations = {
     en: "Historic Places",
     fr: "Lieux patrimoniaux",
   },
-  listOfHistoricPlaces: {
-    en: "List of Historic Places",
-    fr: "Liste des lieux patrimoniaux",
+  places: {
+    en: "Places",
+    fr: "Lieux",
   },
+  contactUs: {
+    en: "Contact Us",
+    fr: "Contactez-nous",
+  },
+
+  // ============================================
+  // ACTIONS & BUTTONS
+  // ============================================
   viewPlace: {
     en: "View Place",
     fr: "Voir le lieu",
@@ -82,6 +172,18 @@ export const translations = {
     en: "Search Places",
     fr: "Rechercher des lieux",
   },
+  print: {
+    en: "Print",
+    fr: "Imprimer",
+  },
+
+  // ============================================
+  // PAGE TITLES & HEADINGS
+  // ============================================
+  listOfHistoricPlaces: {
+    en: "List of Historic Places",
+    fr: "Liste des lieux patrimoniaux",
+  },
   mapView: {
     en: "Map View",
     fr: "Vue carte",
@@ -90,34 +192,19 @@ export const translations = {
     en: "List View",
     fr: "Vue liste",
   },
-  print: {
-    en: "Print",
-    fr: "Imprimer",
-  },
-  places: {
-    en: "Places",
-    fr: "Lieux",
-  },
-  contactUs: {
-    en: "Contact Us",
-    fr: "Contactez-nous",
-  },
-  noPhotosAvailable: {
-    en: "No photos available",
-    fr: "Aucune photo disponible",
-  },
-  noPlacesFound: {
-    en: "No places found",
-    fr: "Aucun lieu trouvé",
-  },
-  loading: {
-    en: "Loading",
-    fr: "Chargement",
-  },
   exploreHistoricPlaces: {
     en: "Explore Historic Places",
     fr: "Explorez les lieux patrimoniaux",
   },
+  photoGallery: {
+    en: "Photo Gallery",
+    fr: "Galerie photos",
+  },
+
+  // ============================================
+  // PLACE DETAIL SECTIONS
+  // (Labels for expansion panels and data fields)
+  // ============================================
   designation: {
     en: "Designation",
     fr: "Désignation",
@@ -150,10 +237,26 @@ export const translations = {
     en: "Date",
     fr: "Date",
   },
-  photoGallery: {
-    en: "Photo Gallery",
-    fr: "Galerie photos",
+
+  // ============================================
+  // STATUS & FEEDBACK MESSAGES
+  // ============================================
+  loading: {
+    en: "Loading",
+    fr: "Chargement",
   },
+  noPhotosAvailable: {
+    en: "No photos available",
+    fr: "Aucune photo disponible",
+  },
+  noPlacesFound: {
+    en: "No places found",
+    fr: "Aucun lieu trouvé",
+  },
+
+  // ============================================
+  // HOME PAGE CONTENT
+  // ============================================
   heroText: {
     en: "Historic places in the Yukon are a tangible record of the people, events and activities that have shaped our way of life and our environment.",
     fr: "Les lieux patrimoniaux du Yukon sont un témoignage tangible des personnes, des événements et des activités qui ont façonné notre mode de vie et notre environnement.",
