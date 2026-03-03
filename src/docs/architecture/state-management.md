@@ -1,22 +1,10 @@
 # State Management
 
-## Philosophy
+## Approach
 
-YHRP uses a **service-based architecture** instead of global state management libraries. This keeps the codebase simple and appropriate for a read-only data display application.
+YHRP uses **local component state** and **service functions** for data fetching. This keeps the codebase simple for a read-only data display application.
 
-## Why No Vuex/Pinia?
-
-This application:
-- Displays read-only data from an external API
-- Has no complex state that needs to be shared globally
-- Has no user accounts or session state
-- Has simple, linear data flow
-
-Global state management would add unnecessary complexity.
-
-## Current Approach
-
-### Local Component State
+## Local Component State
 
 Each component manages its own state using Vue 3's Composition API:
 
@@ -26,7 +14,7 @@ const loading = ref(false);
 const error = ref(null);
 ```
 
-### Services for API Calls
+## Services for API Calls
 
 API integration is handled by service modules that export functions:
 
@@ -42,7 +30,7 @@ import { fetchPlaces } from "../services/placesApi";
 const places = await fetchPlaces(1);
 ```
 
-### Props and Events for Component Communication
+## Props and Events for Component Communication
 
 Parent-child communication uses standard Vue patterns:
 
@@ -58,6 +46,19 @@ Parent-child communication uses standard Vue patterns:
 const props = defineProps(['place']);
 const emit = defineEmits(['click']);
 </script>
+```
+
+## Shared Composables
+
+For state that needs to be shared across components (like language preference), we use composables with module-level refs:
+
+```javascript
+// In composables/useLanguage.js
+const currentLanguage = ref(localStorage.getItem("lang") || "en");
+
+export function useLanguage() {
+  return { currentLanguage, toggleLanguage, t };
+}
 ```
 
 ## Data Flow
@@ -76,27 +77,3 @@ const emit = defineEmits(['click']);
 │                                              └─────────┘ │
 └──────────────────────────────────────────────────────────┘
 ```
-
-## When to Consider Global State
-
-Add Pinia only if the app grows to need:
-- User authentication state
-- Shopping cart or similar cross-page state
-- Complex form data that persists across routes
-- Real-time collaborative features
-
-For this read-only heritage site viewer, local state is sufficient.
-
-## Notification Service
-
-The one piece of "shared" state is the notification service (`src/web/src/services/notificationService.js`), which provides toast notifications:
-
-```javascript
-import { useNotificationService } from "@/services/notificationService";
-
-const { showSuccess, showError } = useNotificationService();
-showSuccess("Place loaded");
-showError("Failed to load data");
-```
-
-Note: This service currently creates new refs per call. If notifications need to work across components, refactor to use module-level shared refs.

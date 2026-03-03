@@ -44,8 +44,7 @@ places/
 ├── components/
 │   ├── PlaceCard.vue       # Card for places grid
 │   ├── PlaceGallery.vue    # Photo gallery
-│   ├── PlaceHeader.vue     # Detail page header
-│   └── PlaceDesignation.vue # Designation info
+│   └── PlaceHeader.vue     # Detail page header with breadcrumbs
 ├── views/
 │   ├── Places.vue          # Paginated places list
 │   └── PlacesForm.vue      # Place detail page
