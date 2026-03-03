@@ -1,5 +1,9 @@
 <template>
   <div class="place-map" ref="mapContainer">
+    <div v-if="isLoading" class="loading-overlay">
+      <v-progress-circular indeterminate color="primary" size="48" />
+      <span class="mt-2 text-body-2">Loading places...</span>
+    </div>
     <div class="layer-control">
       <v-btn
         v-for="layer in baseLayers"
@@ -204,8 +208,8 @@ const initMap = async () => {
   }
 
   console.log("Initializing map...");
-  // Initialize the map centered on Whitehorse, Yukon
-  map = L.map(mapContainer.value).setView([60.7212, -135.0568], 10);
+  // Initialize the map centered on downtown Whitehorse, Yukon (zoom 14 for street level)
+  map = L.map(mapContainer.value).setView([60.7212, -135.0568], 14);
   console.log("Map initialized:", map);
 
   // Set initial base layer
@@ -243,6 +247,20 @@ onUnmounted(() => {
   height: 100%;
   min-height: 300px;
   position: relative;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
 }
 
 .layer-control {
