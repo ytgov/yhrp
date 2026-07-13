@@ -20,6 +20,12 @@ export const AUTH_REDIRECT =
   process.env.AUTH_REDIRECT || process.env.FRONTEND_URL || "";
 export const NODE_ENV = process.env.NODE_ENV;
 
+// Host/scheme for the upstream YHIS API (e.g. "https://yhis.gov.yk.ca").
+// Trailing slashes are trimmed so callers can safely append paths.
+export const YHIS_API_URL = (
+  process.env.YHIS_API_URL || "https://yhis.gov.yk.ca"
+).replace(/\/+$/, "");
+
 export const DB_NAME = process.env.DB_NAME || "postgres";
 export const DB_USER = process.env.DB_USER || "postgres";
 export const DB_PASS = process.env.DB_PASS || "password";

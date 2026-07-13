@@ -1,10 +1,11 @@
 import NodeCache from "node-cache";
 import { RegisterPlace } from "../models/register-place.model";
+import { YHIS_API_URL } from "../config/app-config";
 
 // Cache configuration - items expire after 15 minutes
 const cache = new NodeCache({ stdTTL: 900 });
 
-const BASE_URL = "https://yhis.gov.yk.ca/api/register";
+const BASE_URL = `${YHIS_API_URL}/api/register`;
 
 interface ApiResponse<T> {
   data: T[];

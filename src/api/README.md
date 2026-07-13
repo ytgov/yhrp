@@ -8,6 +8,9 @@ This directory contains the backend API implementation for the YHRP Site Registr
 
 - The production/remote API is available at: `https://yhis.gov.yk.ca/api/register/`
 - All remote integration and contract tests should use this base URL.
+- The host/scheme is configurable via the `YHIS_API_URL` environment variable
+  (host and scheme only, e.g. `https://yhis.gov.yk.ca`; the `/api/register` path
+  is appended by the service). Defaults to `https://yhis.gov.yk.ca` when unset.
 
 ## Directory Structure
 
