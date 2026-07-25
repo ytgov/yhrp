@@ -1,0 +1,224 @@
+# YHIS Register API — Current Understanding
+
+This document captures what we know about the upstream **Yukon Heritage Information System (YHIS)** public register API that YHRP proxies. It reflects live checks against `https://yhis.gov.yk.ca` and the YHSI source in [ytgov/yhsi](https://github.com/ytgov/yhsi).
+
+**Last verified:** 2026-07-25
+
+---
+
+## Overview
+
+| Item | Value |
+|------|-------|
+| Public base URL | `https://yhis.gov.yk.ca/api/register` |
+| Auth | None (public, read-only) |
+| Source of truth | [register-router.ts](https://github.com/ytgov/yhsi/blob/main/api/routes/register-router.ts) |
+| Our proxy | Express `GET /api/register/*` → YHIS (15‑minute cache) |
+| Host config | `YHIS_API_URL` (scheme + host only; defaults to `https://yhis.gov.yk.ca`) |
+
+YHRP does **not** call YHIS from the browser. The Vue app talks to our Express API; Express fetches and caches YHIS responses.
+
+---
+
+## Endpoints We Use
+
+| Method | YHIS path | Purpose |
+|--------|-----------|---------|
+| `GET` | `/api/register?page={n}` | Paginated list of register places |
+| `GET` | `/api/register/{id}` | Single place with description fields |
+| `GET` | `/api/register/{id}/photos` | Photo metadata (incl. thumbnails) |
+| `GET` | `/api/register/{id}/photos/{photoId}` | Thumbnail image bytes (`image/jpg`) |
+
+There is **no** `GET /api/register/count` (returns 404). Item counts come from list `meta.item_count`.
+
+---
+
+## Pagination
+
+- Query param: **`page`** only (1-based integer).
+- Fixed page size: **12** (hardcoded in YHSI; not configurable by clients).
+- `skip`, `take`, `page_size`, `search`, `q`, etc. are **ignored** if sent.
+
+Example:
+
+```http
+GET https://yhis.gov.yk.ca/api/register?page=2
+```
+
+Response envelope:
+
+```json
+{
+  "data": [ /* up to 12 place summary objects */ ],
+  "meta": {
+    "page": 2,
+    "page_size": 12,
+    "item_count": 44,
+    "page_count": 4
+  }
+}
+```
+
+Observed register size at last check: **44** places (`page_count` 4).
+
+Our backend must request `?page=` (not `skip`/`take`). Sending `skip`/`take` effectively always returns page 1.
+
+---
+
+## List item shape
+
+List endpoints return **summary** objects (not full bilingual descriptions):
+
+| Field | Type / notes |
+|-------|----------------|
+| `id` | number — place id |
+| `primaryName` | string |
+| `yHSIId` | string (e.g. `"116B/03/024"`) |
+| `communityName` | string |
+| `latitude` / `longitude` | strings (decimal degrees) |
+| `recognitionDate` | `YYYY-MM-DD` |
+| `designations` | string (e.g. `"Federal"`) |
+| `ThumbFile` | Node Buffer-like `{ type: "Buffer", data: number[] }` JPEG bytes |
+| `caption` | string or `null` |
+
+---
+
+## Detail shape
+
+```http
+GET /api/register/{id}
+```
+
+Returns a **wrapper**:
+
+```json
+{
+  "data": { /* place detail */ }
+}
+```
+
+Detail includes list fields plus bilingual content populated from YHSI description types:
+
+| Field | Role |
+|-------|------|
+| `placeDescriptionEn` / `placeDescriptionFr` | Description (type 5) |
+| `heritageValueEn` / `heritageValueFr` | Heritage value (type 4) |
+| `characterDefEn` / `characterDefFr` | Character-defining elements (type 2) |
+| `descBoundEn` / `descBoundFr` | Boundary description (type 6) |
+| `additionalInfoEn` / `additionalInfoFr` | Additional info (type 30) |
+
+**French note:** YHSI currently prefixes many French fields with `"FRENCH: "` plus the English text when a real translation is missing. Treat French API content as incomplete until YHIS provides real translations.
+
+404 with empty body when the id is not on the register.
+
+---
+
+## Photos
+
+```http
+GET /api/register/{id}/photos
+→ { "data": [ /* photo records */ ] }
+
+GET /api/register/{id}/photos/{photoId}
+→ image/jpg thumbnail bytes
+```
+
+Photo list items include identifiers such as `rowId`, `id`, `placeId`, filenames, dates, and thumbnail payload fields used by our proxy/frontend. Our Express layer may reshape `ThumbFile` before returning to the Vue app.
+
+---
+
+## Search
+
+**Not available on the public register API.**
+
+| Path / param | Result |
+|--------------|--------|
+| `GET /api/register/search` | 404 |
+| `?search=`, `?q=`, `?text=` on list | Ignored; same page results |
+
+YHSI does expose authenticated search elsewhere (`POST /api/place/search`, role-gated — returns 401 without auth). That is an **internal** places API, not the public register. YHRP should not depend on it for citizen-facing search.
+
+If product needs search, options are:
+
+1. Client- or proxy-side filter over cached register pages (small dataset today).
+2. Ask YHSI for a public register search endpoint later.
+
+---
+
+## How YHRP Maps to YHIS
+
+```
+Browser  →  GET /api/register?page=N     (our Express)
+         →  GET {YHIS_API_URL}/api/register?page=N
+
+Browser  →  GET /api/register/:id
+         →  GET {YHIS_API_URL}/api/register/:id
+
+Browser  →  GET /api/register/:id/photos[/:photoId]
+         →  same paths on YHIS
+```
+
+- Config: `src/api/config/app-config.ts` → `YHIS_API_URL`
+- Fetch + cache: `src/api/services/place-service.ts`
+- Routes: `src/api/routes/place-routes.ts`
+- Frontend client: `src/web/src/modules/places/services/placesApi.js` (real API; mock flag off)
+
+---
+
+## Gaps vs our documented / modeled API
+
+Parts of **YHRP’s own docs, TypeScript models, and frontend helpers** describe a contract that does **not** match live `https://yhis.gov.yk.ca/api/register`. Prefer the live shapes in this document over older notes in models/READMEs until those are cleaned up.
+
+### Endpoints and query params we document or call that YHIS register does not support
+
+| Our docs / code | Live YHIS register | Notes |
+|-----------------|--------------------|-------|
+| `GET /api/register/count` | **404** | Counts are only in list `meta.item_count` |
+| `GET /api/register/search` (or search query params) | **404** / ignored | No public register search |
+| `?skip=` / `?take=` | **Ignored** | Only `?page=` works; page size fixed at 12 |
+| `?page_size=` (frontend still sends it) | **Ignored** | Cannot change page size |
+| `GET /api/register/{id}/photo` (singular; `Place.js` photo URL helper) | **Not a valid register photo route** | Real path is `/photos/{photoId}` (plural + photo id) |
+
+Our Express proxy **does** implement the four real register routes (list, detail, photos list, photo file). Anything beyond that in older docs is aspirational or leftover from mock/internal contracts.
+
+### Field names in our models/docs that are not on YHIS register payloads
+
+Our `RegisterPlace` model and places README still describe fields that **do not appear** on live register responses:
+
+| Documented in YHRP models/docs | Actual YHIS register field |
+|--------------------------------|----------------------------|
+| `name` | `primaryName` |
+| `status` | `designations` (string, e.g. `"Federal"`) |
+| `location` (in places README mapping) | `communityName` |
+
+Conversely, some notes say `yHSIId`, `latitude`, `longitude`, and `designations` are “frontend only / not present” on the API — **they are present** on live list and detail payloads.
+
+Bilingual description fields (`placeDescriptionEn/Fr`, etc.) appear on **detail** only, not on the list summary.
+
+### Other YHIS APIs (not register)
+
+Do not confuse register with authenticated YHSI surfaces such as `POST /api/place/search` (401 without roles). Those are outside the public register and are not what YHRP proxies today.
+
+### Historical / wrong base URLs in older material
+
+Older mock data and some README examples still mention hosts such as `test.heritage.ynet.gov.yk.ca` or `heritage.yukon.ca`. The production register host we use is **`https://yhis.gov.yk.ca`**.
+
+---
+
+## What We Do Not Have (Yet)
+
+- Public text search / filters (community, designation, etc.)
+- Configurable page size
+- A dedicated count endpoint
+- Reliable French content (placeholders in upstream)
+- Guaranteed stable field names beyond what register-router selects (`REGISTER_FIELDS` in YHSI)
+- Alignment of YHRP TypeScript models / places README with the live field names above
+
+---
+
+## Related Docs
+
+- [Application overview](../overview/application-overview.md) — system architecture
+- [Caching strategy](./caching-strategy.md) — 15‑minute TTL behaviour
+- [Translations](../translations.md) — UI strings vs API `*En`/`*Fr` fields
+- Upstream router: https://github.com/ytgov/yhsi/blob/main/api/routes/register-router.ts

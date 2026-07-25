@@ -38,7 +38,7 @@ export const API_BASE_URL = `${apiBaseUrl}/api/register`;
 
 // Flag to toggle between mock and real API data
 // Set to true when YHIS API is unavailable
-const USE_MOCK_DATA = true;
+const USE_MOCK_DATA = false;
 
 /**
  * Convert buffer data to base64 URL
@@ -84,7 +84,6 @@ export const fetchPlaces = async (page = 1, pageSize = 12) => {
     }
 
     const data = await response.json();
-    console.log("data", data);
     return {
       places: data.data.map((place) => Place.fromApi(place)),
       total: data.meta.item_count,

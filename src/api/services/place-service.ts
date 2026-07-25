@@ -47,31 +47,18 @@ export class PlaceService {
     return data;
   }
 
-  async getPlaceAll(
-    skip: number,
-    take: number
-  ): Promise<ApiResponse<RegisterPlace>> {
-    const url = `${BASE_URL}/?skip=${skip}&take=${take}`;
+  async getPlaces(page: number = 1): Promise<ApiResponse<RegisterPlace>> {
+    // YHIS register API paginates with ?page= (fixed page size of 12)
+    const url = `${BASE_URL}?page=${page}`;
     return this.fetchWithCache<ApiResponse<RegisterPlace>>(
       url,
-      `places_${skip}_${take}`
+      `places_page_${page}`
     );
-  }
-
-  async getPlaceInPlaceCount(): Promise<number> {
-    const url = `${BASE_URL}/count`;
-    return this.fetchWithCache(url, "place_count");
   }
 
   async getPlaceById(id: number): Promise<RegisterPlace> {
     const url = `${BASE_URL}/${id}`;
     return this.fetchWithCache<RegisterPlace>(url, `place_${id}`);
-  }
-
-  async getPlaces(page: number = 1): Promise<ApiResponse<RegisterPlace>> {
-    const skip = (page - 1) * 12;
-    const take = 12;
-    return this.getPlaceAll(skip, take);
   }
 
   async getPlaceDetails(id: string): Promise<RegisterPlace> {
