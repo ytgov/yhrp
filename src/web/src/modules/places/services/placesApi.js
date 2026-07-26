@@ -7,18 +7,10 @@ import { Place } from "../models/Place";
 
 // Types
 /**
- * @typedef {Object} Place
- * @property {number} id - Place ID
- * @property {string} name - Place name
- * @property {string} description - Place description
- * @property {Object} location - Location coordinates
- * @property {number} location.lat - Latitude
- * @property {number} location.lng - Longitude
- * @property {string} community - Community name
- * @property {string} yhsiId - YHSI ID
- * @property {Array} designations - List of designations
- * @property {string} recognitionDate - Date of recognition
- * @property {string} photoUrl - URL of the place photo
+ * Wire fields from YHIS / our proxy (before Place.fromApi mapping):
+ * id, primaryName, yHSIId, communityName, latitude, longitude,
+ * recognitionDate, designations, ThumbFile, plus detail bilingual *En/*Fr fields.
+ * Responses: list/detail/photos all use a `{ data }` envelope (list also has `meta`).
  */
 
 /**

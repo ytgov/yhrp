@@ -165,35 +165,19 @@ Browser  →  GET /api/register/:id/photos[/:photoId]
 
 ---
 
-## Gaps vs our documented / modeled API
+## Gaps vs older docs / leftover client quirks
 
-Parts of **YHRP’s own docs, TypeScript models, and frontend helpers** describe a contract that does **not** match live `https://yhis.gov.yk.ca/api/register`. Prefer the live shapes in this document over older notes in models/READMEs until those are cleaned up.
+Most TypeScript models and the Express detail response now match live `https://yhis.gov.yk.ca/api/register`. Remaining mismatches:
 
-### Endpoints and query params we document or call that YHIS register does not support
+### Endpoints and query params YHIS register does not support
 
-| Our docs / code | Live YHIS register | Notes |
-|-----------------|--------------------|-------|
+| Call / assumption | Live YHIS register | Notes |
+|-------------------|--------------------|-------|
 | `GET /api/register/count` | **404** | Counts are only in list `meta.item_count` |
 | `GET /api/register/search` (or search query params) | **404** / ignored | No public register search |
 | `?skip=` / `?take=` | **Ignored** | Only `?page=` works; page size fixed at 12 |
 | `?page_size=` (frontend still sends it) | **Ignored** | Cannot change page size |
-| `GET /api/register/{id}/photo` (singular; `Place.js` photo URL helper) | **Not a valid register photo route** | Real path is `/photos/{photoId}` (plural + photo id) |
-
-Our Express proxy **does** implement the four real register routes (list, detail, photos list, photo file). Anything beyond that in older docs is aspirational or leftover from mock/internal contracts.
-
-### Field names in our models/docs that are not on YHIS register payloads
-
-Our `RegisterPlace` model and places README still describe fields that **do not appear** on live register responses:
-
-| Documented in YHRP models/docs | Actual YHIS register field |
-|--------------------------------|----------------------------|
-| `name` | `primaryName` |
-| `status` | `designations` (string, e.g. `"Federal"`) |
-| `location` (in places README mapping) | `communityName` |
-
-Conversely, some notes say `yHSIId`, `latitude`, `longitude`, and `designations` are “frontend only / not present” on the API — **they are present** on live list and detail payloads.
-
-Bilingual description fields (`placeDescriptionEn/Fr`, etc.) appear on **detail** only, not on the list summary.
+| `GET /api/register/{id}/photo` (singular) | **Not a valid route** | Use `/photos` list or `/photos/{photoId}` |
 
 ### Other YHIS APIs (not register)
 
@@ -212,7 +196,6 @@ Older mock data and some README examples still mention hosts such as `test.herit
 - A dedicated count endpoint
 - Reliable French content (placeholders in upstream)
 - Guaranteed stable field names beyond what register-router selects (`REGISTER_FIELDS` in YHSI)
-- Alignment of YHRP TypeScript models / places README with the live field names above
 
 ---
 

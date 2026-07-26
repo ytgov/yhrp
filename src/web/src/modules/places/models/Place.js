@@ -20,8 +20,9 @@ export class Place {
     this.recognitionDate = data.recognitionDate
       ? data.recognitionDate.split("T")[0]
       : null;
-    this.photoId = data.id; // Store the photo ID for URL construction
-    this.photoUrl = this._generatePhotoUrl(data.id);
+    this.photoId = data.id;
+    // List thumbnails come from ThumbFile / GET .../photos — there is no singular /photo route
+    this.photoUrl = null;
 
     // Additional fields from API
     this.placeDescriptionEn = data.placeDescriptionEn || "";
@@ -68,14 +69,6 @@ export class Place {
         return word.charAt(0).toUpperCase() + word.slice(1);
       })
       .join(" ");
-  }
-
-  /**
-   * Generate photo URL for the place
-   * @private
-   */
-  _generatePhotoUrl(id) {
-    return `/api/register/${id}/photo`;
   }
 
   /**

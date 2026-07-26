@@ -62,18 +62,15 @@ interface Place {
 
 ---
 
-### Note: Differences Between Backend and Frontend Place Models
+### Note: Place model alignment
 
-- **Backend (API) fields:**
-  - `id` (number) <-> `PlaceId` (frontend)
-  - `name` (string) <-> `PrimaryName` (frontend)
-  - `location` (string) <-> `Community` (frontend)
-  - `recognitionDate` (string) <-> `RecognitionDate` (frontend)
-  - `placeDescriptionEn/Fr` <-> `EnglishTeaser`/`FrenchTeaser` (frontend uses teasers)
-  - `heritageValueEn/Fr`, `characterDefEn/Fr`, `descBoundEn/Fr`, `additionalInfoEn/Fr`: only in backend
-  - (not present) <-> `YHSIId`, `Latitude`, `Longitude`, `Designations`, `PhotoURL` (frontend only)
+Backend `RegisterPlace` and frontend `Place.fromApi()` both follow the live YHIS register wire shape:
 
-See also the backend model in `src/api/models/register-place.model.ts` for the full API structure.
+- `id`, `primaryName`, `yHSIId`, `communityName`, `latitude`, `longitude`, `recognitionDate`, `designations`, `ThumbFile`
+- Detail also includes bilingual `placeDescriptionEn/Fr`, `heritageValueEn/Fr`, etc.
+- List/detail/photos responses use a `{ data }` envelope (list includes `meta`)
+
+See `src/docs/architecture/yhis-register-api.md` and `src/api/models/register-place.model.ts`.
 
 ## Mock Data
 

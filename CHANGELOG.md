@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Switched places frontend from mock data to the live YHIS register API (`https://yhis.gov.yk.ca/api/register`)
 - Fixed backend place list pagination to use YHIS `?page=` (was sending ignored `skip`/`take` params)
+- Aligned backend `RegisterPlace` / photo types and detail `{ data }` responses with the live YHIS wire shape and frontend `Place.fromApi`
 - Enhanced Places form view with interactive location map
 - Improved map marker styling with custom teal pin design
 - Removed all store files and dependencies, transitioning to Vue 3's Composition API.

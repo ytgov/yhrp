@@ -1,20 +1,31 @@
 /**
- * NOTE: Differences between backend and frontend place models
+ * Place shape returned by the YHIS public register API
+ * (https://yhis.gov.yk.ca/api/register), which our Express proxy forwards.
  *
- * Backend (this file):
- *   - id (number)              <-> PlaceId (frontend)
- *   - name (string)            <-> PrimaryName (frontend)
- *   - status (string)          <-> Designations (frontend)
- *   - recognitionDate (string) <-> RecognitionDate (frontend)
- *   - placeDescriptionEn/Fr    <-> EnglishTeaser/FrenchTeaser (frontend uses teasers)
- *   - heritageValueEn/Fr, characterDefEn/Fr, descBoundEn/Fr, additionalInfoEn/Fr: only in backend
- *   - (not present)            <-> YHSIId, Latitude, Longitude, PhotoURL (frontend only)
+ * List responses include summary fields (+ optional ThumbFile).
+ * Detail responses add the bilingual description fields.
+ *
+ * Frontend maps this via Place.fromApi() in
+ * src/web/src/modules/places/models/Place.js.
  */
 export interface RegisterPlace {
   id: number;
-  name: string;
-  status: string;
-  recognitionDate: string; // ISO date string (YYYY-MM-DD)
+  primaryName: string;
+  yHSIId: string;
+  communityName?: string;
+  latitude?: string;
+  longitude?: string;
+  recognitionDate?: string | null;
+  /** Designation level string from YHIS (e.g. "Federal") */
+  designations?: string;
+  caption?: string | null;
+  /** Embedded list thumbnail (Buffer-like JSON) when present */
+  ThumbFile?: {
+    type?: string;
+    data?: number[];
+  } | null;
+
+  // Detail-only bilingual fields
   placeDescriptionEn?: string;
   placeDescriptionFr?: string;
   heritageValueEn?: string;

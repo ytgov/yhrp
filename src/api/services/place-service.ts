@@ -1,4 +1,9 @@
 import NodeCache from "node-cache";
+import {
+  PhotosResponse,
+  RegisterPlacesResponse,
+  RegisterPlaceResponse,
+} from "../models/api-response.model";
 import { RegisterPlace } from "../models/register-place.model";
 import { YHIS_API_URL } from "../config/app-config";
 
@@ -7,19 +12,8 @@ const cache = new NodeCache({ stdTTL: 900 });
 
 const BASE_URL = `${YHIS_API_URL}/api/register`;
 
-interface ApiResponse<T> {
-  data: T[];
-  meta: {
-    page: number;
-    page_size: number;
-    item_count: number;
-    page_count: number;
-  };
-}
-
 export class PlaceService {
   private async fetchWithCache<T>(url: string, cacheKey: string): Promise<T> {
-    // Check cache first
     const cachedData = cache.get<T>(cacheKey);
     if (cachedData) {
       console.log(`[Cache Hit] ${cacheKey}`);
@@ -35,7 +29,6 @@ export class PlaceService {
       );
     }
 
-    // Check content type
     const contentType = response.headers.get("content-type");
     if (!contentType || !contentType.includes("application/json")) {
       throw new Error(`Expected JSON response but got ${contentType}`);
@@ -47,27 +40,64 @@ export class PlaceService {
     return data;
   }
 
-  async getPlaces(page: number = 1): Promise<ApiResponse<RegisterPlace>> {
+  async getPlaces(page: number = 1): Promise<RegisterPlacesResponse> {
     // YHIS register API paginates with ?page= (fixed page size of 12)
     const url = `${BASE_URL}?page=${page}`;
-    return this.fetchWithCache<ApiResponse<RegisterPlace>>(
+    return this.fetchWithCache<RegisterPlacesResponse>(
       url,
       `places_page_${page}`
     );
   }
 
-  async getPlaceById(id: number): Promise<RegisterPlace> {
+  /**
+   * Fetch a place by id. YHIS returns `{ data: place }`; we unwrap to the place.
+   * Returns undefined when YHIS responds 404.
+   */
+  async getPlaceById(id: number): Promise<RegisterPlace | undefined> {
     const url = `${BASE_URL}/${id}`;
-    return this.fetchWithCache<RegisterPlace>(url, `place_${id}`);
+    const cacheKey = `place_${id}`;
+
+    const cachedData = cache.get<RegisterPlace>(cacheKey);
+    if (cachedData) {
+      console.log(`[Cache Hit] ${cacheKey}`);
+      return cachedData;
+    }
+    console.log(`[Cache Miss] ${cacheKey}`);
+
+    const response = await fetch(url);
+    if (response.status === 404) {
+      return undefined;
+    }
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to fetch data: ${response.status} - ${errorText}`
+      );
+    }
+
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error(`Expected JSON response but got ${contentType}`);
+    }
+
+    const body = (await response.json()) as RegisterPlaceResponse;
+    const place = body?.data;
+    if (!place) {
+      return undefined;
+    }
+
+    cache.set(cacheKey, place);
+    console.log(`[Cache Set] ${cacheKey}`);
+    return place;
   }
 
-  async getPlaceDetails(id: string): Promise<RegisterPlace> {
-    return this.getPlaceById(parseInt(id));
+  async getPlaceDetails(id: string): Promise<RegisterPlace | undefined> {
+    return this.getPlaceById(parseInt(id, 10));
   }
 
-  async getPlacePhotos(id: string): Promise<any> {
+  async getPlacePhotos(id: string): Promise<PhotosResponse> {
     const url = `${BASE_URL}/${id}/photos`;
-    return this.fetchWithCache(url, `place_photos_${id}`);
+    return this.fetchWithCache<PhotosResponse>(url, `place_photos_${id}`);
   }
 
   async getPhoto(
@@ -77,7 +107,6 @@ export class PlaceService {
     const url = `${BASE_URL}/${id}/photos/${photoId}`;
     const cacheKey = `photo_${id}_${photoId}`;
 
-    // Check cache first
     const cachedPhoto = cache.get<{ buffer: Buffer; contentType: string }>(
       cacheKey
     );

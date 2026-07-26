@@ -1,9 +1,11 @@
 import { Request, Response } from "express";
 import {
   ErrorResponse,
+  PhotosResponse,
+  RegisterPhoto,
+  RegisterPlaceResponse,
   RegisterPlacesResponse,
 } from "../models/api-response.model";
-import { RegisterPlace } from "../models/register-place.model";
 import { PlaceService } from "../services/place-service";
 
 export class PlaceController {
@@ -17,7 +19,6 @@ export class PlaceController {
       const page = parseInt(req.query.page as string) || 1;
       const response: RegisterPlacesResponse =
         await this.placeService.getPlaces(page);
-      console.log(response.data);
 
       res.json(response);
     } catch (error) {
@@ -28,17 +29,18 @@ export class PlaceController {
 
   async getPlaceDetails(
     req: Request,
-    res: Response<RegisterPlace | ErrorResponse>
+    res: Response<RegisterPlaceResponse | ErrorResponse>
   ) {
     try {
       const { id } = req.params;
-      const data: RegisterPlace = await this.placeService.getPlaceDetails(id);
+      const place = await this.placeService.getPlaceDetails(id);
 
-      if (!data) {
+      if (!place) {
         return res.status(404).json({ error: "Place not found" });
       }
 
-      return res.json(data);
+      // Match YHIS / frontend contract: { data: place }
+      return res.json({ data: place });
     } catch (error) {
       console.error("Error fetching place details:", error);
       return res.status(500).json({
@@ -50,31 +52,34 @@ export class PlaceController {
 
   async getPlacePhotos(
     req: Request,
-    res: Response<{ data: any[]; meta: any } | ErrorResponse>
+    res: Response<PhotosResponse | ErrorResponse>
   ) {
     try {
       const { id } = req.params;
-      const data = await this.placeService.getPlaceDetails(id);
+      const place = await this.placeService.getPlaceDetails(id);
 
-      if (!data) {
+      if (!place) {
         return res.status(404).json({ error: "Place not found" });
       }
 
       const response = await this.placeService.getPlacePhotos(id);
 
-      // Format the photos to include ThumbFile with data
-      const formattedPhotos = response.data.map((photo: any) => ({
-        ...photo,
-        ThumbFile: {
-          data: photo.ThumbFile?.data || [],
-          base64: photo.ThumbFile?.base64 || "",
-        },
-      }));
+      const formattedPhotos: RegisterPhoto[] = (response.data || []).map(
+        (photo: RegisterPhoto) => ({
+          ...photo,
+          ThumbFile: {
+            data: photo.ThumbFile?.data || [],
+            base64: photo.ThumbFile?.base64 || "",
+          },
+        })
+      );
 
-      return res.json({
+      const payload: PhotosResponse = {
         data: formattedPhotos,
         meta: response.meta,
-      });
+      };
+
+      return res.json(payload);
     } catch (error) {
       console.error("Error fetching photos:", error);
       return res.status(500).json({
@@ -87,9 +92,9 @@ export class PlaceController {
   async getPhotoFile(req: Request, res: Response<Buffer | ErrorResponse>) {
     try {
       const { id, photoId } = req.params;
-      const data = await this.placeService.getPlaceDetails(id);
+      const place = await this.placeService.getPlaceDetails(id);
 
-      if (!data) {
+      if (!place) {
         return res.status(404).json({ error: "Place not found" });
       }
 
