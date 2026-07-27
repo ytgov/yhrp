@@ -24,7 +24,7 @@
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { nextTick, onMounted, onUnmounted, ref } from "vue";
-import { fetchPlacePhotos, fetchPlaces } from "../../places/services/placesApi";
+import { fetchAllPlaces } from "../../places/services/placesApi";
 import { createTealPinMarker } from "../utils/markerDefinitions";
 import "../utils/markerStyles.css";
 
@@ -32,7 +32,6 @@ import "../utils/markerStyles.css";
 const mapContainer = ref(null);
 const currentLayer = ref("esri-topo");
 const isLoading = ref(false);
-const photoUrls = ref(new Map());
 
 // Map instance refs
 let map = null;
@@ -89,37 +88,17 @@ const extractCoordinates = (place) => {
   return null;
 };
 
-const loadPhotoUrls = async (places) => {
-  for (const place of places) {
-    try {
-      const photos = await fetchPlacePhotos(place.id);
-      if (photos && photos.length > 0) {
-        photoUrls.value.set(place.id, photos[0].imageUrl);
-      }
-    } catch (error) {
-      console.error(`Error loading photo for place ${place.id}:`, error);
-    }
-  }
-};
-
 // Load places and add them to the map
 const loadPlaces = async () => {
   try {
     isLoading.value = true;
-    console.log("Loading places...");
 
-    const response = await fetchPlaces(); // Load first 100 places
-    console.log("Places response:", response);
+    // List responses already include ThumbFile — use that for popups (no per-place photo fetch)
+    const places = await fetchAllPlaces();
 
-    if (!response?.places) {
-      console.log("No places data in response");
+    if (!places.length) {
       return;
     }
-
-    const places = response.places;
-    console.log("Places data:", places);
-
-    await loadPhotoUrls(places);
 
     // Create a layer group for places
     if (placesLayer) {
@@ -131,7 +110,6 @@ const loadPlaces = async () => {
       const coordinates = extractCoordinates(place);
 
       if (!coordinates) {
-        console.log("Place missing coordinates:", place);
         continue;
       }
 
@@ -142,10 +120,9 @@ const loadPlaces = async () => {
       });
 
       const title = place.name || "Untitled Place";
-      const thumbnail = photoUrls.value.get(place.id) || "";
+      const thumbnail = place.photoUrl || "";
       const placeId = place.id;
 
-      // Use plain HTML for the popup content
       let popupHtml = `<div class='place-popup' style='text-align:center; max-width:600px; background-color: white; padding: 16px; border-radius: 4px;'>`;
 
       if (thumbnail) {
@@ -169,7 +146,6 @@ const loadPlaces = async () => {
     }
 
     placesLayer.addTo(map);
-    console.log("Places layer added to map");
   } catch (error) {
     console.error("Error loading places:", error);
   } finally {
@@ -179,7 +155,6 @@ const loadPlaces = async () => {
 
 // Change base layer
 const changeBaseLayer = (layerId) => {
-  console.log("changeBaseLayer called with:", layerId);
   const layer = baseLayers.find((l) => l.id === layerId);
 
   if (!layer || !map) {
@@ -187,11 +162,9 @@ const changeBaseLayer = (layerId) => {
   }
 
   if (currentBaseLayer) {
-    console.log("Removing current base layer");
     map.removeLayer(currentBaseLayer);
   }
 
-  console.log("Adding tile layer");
   currentBaseLayer = L.tileLayer(layer.url, {
     attribution: layer.attribution,
   }).addTo(map);
@@ -201,22 +174,15 @@ const changeBaseLayer = (layerId) => {
 
 // Initialize map
 const initMap = async () => {
-  console.log("initMap called");
   if (!mapContainer.value) {
     console.error("mapContainer is null");
     return;
   }
 
-  console.log("Initializing map...");
   // Initialize the map centered on downtown Whitehorse, Yukon (zoom 14 for street level)
   map = L.map(mapContainer.value).setView([60.7212, -135.0568], 14);
-  console.log("Map initialized:", map);
 
-  // Set initial base layer
-  console.log("Setting initial base layer");
   changeBaseLayer("esri-topo");
-
-  // Load places
   await loadPlaces();
 };
 

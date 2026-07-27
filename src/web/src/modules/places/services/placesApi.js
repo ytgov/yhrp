@@ -88,6 +88,27 @@ export const fetchPlaces = async (page = 1, pageSize = 12) => {
 };
 
 /**
+ * Fetch every register page (for map / full listings).
+ * Each place includes list ThumbFile when YHIS provides it.
+ * @returns {Promise<Array<Place>>}
+ */
+export const fetchAllPlaces = async () => {
+  const places = [];
+  let page = 1;
+  let total = Infinity;
+
+  while (places.length < total) {
+    const response = await fetchPlaces(page);
+    if (!response?.places?.length) break;
+    places.push(...response.places);
+    total = response.total;
+    page += 1;
+  }
+
+  return places;
+};
+
+/**
  * Fetch a single place by ID
  * @param {number} id - Place ID
  * @returns {Promise<Place>}

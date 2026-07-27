@@ -21,8 +21,8 @@ export class Place {
       ? data.recognitionDate.split("T")[0]
       : null;
     this.photoId = data.id;
-    // List thumbnails come from ThumbFile / GET .../photos — there is no singular /photo route
-    this.photoUrl = null;
+    // Prefer list ThumbFile (base64 JPEG) — avoids a separate photos request per place
+    this.photoUrl = this._thumbFileToDataUrl(data.ThumbFile);
 
     // Additional fields from API
     this.placeDescriptionEn = data.placeDescriptionEn || "";
@@ -69,6 +69,25 @@ export class Place {
         return word.charAt(0).toUpperCase() + word.slice(1);
       })
       .join(" ");
+  }
+
+  /**
+   * Convert YHIS ThumbFile buffer payload to a data URL
+   * @private
+   */
+  _thumbFileToDataUrl(thumbFile) {
+    const buffer = thumbFile?.data;
+    if (!buffer?.length) return null;
+
+    try {
+      const binary = buffer.reduce(
+        (data, byte) => data + String.fromCharCode(byte),
+        ""
+      );
+      return `data:image/jpeg;base64,${btoa(binary)}`;
+    } catch {
+      return null;
+    }
   }
 
   /**
