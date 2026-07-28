@@ -165,6 +165,20 @@ Browser  →  GET /api/register/:id/photos[/:photoId]
 
 ---
 
+### Photos / thumbnails (current upstream behaviour)
+
+Verified against live YHIS (2026-07-28):
+
+| Source | What we see |
+|--------|-------------|
+| List `ThumbFile` | Present on **only ~4 of 44** register places |
+| `GET /api/register/{id}/photos` | Returns `{ data: [] }` for sampled places (including ones that have list `ThumbFile`) |
+| Detail payload | No `ThumbFile` / photo fields |
+
+So missing images in the UI are mostly an **upstream data gap**, not YHRP cache. Our list/map UIs use list `ThumbFile` when present; detail galleries depend on the photos endpoint and will show empty until YHIS returns photo records again.
+
+---
+
 ## Gaps vs older docs / leftover client quirks
 
 Most TypeScript models and the Express detail response now match live `https://yhis.gov.yk.ca/api/register`. Remaining mismatches:
