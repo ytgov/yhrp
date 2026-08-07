@@ -1,13 +1,24 @@
 /**
- * Class representing a Place in the system
+ * Class representing a Place in the system.
+ * Field names match the YHIS register wire shape (and our Express proxy).
  */
 export class Place {
   constructor(data) {
     this.placeId = data.id;
     this.id = data.id; // For backward compatibility
-    this.name = this._toProperCase(data.primaryName || data.name || "");
-    this.location = data.communityName || data.location || "";
+
+    // Metadata — same names as YHIS / backend RegisterPlace
+    this.primaryName = data.primaryName || data.name || "";
+    this.fr_primaryName = data.fr_primaryName || "";
+    this.communityName = data.communityName || data.location || "";
+    this.fr_communityName = data.fr_communityName || "";
+    this.fr_designations = data.fr_designations || "";
+
+    // Convenience English defaults (prefer localized*() helpers in UI)
+    this.name = this._toProperCase(this.primaryName);
+    this.location = this.communityName;
     this.description = data.placeDescriptionEn || "";
+
     this.coordinates = [
       parseFloat(data.latitude || data.coordinates?.[0] || 0),
       parseFloat(data.longitude || data.coordinates?.[1] || 0),
@@ -24,7 +35,7 @@ export class Place {
     // Prefer list ThumbFile (base64 JPEG) — avoids a separate photos request per place
     this.photoUrl = this._thumbFileToDataUrl(data.ThumbFile);
 
-    // Additional fields from API
+    // Detail bilingual description fields (*En / *Fr)
     this.placeDescriptionEn = data.placeDescriptionEn || "";
     this.placeDescriptionFr = data.placeDescriptionFr || "";
     this.heritageValueEn = data.heritageValueEn || "";
@@ -38,6 +49,36 @@ export class Place {
   }
 
   /**
+   * Localized display name (falls back to the other language if missing).
+   * @param {boolean} preferEnglish
+   */
+  localizedName(preferEnglish = true) {
+    const en = this._toProperCase(this.primaryName);
+    const fr = this._toProperCase(this.fr_primaryName);
+    return preferEnglish ? en || fr : fr || en;
+  }
+
+  /**
+   * Localized community / location label.
+   * @param {boolean} preferEnglish
+   */
+  localizedLocation(preferEnglish = true) {
+    const en = this.communityName || "";
+    const fr = this.fr_communityName || "";
+    return preferEnglish ? en || fr : fr || en;
+  }
+
+  /**
+   * Localized designation level string.
+   * @param {boolean} preferEnglish
+   */
+  localizedDesignation(preferEnglish = true) {
+    const en = this.designations?.[0]?.level || "";
+    const fr = this.designations?.[0]?.levelFr || this.fr_designations || "";
+    return preferEnglish ? en || fr : fr || en;
+  }
+
+  /**
    * Convert text to proper case (first letter of each word capitalized)
    * @private
    */
@@ -48,7 +89,7 @@ export class Place {
       .toLowerCase()
       .split(" ")
       .map((word) => {
-        // Handle special cases like "of", "the", "and" in the middle of titles
+        // Handle special cases like "of", "the", and "and" in the middle of titles
         const smallWords = [
           "of",
           "the",
@@ -95,7 +136,7 @@ export class Place {
    * @private
    */
   _parseDesignations(data) {
-    if (!data.designations) return [];
+    if (!data.designations && !data.fr_designations) return [];
 
     // If designations is already an array with the correct structure, return it
     if (Array.isArray(data.designations) && data.designations[0]?.level) {
@@ -106,6 +147,7 @@ export class Place {
     return [
       {
         level: data.designations || "",
+        levelFr: data.fr_designations || "",
         date: data.recognitionDate ? data.recognitionDate.split("T")[0] : null,
         bylaw: "", // API doesn't provide this yet
         reasons: [], // API doesn't provide this yet
@@ -172,11 +214,14 @@ export class Place {
     return new Place({
       id: data.placeId,
       primaryName: data.name,
+      fr_primaryName: data.nameFr || "",
       communityName: data.location,
+      fr_communityName: data.locationFr || "",
       placeDescriptionEn: data.description,
       latitude: data.coordinates[0],
       longitude: data.coordinates[1],
       designations: data.designations?.[0]?.level,
+      fr_designations: data.designations?.[0]?.levelFr || "",
       recognitionDate: data.designations?.[0]?.date,
       heritageValueEn: data.culturalHistory,
       characterDefEn: data.heritageValues?.[0]?.items?.join("\n"),

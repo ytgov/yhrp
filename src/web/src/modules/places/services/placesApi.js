@@ -8,8 +8,9 @@ import { Place } from "../models/Place";
 // Types
 /**
  * Wire fields from YHIS / our proxy (before Place.fromApi mapping):
- * id, primaryName, yHSIId, communityName, latitude, longitude,
- * recognitionDate, designations, ThumbFile, plus detail bilingual *En/*Fr fields.
+ * id, primaryName, fr_primaryName, yHSIId, communityName, fr_communityName,
+ * latitude, longitude, recognitionDate, designations, fr_designations, ThumbFile,
+ * plus detail bilingual *En/*Fr description fields.
  * Responses: list/detail/photos all use a `{ data }` envelope (list also has `meta`).
  */
 

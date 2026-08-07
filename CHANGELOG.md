@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Aligned backend `RegisterPlace` / photo types and detail `{ data }` responses with the live YHIS wire shape and frontend `Place.fromApi`
 - Map markers now use list `ThumbFile` thumbnails instead of fetching photos per place before drawing
 - Places list cards use list `ThumbFile` thumbnails (YHIS `/photos` currently returns empty for register places)
+- Mapped YHIS French metadata fields (`fr_primaryName`, `fr_communityName`, `fr_designations`) consistently on backend and frontend; place UI localizes name, community, and designation
 - Enhanced Places form view with interactive location map
 - Improved map marker styling with custom teal pin design
 - Removed all store files and dependencies, transitioning to Vue 3's Composition API.

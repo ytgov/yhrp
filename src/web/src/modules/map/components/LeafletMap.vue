@@ -23,8 +23,9 @@
 <script setup>
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { nextTick, onMounted, onUnmounted, ref } from "vue";
+import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { fetchAllPlaces } from "../../places/services/placesApi";
+import { useLanguage } from "@/composables/useLanguage";
 import { createTealPinMarker } from "../utils/markerDefinitions";
 import "../utils/markerStyles.css";
 
@@ -32,11 +33,13 @@ import "../utils/markerStyles.css";
 const mapContainer = ref(null);
 const currentLayer = ref("esri-topo");
 const isLoading = ref(false);
+const { isEnglish } = useLanguage();
 
 // Map instance refs
 let map = null;
 let currentBaseLayer = null;
 let placesLayer = null;
+let loadedPlaces = [];
 
 // Base layer configuration
 const baseLayers = [
@@ -88,6 +91,58 @@ const extractCoordinates = (place) => {
   return null;
 };
 
+// Render place markers (and rebuild when language changes)
+const renderPlacesLayer = (places) => {
+  if (!map) return;
+
+  if (placesLayer) {
+    map.removeLayer(placesLayer);
+  }
+  placesLayer = L.layerGroup();
+
+  for (const place of places) {
+    const coordinates = extractCoordinates(place);
+
+    if (!coordinates) {
+      continue;
+    }
+
+    const { latitude, longitude } = coordinates;
+
+    const marker = L.marker([latitude, longitude], {
+      icon: createTealPinMarker(),
+    });
+
+    const title =
+      place.localizedName?.(isEnglish.value) || place.name || "Untitled Place";
+    const thumbnail = place.photoUrl || "";
+    const placeId = place.id;
+
+    let popupHtml = `<div class='place-popup' style='text-align:center; max-width:600px; background-color: white; padding: 16px; border-radius: 4px;'>`;
+
+    if (thumbnail) {
+      popupHtml += `<img src='${thumbnail}' alt='${title}' style='max-width:250px; border-radius:8px; margin-bottom:12px; display:block; margin-left:auto; margin-right:auto;' />`;
+    }
+
+    popupHtml += `<div style='font-size:18px; font-weight:600; margin-bottom:12px; color:#333;'>${title}</div>`;
+
+    if (placeId) {
+      popupHtml += `<a href='/places/view/${placeId}' target='_blank' style='display:inline-block; padding:8px 16px; background:#0097a9; color:white; border-radius:4px; text-decoration:none; font-size:14px; font-weight:500;'>View Details</a>`;
+    }
+
+    popupHtml += `</div>`;
+
+    marker.bindPopup(popupHtml, {
+      className: "custom-popup",
+      closeButton: false,
+    });
+
+    placesLayer.addLayer(marker);
+  }
+
+  placesLayer.addTo(map);
+};
+
 // Load places and add them to the map
 const loadPlaces = async () => {
   try {
@@ -95,57 +150,13 @@ const loadPlaces = async () => {
 
     // List responses already include ThumbFile — use that for popups (no per-place photo fetch)
     const places = await fetchAllPlaces();
+    loadedPlaces = places;
 
     if (!places.length) {
       return;
     }
 
-    // Create a layer group for places
-    if (placesLayer) {
-      map.removeLayer(placesLayer);
-    }
-    placesLayer = L.layerGroup();
-
-    for (const place of places) {
-      const coordinates = extractCoordinates(place);
-
-      if (!coordinates) {
-        continue;
-      }
-
-      const { latitude, longitude } = coordinates;
-
-      const marker = L.marker([latitude, longitude], {
-        icon: createTealPinMarker(),
-      });
-
-      const title = place.name || "Untitled Place";
-      const thumbnail = place.photoUrl || "";
-      const placeId = place.id;
-
-      let popupHtml = `<div class='place-popup' style='text-align:center; max-width:600px; background-color: white; padding: 16px; border-radius: 4px;'>`;
-
-      if (thumbnail) {
-        popupHtml += `<img src='${thumbnail}' alt='${title}' style='max-width:250px; border-radius:8px; margin-bottom:12px; display:block; margin-left:auto; margin-right:auto;' />`;
-      }
-
-      popupHtml += `<div style='font-size:18px; font-weight:600; margin-bottom:12px; color:#333;'>${title}</div>`;
-
-      if (placeId) {
-        popupHtml += `<a href='/places/view/${placeId}' target='_blank' style='display:inline-block; padding:8px 16px; background:#0097a9; color:white; border-radius:4px; text-decoration:none; font-size:14px; font-weight:500;'>View Details</a>`;
-      }
-
-      popupHtml += `</div>`;
-
-      marker.bindPopup(popupHtml, {
-        className: "custom-popup",
-        closeButton: false,
-      });
-
-      placesLayer.addLayer(marker);
-    }
-
-    placesLayer.addTo(map);
+    renderPlacesLayer(places);
   } catch (error) {
     console.error("Error loading places:", error);
   } finally {
@@ -194,7 +205,15 @@ const cleanup = () => {
   }
   currentBaseLayer = null;
   placesLayer = null;
+  loadedPlaces = [];
 };
+
+// Rebuild marker popups when language toggles
+watch(isEnglish, () => {
+  if (loadedPlaces.length) {
+    renderPlacesLayer(loadedPlaces);
+  }
+});
 
 // Lifecycle hooks
 onMounted(async () => {

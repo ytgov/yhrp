@@ -45,8 +45,8 @@
         >
           <place-card
             :image-url="photoURL(item)"
-            :title="item.name"
-            :subtitle="item.location"
+            :title="item.localizedName(isEnglish)"
+            :subtitle="item.localizedLocation(isEnglish)"
             @click="handleClick(item)"
           />
         </v-col>
@@ -74,7 +74,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { fetchPlaces } from "../services/placesApi";
 
-const { t } = useLanguage();
+const { t, isEnglish } = useLanguage();
 
 const router = useRouter();
 

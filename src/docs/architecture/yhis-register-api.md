@@ -2,7 +2,7 @@
 
 This document captures what we know about the upstream **Yukon Heritage Information System (YHIS)** public register API that YHRP proxies. It reflects live checks against `https://yhis.gov.yk.ca` and the YHSI source in [ytgov/yhsi](https://github.com/ytgov/yhsi).
 
-**Last verified:** 2026-07-25
+**Last verified:** 2026-08-06
 
 ---
 
@@ -72,12 +72,15 @@ List endpoints return **summary** objects (not full bilingual descriptions):
 | Field | Type / notes |
 |-------|----------------|
 | `id` | number — place id |
-| `primaryName` | string |
+| `primaryName` | string (English) |
+| `fr_primaryName` | string or `null` (French name) |
 | `yHSIId` | string (e.g. `"116B/03/024"`) |
-| `communityName` | string |
+| `communityName` | string (English) |
+| `fr_communityName` | string or `null` (French community) |
 | `latitude` / `longitude` | strings (decimal degrees) |
 | `recognitionDate` | `YYYY-MM-DD` |
 | `designations` | string (e.g. `"Federal"`) |
+| `fr_designations` | string or `null` (French designation label) |
 | `ThumbFile` | Node Buffer-like `{ type: "Buffer", data: number[] }` JPEG bytes |
 | `caption` | string or `null` |
 
@@ -97,7 +100,7 @@ Returns a **wrapper**:
 }
 ```
 
-Detail includes list fields plus bilingual content populated from YHSI description types:
+Detail includes list fields (including `fr_*` metadata) plus bilingual content populated from YHSI description types:
 
 | Field | Role |
 |-------|------|
@@ -107,7 +110,9 @@ Detail includes list fields plus bilingual content populated from YHSI descripti
 | `descBoundEn` / `descBoundFr` | Boundary description (type 6) |
 | `additionalInfoEn` / `additionalInfoFr` | Additional info (type 30) |
 
-**French note:** YHSI currently prefixes many French fields with `"FRENCH: "` plus the English text when a real translation is missing. Treat French API content as incomplete until YHIS provides real translations.
+**French note:** As of Aug 2026, YHIS returns real French description text via `fR_DescriptionText` and French metadata via `fr_primaryName` / `fr_communityName` / `fr_designations`. Some `fr_*` values may still be `null` when a translation is missing — UI should fall back to English.
+
+YHRP keeps these wire names on both the backend `RegisterPlace` model and the frontend `Place` model for consistency.
 
 404 with empty body when the id is not on the register.
 

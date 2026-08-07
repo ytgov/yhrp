@@ -27,12 +27,15 @@ describe("Remote Register API", () => {
         const place = response.body.data[0];
         expect(place).toHaveProperty("id");
         expect(place).toHaveProperty("primaryName");
+        expect(place).toHaveProperty("fr_primaryName");
         expect(place).toHaveProperty("yHSIId");
         expect(place).toHaveProperty("latitude");
         expect(place).toHaveProperty("longitude");
         expect(place).toHaveProperty("recognitionDate");
         expect(place).toHaveProperty("communityName");
+        expect(place).toHaveProperty("fr_communityName");
         expect(place).toHaveProperty("designations");
+        expect(place).toHaveProperty("fr_designations");
         expect(place).toHaveProperty("ThumbFile");
       }
     });
@@ -52,6 +55,7 @@ describe("Remote Register API", () => {
       expect(response.body).toHaveProperty("data");
       expect(response.body.data).toHaveProperty("id");
       expect(response.body.data).toHaveProperty("primaryName");
+      expect(response.body.data).toHaveProperty("fr_primaryName");
       expect(response.body.data).toHaveProperty("placeDescriptionEn");
       expect(response.body.data).toHaveProperty("placeDescriptionFr");
     });

@@ -66,9 +66,10 @@ interface Place {
 
 Backend `RegisterPlace` and frontend `Place.fromApi()` both follow the live YHIS register wire shape:
 
-- `id`, `primaryName`, `yHSIId`, `communityName`, `latitude`, `longitude`, `recognitionDate`, `designations`, `ThumbFile`
+- Metadata: `id`, `primaryName`, `fr_primaryName`, `yHSIId`, `communityName`, `fr_communityName`, `latitude`, `longitude`, `recognitionDate`, `designations`, `fr_designations`, `ThumbFile`
 - Detail also includes bilingual `placeDescriptionEn/Fr`, `heritageValueEn/Fr`, etc.
 - List/detail/photos responses use a `{ data }` envelope (list includes `meta`)
+- UI uses `Place.localizedName/Location/Designation(isEnglish)` plus `*En`/`*Fr` fields for descriptions
 
 See `src/docs/architecture/yhis-register-api.md` and `src/api/models/register-place.model.ts`.
 
