@@ -5,9 +5,9 @@
         <h1 class="text-h4 mb-4">{{ t(translations.contactUs) }}</h1>
         <p class="text-body-1 mb-6">{{ t(translations.contactIntro) }}</p>
 
-        <div class="d-flex flex-column ga-4">
-          <div class="d-flex align-center ga-3">
-            <v-icon color="primary" icon="mdi-email" />
+        <div class="d-flex flex-column">
+          <div class="d-flex align-center mb-10">
+            <v-icon color="primary" icon="mdi-email" class="me-3" />
             <div>
               <div class="text-subtitle-2 text-grey-darken-1">
                 {{ t(translations.contactEmail) }}
@@ -21,8 +21,8 @@
             </div>
           </div>
 
-          <div class="d-flex align-center ga-3">
-            <v-icon color="primary" icon="mdi-phone" />
+          <div class="d-flex align-center">
+            <v-icon color="primary" icon="mdi-phone" class="me-3" />
             <div>
               <div class="text-subtitle-2 text-grey-darken-1">
                 {{ t(translations.contactPhone) }}

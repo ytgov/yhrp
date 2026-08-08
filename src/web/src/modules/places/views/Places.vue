@@ -3,31 +3,29 @@
     <v-container>
       <v-row>
         <v-col cols="12">
-          <div
-            class="d-flex flex-column flex-sm-row align-sm-center justify-space-between"
-          >
-            <h1 class="text-h4 mb-4 mb-sm-0">
+          <div class="places-list-header">
+            <h1 class="text-h4 mb-0">
               {{ t(translations.listOfHistoricPlaces) }} {{ photoCountText }}
             </h1>
-            <div class="d-flex flex-column flex-sm-row">
-              <v-select
-                v-model="sortBy"
-                :items="sortOptions"
-                :label="t(translations.sortBy)"
-                density="compact"
-                hide-details
-                class="mb-3 mb-sm-0 me-sm-3"
-                style="min-width: 220px; max-width: 280px"
-              />
-              <v-select
-                v-if="showFilter"
-                v-model="filterValue"
-                :items="filterOptions"
-                :label="filterLabel"
-                density="compact"
-                hide-details
-                style="min-width: 220px; max-width: 280px"
-              />
+            <div class="places-sort-controls">
+              <div class="places-sort-control">
+                <v-select
+                  v-model="sortBy"
+                  :items="sortOptions"
+                  :label="t(translations.sortBy)"
+                  density="compact"
+                  hide-details
+                />
+              </div>
+              <div v-if="showFilter" class="places-sort-control">
+                <v-select
+                  v-model="filterValue"
+                  :items="filterOptions"
+                  :label="filterLabel"
+                  density="compact"
+                  hide-details
+                />
+              </div>
             </div>
           </div>
         </v-col>
@@ -278,5 +276,24 @@ onMounted(() => {
 <style scoped>
 .v-col {
   transition: all 0.3s ease;
+}
+
+.places-list-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.places-sort-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.places-sort-control {
+  width: 100%;
 }
 </style>
