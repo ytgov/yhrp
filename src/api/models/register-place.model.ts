@@ -45,4 +45,7 @@ export interface RegisterPlace {
   descBoundFr?: string;
   additionalInfoEn?: string;
   additionalInfoFr?: string;
+  /** Cultural history — not yet exposed by YHIS public register (see docs) */
+  culturalHistoryEn?: string;
+  culturalHistoryFr?: string;
 }

@@ -131,6 +131,10 @@ const expansionPanels = computed(() => {
       title: t(translations.descriptionOfBoundaries),
       content: getLocalizedField("descBoundEn", "descBoundFr"),
     },
+    {
+      title: t(translations.culturalHistory),
+      content: getLocalizedField("culturalHistoryEn", "culturalHistoryFr"),
+    },
   ].filter((p) => p.content);
 });
 
