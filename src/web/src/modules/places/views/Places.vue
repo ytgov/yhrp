@@ -4,20 +4,31 @@
       <v-row>
         <v-col cols="12">
           <div
-            class="d-flex flex-column flex-sm-row align-sm-center justify-space-between ga-4"
+            class="d-flex flex-column flex-sm-row align-sm-center justify-space-between"
           >
-            <h1 class="text-h4 mb-0">
+            <h1 class="text-h4 mb-4 mb-sm-0">
               {{ t(translations.listOfHistoricPlaces) }} {{ photoCountText }}
             </h1>
-            <v-select
-              v-model="sortBy"
-              :items="sortOptions"
-              :label="t(translations.sortBy)"
-              density="compact"
-              hide-details
-              class="sort-select"
-              style="max-width: 280px"
-            />
+            <div class="d-flex flex-column flex-sm-row">
+              <v-select
+                v-model="sortBy"
+                :items="sortOptions"
+                :label="t(translations.sortBy)"
+                density="compact"
+                hide-details
+                class="mb-3 mb-sm-0 me-sm-3"
+                style="min-width: 220px; max-width: 280px"
+              />
+              <v-select
+                v-if="showFilter"
+                v-model="filterValue"
+                :items="filterOptions"
+                :label="filterLabel"
+                density="compact"
+                hide-details
+                style="min-width: 220px; max-width: 280px"
+              />
+            </div>
           </div>
         </v-col>
       </v-row>
@@ -94,6 +105,7 @@ const allPlaces = ref([]);
 const loading = ref(false);
 const error = ref(null);
 const sortBy = ref("name");
+const filterValue = ref("");
 
 const sortOptions = computed(() => [
   { title: t(translations.sortAlphabetical), value: "name" },
@@ -101,8 +113,71 @@ const sortOptions = computed(() => [
   { title: t(translations.sortDesignation), value: "designation" },
 ]);
 
+const showFilter = computed(
+  () => sortBy.value === "community" || sortBy.value === "designation"
+);
+
+const filterLabel = computed(() =>
+  sortBy.value === "community"
+    ? t(translations.filterCommunity)
+    : t(translations.filterDesignation)
+);
+
+const uniqueSortedOptions = (entries, preferEnglish) => {
+  const locale = preferEnglish ? "en" : "fr";
+  return [...entries.entries()]
+    .sort((a, b) => a[1].localeCompare(b[1], locale, { sensitivity: "base" }))
+    .map(([value, title]) => ({ title, value }));
+};
+
+const filterOptions = computed(() => {
+  const preferEnglish = isEnglish.value;
+  const allOption = { title: t(translations.filterAll), value: "" };
+  const entries = new Map();
+
+  if (sortBy.value === "community") {
+    for (const place of allPlaces.value) {
+      const value = place.communityName || place.localizedLocation(true);
+      if (!value || entries.has(value)) continue;
+      entries.set(value, place.localizedLocation(preferEnglish) || value);
+    }
+  } else if (sortBy.value === "designation") {
+    for (const place of allPlaces.value) {
+      const value =
+        place.designations?.[0]?.level || place.localizedDesignation(true);
+      if (!value || entries.has(value)) continue;
+      entries.set(value, place.localizedDesignation(preferEnglish) || value);
+    }
+  }
+
+  return [allOption, ...uniqueSortedOptions(entries, preferEnglish)];
+});
+
+const filteredPlaces = computed(() => {
+  const places = allPlaces.value;
+  if (!filterValue.value || !showFilter.value) return places;
+
+  if (sortBy.value === "community") {
+    return places.filter(
+      (place) =>
+        (place.communityName || place.localizedLocation(true)) ===
+        filterValue.value
+    );
+  }
+
+  if (sortBy.value === "designation") {
+    return places.filter(
+      (place) =>
+        (place.designations?.[0]?.level || place.localizedDesignation(true)) ===
+        filterValue.value
+    );
+  }
+
+  return places;
+});
+
 const sortedPlaces = computed(() => {
-  const places = [...allPlaces.value];
+  const places = [...filteredPlaces.value];
   const preferEnglish = isEnglish.value;
 
   const compareStrings = (a, b) =>
@@ -181,6 +256,11 @@ const getDataFromApi = async () => {
 };
 
 watch(sortBy, () => {
+  filterValue.value = "";
+  page.value = 1;
+});
+
+watch(filterValue, () => {
   page.value = 1;
 });
 
