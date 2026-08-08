@@ -1,32 +1,191 @@
-# YG vue-template
-A template to for Vuejs based web apps for internal services.  
+# Yukon Register of Historic Places (YHRP)
 
-## Development from this template
+A public-facing web application for browsing and exploring designated heritage sites throughout Yukon, Canada.
 
-The intent of this template is to evolve over time, so projects should fork this code into a new repository. That will allow the project files to evolve over time and be able to update the child repositories.
+## What This App Does
 
-Before starting the API server, you need to create the appropriate .env file which can be done by running `cp src/api/.env src/api/.env.development`. You must then set the appropriate values
+YHRP provides citizens with access to the Yukon Register of Historic Places - a database of heritage sites maintained by the Yukon Government. Users can:
 
-To develop within this environment, you must have Node.js and NPM installed on your development machine. Open two terminal windows and open one to `/src/api` and `src/web` respectively. Both the API back-end and the web front-end can be started with: `npm run start:dev`.
+- Browse a paginated list of historic places with photos
+- View detailed information about each place (designation, heritage value, boundaries, etc.)
+- See place locations on an interactive map
+- Explore all places on a full-screen map view
+- View content in **English or French** (bilingual)
 
-Once both are running, open your browser and navigate to http://localhost:8080 to view the application.
+## Architecture
 
-## Understanding the environment variables
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Vue 3 Frontend (Vuetify 3)                   │
+│                                                                 │
+│  Routes:                                                        │
+│    /           → Home page with featured places carousel        │
+│    /places     → Paginated grid of all historic places          │
+│    /places/view/:id → Place details with photos & map           │
+│    /map        → Full-screen interactive map                    │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    Express API (Caching Proxy)                  │
+│                                                                 │
+│  Endpoints:                                                     │
+│    GET /api/register          → Paginated places list           │
+│    GET /api/register/:id      → Single place details            │
+│    GET /api/register/:id/photos → Photos for a place            │
+│    GET /api/register/:id/photos/:photoId → Single photo file    │
+│                                                                 │
+│  Features:                                                      │
+│    • 15-minute in-memory cache (node-cache)                     │
+│    • Serves frontend static files in production                 │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              Yukon Heritage Information System (YHSI) API       │
+│              https://yhis.gov.yk.ca/api/register               │
+│                                                                 │
+│  Source: github.com/ytgov/yhsi                                 │
+│  (External government API - source of truth for place data)    │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-Environment variables should never be checked into the repository! 
+## Tech Stack
 
-- API_PORT=(the port the API will be listening on (doesn't have to match the docker port))
-- FRONTEND_URL=(the url of the service, from browser)
-- AUTH_REDIRECT=(FRONTEND_URL from above)/login-complete
-- VIVVO_CLIENT_ID=(the client id provided for the service)
-- VIVVO_CLIENT_SECRET=(the client secret provided for the service)
-- VIVVO_CALLBACK_URL=(the fully qualified url of the API, must match setup in Vivvo)/authorization-code/callback
+| Layer | Technology |
+|-------|------------|
+| Frontend Framework | Vue 3 (Composition API) |
+| UI Components | Vuetify 3 |
+| Maps | Leaflet |
+| Backend | Express.js + TypeScript |
+| Caching | node-cache (15-min TTL) |
+| Deployment | Docker (single container) |
 
-## Building the container image
-docker build -t vue-template .
+## Bilingual Support
 
-## Running the container in test or production
+The application supports English and French. Users can toggle language via the navbar.
 
-By default, the container will run in development mode, but following the step above, you can create the appropriate environment files for the instance you are targetting. Depending, the application will look for either `src/api/.env.test` or `src/api/.env.production`. To tell the API which instance to use, add the environment variable `NODE_ENV` to the docker run command like below.
+**Two types of bilingual content:**
 
-`docker run -p 8222:3000 -e NODE_ENV=production --restart=on-failure vue-template`
+1. **API Content** - Place descriptions come from YHIS with paired fields (`*En` / `*Fr`)
+2. **UI Strings** - Labels and buttons are managed in a CSV file
+
+**For translators and developers:** See [src/docs/translations.md](src/docs/translations.md) for:
+- How to add new translated labels
+- Working with translation services
+- CSV file format and workflow
+
+## Project Structure
+
+```
+yhrp/
+├── src/
+│   ├── api/                    # Express backend
+│   │   ├── controllers/        # Request handlers
+│   │   ├── services/           # Business logic + caching
+│   │   ├── models/             # TypeScript interfaces
+│   │   ├── routes/             # Route definitions
+│   │   └── index.ts            # App entry point
+│   │
+│   ├── web/                    # Vue 3 frontend
+│   │   └── src/
+│   │       ├── modules/        # Feature modules
+│   │       │   ├── home/       # Home page
+│   │       │   ├── places/     # Places list & details
+│   │       │   └── map/        # Map views
+│   │       ├── components/     # Shared components
+│   │       ├── layouts/        # Page layouts
+│   │       ├── plugins/        # Vuetify setup
+│   │       └── services/       # Shared services
+│   │
+│   └── docs/                   # Documentation
+│       ├── architecture/       # Technical docs
+│       ├── processes/          # Dev workflows
+│       └── development/        # Dev guides
+│
+├── Dockerfile                  # Production build
+└── CHANGELOG.md               # Version history
+```
+
+## Development Setup
+
+### Prerequisites
+
+- Node.js 20+
+- npm
+
+### Quick Start
+
+```bash
+# Install dependencies
+cd src/api && npm install
+cd ../web && npm install
+
+# Start development servers (2 terminals)
+
+# Terminal 1 - API (port 3000)
+cd src/api
+npm run start:dev
+
+# Terminal 2 - Frontend (port 5173)
+cd src/web
+npm run dev
+```
+
+Access the app at http://localhost:5173
+
+### Available Scripts
+
+**Frontend (`src/web/`):**
+```bash
+npm run dev          # Start dev server
+npm run build        # Production build
+npm run test         # Run tests
+```
+
+**Backend (`src/api/`):**
+```bash
+npm run start:dev    # Start with hot reload
+npm run build:api    # Compile TypeScript
+npm test             # Run tests
+```
+
+## Deployment
+
+### Docker Build
+
+```bash
+# Build image
+docker build -t yhrp-viewer .
+
+# Run container
+docker run -p 8222:3000 -e NODE_ENV=production --restart=on-failure yhrp-viewer
+```
+
+The Docker build:
+1. Compiles the Vue frontend
+2. Compiles the Express backend
+3. Bundles everything into a single Node.js container
+4. Serves frontend as static files from Express
+
+## Contributing
+
+See `src/docs/processes/` for:
+- `branching-strategy.md` - Git workflow
+- `release-process.md` - Release procedures
+- `CHANGELOG_GUIDE.md` - Changelog format
+
+### Branch Naming
+
+- Features: `feature/description`
+- Bugfixes: `bugfix/description`
+- Hotfixes: `hotfix/description`
+- Releases: `release/vX.Y.Z`
+
+### Commit Format
+
+Use conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
+
+## License
+
+Internal use only - Yukon Government

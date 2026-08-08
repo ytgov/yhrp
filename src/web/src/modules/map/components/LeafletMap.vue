@@ -1,0 +1,297 @@
+<template>
+  <div class="place-map" ref="mapContainer">
+    <div v-if="isLoading" class="loading-overlay">
+      <v-progress-circular indeterminate color="primary" size="48" />
+      <span class="mt-2 text-body-2">Loading places...</span>
+    </div>
+    <div class="layer-control">
+      <v-btn
+        v-for="layer in baseLayers"
+        :key="layer.id"
+        size="small"
+        :color="currentLayer === layer.id ? 'primary' : 'grey'"
+        class="layer-btn"
+        @click="changeBaseLayer(layer.id)"
+        :title="layer.name"
+      >
+        <v-icon>{{ layer.icon }}</v-icon>
+      </v-btn>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { fetchAllPlaces } from "../../places/services/placesApi";
+import { useLanguage } from "@/composables/useLanguage";
+import { createTealPinMarker } from "../utils/markerDefinitions";
+import "../utils/markerStyles.css";
+
+// Reactive refs
+const mapContainer = ref(null);
+const currentLayer = ref("esri-topo");
+const isLoading = ref(false);
+const { isEnglish } = useLanguage();
+
+// Map instance refs
+let map = null;
+let currentBaseLayer = null;
+let placesLayer = null;
+let loadedPlaces = [];
+
+// Base layer configuration
+const baseLayers = [
+  {
+    id: "esri-topo",
+    name: "Topographic",
+    icon: "mdi-map",
+    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: "© OpenStreetMap contributors",
+  },
+  {
+    id: "satellite",
+    name: "Satellite",
+    icon: "mdi-satellite",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    attribution: "© Esri",
+  },
+  {
+    id: "terrain",
+    name: "Terrain",
+    icon: "mdi-terrain",
+    url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+    attribution: "© OpenTopoMap",
+  },
+];
+
+// Extract coordinates from place data
+const extractCoordinates = (place) => {
+  // Handle coordinates in array format [latitude, longitude]
+  if (
+    place.coordinates &&
+    Array.isArray(place.coordinates) &&
+    place.coordinates.length === 2
+  ) {
+    return {
+      latitude: place.coordinates[0],
+      longitude: place.coordinates[1],
+    };
+  }
+
+  // Fallback to separate latitude/longitude properties
+  if (place.latitude && place.longitude) {
+    return {
+      latitude: place.latitude,
+      longitude: place.longitude,
+    };
+  }
+
+  return null;
+};
+
+// Render place markers (and rebuild when language changes)
+const renderPlacesLayer = (places) => {
+  if (!map) return;
+
+  if (placesLayer) {
+    map.removeLayer(placesLayer);
+  }
+  placesLayer = L.layerGroup();
+
+  for (const place of places) {
+    const coordinates = extractCoordinates(place);
+
+    if (!coordinates) {
+      continue;
+    }
+
+    const { latitude, longitude } = coordinates;
+
+    const marker = L.marker([latitude, longitude], {
+      icon: createTealPinMarker(),
+    });
+
+    const title =
+      place.localizedName?.(isEnglish.value) || place.name || "Untitled Place";
+    const thumbnail = place.photoUrl || "";
+    const placeId = place.id;
+
+    let popupHtml = `<div class='place-popup' style='text-align:center; max-width:600px; background-color: white; padding: 16px; border-radius: 4px;'>`;
+
+    if (thumbnail) {
+      popupHtml += `<img src='${thumbnail}' alt='${title}' style='max-width:250px; border-radius:8px; margin-bottom:12px; display:block; margin-left:auto; margin-right:auto;' />`;
+    }
+
+    popupHtml += `<div style='font-size:18px; font-weight:600; margin-bottom:12px; color:#333;'>${title}</div>`;
+
+    if (placeId) {
+      popupHtml += `<a href='/places/view/${placeId}' target='_blank' style='display:inline-block; padding:8px 16px; background:#0097a9; color:white; border-radius:4px; text-decoration:none; font-size:14px; font-weight:500;'>View Details</a>`;
+    }
+
+    popupHtml += `</div>`;
+
+    marker.bindPopup(popupHtml, {
+      className: "custom-popup",
+      closeButton: false,
+    });
+
+    placesLayer.addLayer(marker);
+  }
+
+  placesLayer.addTo(map);
+};
+
+// Load places and add them to the map
+const loadPlaces = async () => {
+  try {
+    isLoading.value = true;
+
+    // List responses already include ThumbFile — use that for popups (no per-place photo fetch)
+    const places = await fetchAllPlaces();
+    loadedPlaces = places;
+
+    if (!places.length) {
+      return;
+    }
+
+    renderPlacesLayer(places);
+  } catch (error) {
+    console.error("Error loading places:", error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Change base layer
+const changeBaseLayer = (layerId) => {
+  const layer = baseLayers.find((l) => l.id === layerId);
+
+  if (!layer || !map) {
+    return;
+  }
+
+  if (currentBaseLayer) {
+    map.removeLayer(currentBaseLayer);
+  }
+
+  currentBaseLayer = L.tileLayer(layer.url, {
+    attribution: layer.attribution,
+  }).addTo(map);
+
+  currentLayer.value = layerId;
+};
+
+// Initialize map
+const initMap = async () => {
+  if (!mapContainer.value) {
+    console.error("mapContainer is null");
+    return;
+  }
+
+  // Initialize the map centered on downtown Whitehorse, Yukon (zoom 14 for street level)
+  map = L.map(mapContainer.value).setView([60.7212, -135.0568], 14);
+
+  changeBaseLayer("esri-topo");
+  await loadPlaces();
+};
+
+// Cleanup function
+const cleanup = () => {
+  if (map) {
+    map.remove();
+    map = null;
+  }
+  currentBaseLayer = null;
+  placesLayer = null;
+  loadedPlaces = [];
+};
+
+// Rebuild marker popups when language toggles
+watch(isEnglish, () => {
+  if (loadedPlaces.length) {
+    renderPlacesLayer(loadedPlaces);
+  }
+});
+
+// Lifecycle hooks
+onMounted(async () => {
+  await nextTick();
+  await initMap();
+});
+
+onUnmounted(() => {
+  cleanup();
+});
+</script>
+
+<style scoped>
+.place-map {
+  width: 100%;
+  height: calc(100vh - 70px);
+  min-height: 300px;
+  position: relative;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+}
+
+.layer-control {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  background: white;
+  padding: 3px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.layer-btn {
+  min-width: 30px !important;
+  height: 30px !important;
+  padding: 0 !important;
+}
+
+:deep(.layer-btn .v-icon) {
+  font-size: 18px !important;
+}
+
+/* Popup Styles for LeafletMap */
+:deep(.custom-popup .leaflet-popup-content-wrapper) {
+  background: white;
+  color: #333;
+  border-radius: 4px;
+  padding: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+:deep(.custom-popup .leaflet-popup-tip) {
+  background: white;
+}
+
+:deep(.custom-popup .leaflet-popup-content) {
+  margin: 0;
+  padding: 0;
+}
+
+:deep(.custom-popup .leaflet-popup-close-button) {
+  color: #666;
+  font-size: 18px;
+  padding: 8px;
+}
+</style>

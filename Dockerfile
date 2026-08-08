@@ -1,29 +1,42 @@
-FROM node:14-alpine3.10
+# Frontend builder stage
+FROM node:20-alpine AS frontend-builder
 
-RUN mkdir /home/node/app && chown -R node:node /home/node/app
-RUN mkdir /home/node/web && chown -R node:node /home/node/web
-
-COPY --chown=node:node src/web/package*.json /home/node/web/
-COPY --chown=node:node src/api/package*.json /home/node/app/
-
-USER node
-
-WORKDIR /home/node/app
-RUN npm install && npm cache clean --force --loglevel=error
-COPY --chown=node:node src/api/.env* ./
-
-WORKDIR /home/node/web
+WORKDIR /build/web
+COPY src/web/package*.json ./
 RUN npm install && npm cache clean --force --loglevel=error
 
-COPY --chown=node:node src/api /home/node/app/
-COPY --chown=node:node src/web /home/node/web/
-
+COPY src/web ./
 RUN npm run build:docker
 
-EXPOSE 3000
+# API builder stage
+FROM node:20-alpine AS api-builder
 
+WORKDIR /build/api
+COPY src/api/package*.json ./
+RUN npm install && npm cache clean --force --loglevel=error
+
+COPY src/api ./
+RUN npm run build:api
+
+# Final stage
+FROM node:20-alpine
+
+RUN mkdir -p /home/node/app && chown -R node:node /home/node/app
+
+USER node
 WORKDIR /home/node/app
 
+# Copy built frontend from builder
+COPY --from=frontend-builder --chown=node:node /build/api/dist/web ./dist/web
+
+# Copy built API from builder
+COPY --from=api-builder --chown=node:node /build/api/dist ./dist
+COPY --from=api-builder --chown=node:node /build/api/package*.json ./
+
+# Install production dependencies only
+RUN npm install --production && npm cache clean --force --loglevel=error
+
 ENV NODE_ENV=production
-RUN npm run build:api
-CMD [ "node", "./dist/index.js" ]
+
+EXPOSE 3000
+CMD [ "node", "dist/index.js" ]
