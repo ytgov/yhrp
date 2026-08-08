@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Contact Us page with Historic Sites email (`historic.sites@yukon.ca`) and phone (`867-667-5386`)
+- Places list sorting by name, community, or designation type (client-side over full register)
+- Cultural History expansion panel on place detail (ready for YHIS `culturalHistoryEn`/`Fr`; not yet exposed by public register API)
 - Added PlaceLocationMap component for displaying individual place locations
 - Interactive map marker with custom teal pin design
 - Added base layer switcher with Streets, Satellite, and Terrain options
@@ -36,6 +39,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Emphasized home page intro as a bold central heading with continuous larger body text
+- Place detail: description under site name; gallery height aligned with map; photos use contain (less cropping); captions shown once; expansion panels open by default
+- Renamed "Character Definition" label to "Character-Defining Elements"
 - Switched places frontend from mock data to the live YHIS register API (`https://yhis.gov.yk.ca/api/register`)
 - Fixed backend place list pagination to use YHIS `?page=` (was sending ignored `skip`/`take` params)
 - Aligned backend `RegisterPlace` / photo types and detail `{ data }` responses with the live YHIS wire shape and frontend `Place.fromApi`

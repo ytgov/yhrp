@@ -6,6 +6,10 @@ map,Map,Carte
 historicPlaces,Historic Places,Lieux patrimoniaux
 places,Places,Lieux
 contactUs,Contact Us,Contactez-nous
+# CONTACT PAGE
+contactIntro,"For questions about the Yukon Register of Historic Places, contact Historic Sites.","Pour toute question concernant le Répertoire des lieux patrimoniaux du Yukon, communiquez avec les Lieux historiques."
+contactEmail,Email,Courriel
+contactPhone,Phone,Téléphone
 # ACTIONS & BUTTONS
 viewPlace,View Place,Voir le lieu
 viewDetails,View Details,Voir les détails
@@ -24,15 +28,23 @@ photoGallery,Photo Gallery,Galerie photos
 designation,Designation,Désignation
 placeDescription,Place Description,Description du lieu
 heritageValue,Heritage Value,Valeur patrimoniale
-characterDefinition,Character Definition,Définition du caractère
+characterDefinition,Character-Defining Elements,Éléments caractéristiques
 additionalInformation,Additional Information,Informations supplémentaires
 descriptionOfBoundaries,Description of Boundaries,Description des limites
+culturalHistory,Cultural History,Histoire culturelle
 level,Level,Niveau
 date,Date,Date
 # STATUS & FEEDBACK MESSAGES
 loading,Loading,Chargement
 noPhotosAvailable,No photos available,Aucune photo disponible
 noPlacesFound,No places found,Aucun lieu trouvé
+sortBy,Sort by,Trier par
+sortAlphabetical,Alphabetical,Alphabétique
+sortCommunity,Community,Communauté
+sortDesignation,Designation type,Type de désignation
+filterAll,All,Tous
+filterCommunity,Community,Communauté
+filterDesignation,Designation,Désignation
 # HOME PAGE CONTENT
 heroText,"Historic places in the Yukon are a tangible record of the people, events and activities that have shaped our way of life and our environment.","Les lieux patrimoniaux du Yukon sont un témoignage tangible des personnes, des événements et des activités qui ont façonné notre mode de vie et notre environnement."
 heroSubtext1,"Our historic places represent the technologies, designs and ideas that are the framework of our society and the basis for our future.","Nos lieux patrimoniaux représentent les technologies, les designs et les idées qui constituent le cadre de notre société et la base de notre avenir."

@@ -5,14 +5,13 @@
       :show-arrows="photos.length > 1"
       hide-delimiter-background
       delimiter-icon="mdi-circle"
-      height="400"
+      :height="height"
       @update:model-value="handlePhotoChange"
     >
       <v-carousel-item
         v-for="photo in photos"
         :key="photo.id"
         :src="photo.imageUrl"
-        cover
         class="cursor-pointer"
         @click="openFullscreen(photo)"
       >
@@ -22,12 +21,16 @@
       </v-carousel-item>
     </v-carousel>
 
-    <div v-else class="d-flex flex-column align-center justify-center" style="height: 400px">
+    <div
+      v-else
+      class="d-flex flex-column align-center justify-center"
+      :style="{ height: `${height}px` }"
+    >
       <v-icon size="64" color="grey">mdi-image-off</v-icon>
       <p class="text-grey mt-2">{{ t(translations.noPhotosAvailable) }}</p>
     </div>
 
-    <v-card v-if="currentPhoto?.comments" flat class="mt-2">
+    <v-card v-if="showDistinctComments" flat class="mt-2">
       <v-card-text class="text-body-2 text-grey-darken-1">
         {{ currentPhoto.comments }}
       </v-card-text>
@@ -56,7 +59,6 @@
             v-for="photo in photos"
             :key="photo.id"
             :src="photo.imageUrl"
-            cover
           >
             <div v-if="photo.caption" class="photo-caption">
               {{ photo.caption }}
@@ -69,7 +71,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useLanguage, translations } from "@/composables/useLanguage";
 import { fetchPlacePhotos } from "../services/placesApi";
 
@@ -80,6 +82,10 @@ const props = defineProps({
     type: [Number, String],
     required: true,
   },
+  height: {
+    type: [Number, String],
+    default: 400,
+  },
 });
 
 const photos = ref([]);
@@ -87,6 +93,13 @@ const loading = ref(true);
 const fullscreen = ref(false);
 const currentPhotoIndex = ref(0);
 const currentPhoto = ref(null);
+
+const showDistinctComments = computed(() => {
+  const comments = currentPhoto.value?.comments?.trim();
+  if (!comments) return false;
+  const caption = currentPhoto.value?.caption?.trim() || "";
+  return comments !== caption;
+});
 
 const loadPhotos = async () => {
   try {

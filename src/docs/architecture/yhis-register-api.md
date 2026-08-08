@@ -109,10 +109,11 @@ Detail includes list fields (including `fr_*` metadata) plus bilingual content p
 | `characterDefEn` / `characterDefFr` | Character-defining elements (type 2) |
 | `descBoundEn` / `descBoundFr` | Boundary description (type 6) |
 | `additionalInfoEn` / `additionalInfoFr` | Additional info (type 30) |
+| `culturalHistoryEn` / `culturalHistoryFr` | **Not mapped yet** — YHRP UI is ready; YHIS `register-router` does not currently populate these. Needs a YHSI description-type mapping before live data appears. |
 
 **French note:** As of Aug 2026, YHIS returns real French description text via `fR_DescriptionText` and French metadata via `fr_primaryName` / `fr_communityName` / `fr_designations`. Some `fr_*` values may still be `null` when a translation is missing — UI should fall back to English.
 
-YHRP keeps these wire names on both the backend `RegisterPlace` model and the frontend `Place` model for consistency.
+YHRP keeps these wire names on both the backend `RegisterPlace` model and the frontend `Place` model for consistency. Cultural History is wired end-to-end in YHRP (model + place-detail panel) and will show when YHIS starts returning the fields (or when using mock data).
 
 404 with empty body when the id is not on the register.
 
