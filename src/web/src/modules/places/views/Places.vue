@@ -45,8 +45,8 @@
         >
           <place-card
             :image-url="photoURL(item)"
-            :title="item.name"
-            :subtitle="item.location"
+            :title="item.localizedName(isEnglish)"
+            :subtitle="item.localizedLocation(isEnglish)"
             @click="handleClick(item)"
           />
         </v-col>
@@ -72,9 +72,9 @@ import { useLanguage, translations } from "@/composables/useLanguage";
 import PlaceCard from "@/modules/places/components/PlaceCard.vue";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import { fetchPlacePhotos, fetchPlaces } from "../services/placesApi";
+import { fetchPlaces } from "../services/placesApi";
 
-const { t } = useLanguage();
+const { t, isEnglish } = useLanguage();
 
 const router = useRouter();
 
@@ -84,27 +84,14 @@ const totalLength = ref(0);
 const placesList = ref([]);
 const loading = ref(false);
 const error = ref(null);
-const photoUrls = ref(new Map());
 
 const photoCountText = computed(() => {
   return totalLength.value ? `(${totalLength.value})` : "(0)";
 });
 
 const photoURL = (place) => {
-  return photoUrls.value.get(place.id) || "";
-};
-
-const loadPhotoUrls = async () => {
-  for (const place of placesList.value) {
-    try {
-      const photos = await fetchPlacePhotos(place.id);
-      if (photos && photos.length > 0) {
-        photoUrls.value.set(place.id, photos[0].imageUrl);
-      }
-    } catch (err) {
-      console.error(`Error loading photo for place ${place.id}:`, err);
-    }
-  }
+  // Prefer ThumbFile from the register list response (no per-place photos call)
+  return place.photoUrl || "";
 };
 
 const handleClick = (place) => {
@@ -121,7 +108,6 @@ const getDataFromApi = async () => {
     placesList.value = response.places;
     totalLength.value = response.total;
     numberOfPages.value = Math.ceil(response.total / response.pageSize);
-    await loadPhotoUrls();
   } catch (err) {
     error.value = err.message;
   } finally {

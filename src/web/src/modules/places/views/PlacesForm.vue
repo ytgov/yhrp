@@ -1,6 +1,6 @@
 <template>
   <div class="fill-height">
-    <PlaceHeader :place-name="placeData?.name" @print="handlePrint" />
+    <PlaceHeader :place-name="displayName" @print="handlePrint" />
 
     <v-container>
       <v-row v-if="loading">
@@ -20,7 +20,7 @@
       <template v-else-if="placeData">
         <v-row>
           <v-col cols="12">
-            <h1 class="text-h4 mb-2">{{ placeData.name }}</h1>
+            <h1 class="text-h4 mb-2">{{ displayName }}</h1>
           </v-col>
         </v-row>
 
@@ -33,7 +33,7 @@
               <PlaceLocationMap
                 :latitude="placeData.coordinates[0]"
                 :longitude="placeData.coordinates[1]"
-                :place-name="placeData.name"
+                :place-name="displayName"
               />
             </v-card>
           </v-col>
@@ -96,26 +96,47 @@ const getLocalizedField = (enField, frField) => {
     : placeData.value[frField] || placeData.value[enField] || "";
 };
 
+const displayName = computed(() => {
+  if (!placeData.value) return "";
+  return placeData.value.localizedName(isEnglish.value);
+});
+
 const placeDescription = computed(() => {
   if (!placeData.value) return "";
-  return getLocalizedField("placeDescriptionEn", "placeDescriptionFr") ||
-    (isEnglish.value ? placeData.value.teaserEnglish : placeData.value.teaserFrench) ||
-    "";
+  return getLocalizedField("placeDescriptionEn", "placeDescriptionFr");
 });
 
 const expansionPanels = computed(() => {
   if (!placeData.value) return [];
-  const d = placeData.value.designations?.[0];
+  const designationLevel = placeData.value.localizedDesignation(isEnglish.value);
+  const designationDate = placeData.value.designations?.[0]?.date || "";
   return [
     {
       title: t(translations.designation),
-      content: d ? `${t(translations.level)}: ${d.level || ""}\n${t(translations.date)}: ${d.date || ""}` : "",
+      content: designationLevel
+        ? `${t(translations.level)}: ${designationLevel}\n${t(translations.date)}: ${designationDate}`
+        : "",
     },
-    { title: t(translations.placeDescription), content: getLocalizedField("placeDescriptionEn", "placeDescriptionFr") },
-    { title: t(translations.heritageValue), content: getLocalizedField("heritageValueEn", "heritageValueFr") },
-    { title: t(translations.characterDefinition), content: getLocalizedField("characterDefEn", "characterDefFr") },
-    { title: t(translations.additionalInformation), content: getLocalizedField("additionalInfoEn", "additionalInfoFr") },
-    { title: t(translations.descriptionOfBoundaries), content: getLocalizedField("descBoundEn", "descBoundFr") },
+    {
+      title: t(translations.placeDescription),
+      content: getLocalizedField("placeDescriptionEn", "placeDescriptionFr"),
+    },
+    {
+      title: t(translations.heritageValue),
+      content: getLocalizedField("heritageValueEn", "heritageValueFr"),
+    },
+    {
+      title: t(translations.characterDefinition),
+      content: getLocalizedField("characterDefEn", "characterDefFr"),
+    },
+    {
+      title: t(translations.additionalInformation),
+      content: getLocalizedField("additionalInfoEn", "additionalInfoFr"),
+    },
+    {
+      title: t(translations.descriptionOfBoundaries),
+      content: getLocalizedField("descBoundEn", "descBoundFr"),
+    },
   ].filter((p) => p.content);
 });
 
@@ -142,4 +163,3 @@ watch(
   { immediate: true }
 );
 </script>
-

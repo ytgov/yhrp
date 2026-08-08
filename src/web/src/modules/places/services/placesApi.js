@@ -7,18 +7,11 @@ import { Place } from "../models/Place";
 
 // Types
 /**
- * @typedef {Object} Place
- * @property {number} id - Place ID
- * @property {string} name - Place name
- * @property {string} description - Place description
- * @property {Object} location - Location coordinates
- * @property {number} location.lat - Latitude
- * @property {number} location.lng - Longitude
- * @property {string} community - Community name
- * @property {string} yhsiId - YHSI ID
- * @property {Array} designations - List of designations
- * @property {string} recognitionDate - Date of recognition
- * @property {string} photoUrl - URL of the place photo
+ * Wire fields from YHIS / our proxy (before Place.fromApi mapping):
+ * id, primaryName, fr_primaryName, yHSIId, communityName, fr_communityName,
+ * latitude, longitude, recognitionDate, designations, fr_designations, ThumbFile,
+ * plus detail bilingual *En/*Fr description fields.
+ * Responses: list/detail/photos all use a `{ data }` envelope (list also has `meta`).
  */
 
 /**
@@ -38,7 +31,7 @@ export const API_BASE_URL = `${apiBaseUrl}/api/register`;
 
 // Flag to toggle between mock and real API data
 // Set to true when YHIS API is unavailable
-const USE_MOCK_DATA = true;
+const USE_MOCK_DATA = false;
 
 /**
  * Convert buffer data to base64 URL
@@ -84,7 +77,6 @@ export const fetchPlaces = async (page = 1, pageSize = 12) => {
     }
 
     const data = await response.json();
-    console.log("data", data);
     return {
       places: data.data.map((place) => Place.fromApi(place)),
       total: data.meta.item_count,
@@ -94,6 +86,27 @@ export const fetchPlaces = async (page = 1, pageSize = 12) => {
     console.error("Error fetching places:", error);
     throw error;
   }
+};
+
+/**
+ * Fetch every register page (for map / full listings).
+ * Each place includes list ThumbFile when YHIS provides it.
+ * @returns {Promise<Array<Place>>}
+ */
+export const fetchAllPlaces = async () => {
+  const places = [];
+  let page = 1;
+  let total = Infinity;
+
+  while (places.length < total) {
+    const response = await fetchPlaces(page);
+    if (!response?.places?.length) break;
+    places.push(...response.places);
+    total = response.total;
+    page += 1;
+  }
+
+  return places;
 };
 
 /**

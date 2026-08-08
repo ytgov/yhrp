@@ -27,12 +27,15 @@ describe("Remote Register API", () => {
         const place = response.body.data[0];
         expect(place).toHaveProperty("id");
         expect(place).toHaveProperty("primaryName");
+        expect(place).toHaveProperty("fr_primaryName");
         expect(place).toHaveProperty("yHSIId");
         expect(place).toHaveProperty("latitude");
         expect(place).toHaveProperty("longitude");
         expect(place).toHaveProperty("recognitionDate");
         expect(place).toHaveProperty("communityName");
+        expect(place).toHaveProperty("fr_communityName");
         expect(place).toHaveProperty("designations");
+        expect(place).toHaveProperty("fr_designations");
         expect(place).toHaveProperty("ThumbFile");
       }
     });
@@ -45,14 +48,16 @@ describe("Remote Register API", () => {
   });
 
   describe("GET /:id", () => {
-    it("should return place details", async () => {
+    it("should return place details wrapped in data", async () => {
       const response = await request(BASE_URL).get("/1");
 
       expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty("id");
-      expect(response.body).toHaveProperty("name");
-      expect(response.body).toHaveProperty("placeDescriptionEn");
-      expect(response.body).toHaveProperty("placeDescriptionFr");
+      expect(response.body).toHaveProperty("data");
+      expect(response.body.data).toHaveProperty("id");
+      expect(response.body.data).toHaveProperty("primaryName");
+      expect(response.body.data).toHaveProperty("fr_primaryName");
+      expect(response.body.data).toHaveProperty("placeDescriptionEn");
+      expect(response.body.data).toHaveProperty("placeDescriptionFr");
     });
 
     it("should return 404 for non-existent place", async () => {
@@ -71,7 +76,7 @@ describe("Remote Register API", () => {
       expect(Array.isArray(response.body.data)).toBe(true);
       if (response.body.data.length > 0) {
         expect(response.body.data[0]).toHaveProperty("id");
-        expect(response.body.data[0]).toHaveProperty("url");
+        expect(response.body.data[0]).toHaveProperty("ThumbFile");
       }
     });
 

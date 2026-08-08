@@ -23,8 +23,9 @@
 <script setup>
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { nextTick, onMounted, onUnmounted, ref } from "vue";
-import { fetchPlacePhotos, fetchPlaces } from "../../places/services/placesApi";
+import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { fetchAllPlaces } from "../../places/services/placesApi";
+import { useLanguage } from "@/composables/useLanguage";
 import { createTealPinMarker } from "../utils/markerDefinitions";
 import "../utils/markerStyles.css";
 
@@ -32,12 +33,13 @@ import "../utils/markerStyles.css";
 const mapContainer = ref(null);
 const currentLayer = ref("esri-topo");
 const isLoading = ref(false);
-const photoUrls = ref(new Map());
+const { isEnglish } = useLanguage();
 
 // Map instance refs
 let map = null;
 let currentBaseLayer = null;
 let placesLayer = null;
+let loadedPlaces = [];
 
 // Base layer configuration
 const baseLayers = [
@@ -89,87 +91,72 @@ const extractCoordinates = (place) => {
   return null;
 };
 
-const loadPhotoUrls = async (places) => {
-  for (const place of places) {
-    try {
-      const photos = await fetchPlacePhotos(place.id);
-      if (photos && photos.length > 0) {
-        photoUrls.value.set(place.id, photos[0].imageUrl);
-      }
-    } catch (error) {
-      console.error(`Error loading photo for place ${place.id}:`, error);
-    }
+// Render place markers (and rebuild when language changes)
+const renderPlacesLayer = (places) => {
+  if (!map) return;
+
+  if (placesLayer) {
+    map.removeLayer(placesLayer);
   }
+  placesLayer = L.layerGroup();
+
+  for (const place of places) {
+    const coordinates = extractCoordinates(place);
+
+    if (!coordinates) {
+      continue;
+    }
+
+    const { latitude, longitude } = coordinates;
+
+    const marker = L.marker([latitude, longitude], {
+      icon: createTealPinMarker(),
+    });
+
+    const title =
+      place.localizedName?.(isEnglish.value) || place.name || "Untitled Place";
+    const thumbnail = place.photoUrl || "";
+    const placeId = place.id;
+
+    let popupHtml = `<div class='place-popup' style='text-align:center; max-width:600px; background-color: white; padding: 16px; border-radius: 4px;'>`;
+
+    if (thumbnail) {
+      popupHtml += `<img src='${thumbnail}' alt='${title}' style='max-width:250px; border-radius:8px; margin-bottom:12px; display:block; margin-left:auto; margin-right:auto;' />`;
+    }
+
+    popupHtml += `<div style='font-size:18px; font-weight:600; margin-bottom:12px; color:#333;'>${title}</div>`;
+
+    if (placeId) {
+      popupHtml += `<a href='/places/view/${placeId}' target='_blank' style='display:inline-block; padding:8px 16px; background:#0097a9; color:white; border-radius:4px; text-decoration:none; font-size:14px; font-weight:500;'>View Details</a>`;
+    }
+
+    popupHtml += `</div>`;
+
+    marker.bindPopup(popupHtml, {
+      className: "custom-popup",
+      closeButton: false,
+    });
+
+    placesLayer.addLayer(marker);
+  }
+
+  placesLayer.addTo(map);
 };
 
 // Load places and add them to the map
 const loadPlaces = async () => {
   try {
     isLoading.value = true;
-    console.log("Loading places...");
 
-    const response = await fetchPlaces(); // Load first 100 places
-    console.log("Places response:", response);
+    // List responses already include ThumbFile — use that for popups (no per-place photo fetch)
+    const places = await fetchAllPlaces();
+    loadedPlaces = places;
 
-    if (!response?.places) {
-      console.log("No places data in response");
+    if (!places.length) {
       return;
     }
 
-    const places = response.places;
-    console.log("Places data:", places);
-
-    await loadPhotoUrls(places);
-
-    // Create a layer group for places
-    if (placesLayer) {
-      map.removeLayer(placesLayer);
-    }
-    placesLayer = L.layerGroup();
-
-    for (const place of places) {
-      const coordinates = extractCoordinates(place);
-
-      if (!coordinates) {
-        console.log("Place missing coordinates:", place);
-        continue;
-      }
-
-      const { latitude, longitude } = coordinates;
-
-      const marker = L.marker([latitude, longitude], {
-        icon: createTealPinMarker(),
-      });
-
-      const title = place.name || "Untitled Place";
-      const thumbnail = photoUrls.value.get(place.id) || "";
-      const placeId = place.id;
-
-      // Use plain HTML for the popup content
-      let popupHtml = `<div class='place-popup' style='text-align:center; max-width:600px; background-color: white; padding: 16px; border-radius: 4px;'>`;
-
-      if (thumbnail) {
-        popupHtml += `<img src='${thumbnail}' alt='${title}' style='max-width:250px; border-radius:8px; margin-bottom:12px; display:block; margin-left:auto; margin-right:auto;' />`;
-      }
-
-      popupHtml += `<div style='font-size:18px; font-weight:600; margin-bottom:12px; color:#333;'>${title}</div>`;
-
-      if (placeId) {
-        popupHtml += `<a href='/places/view/${placeId}' target='_blank' style='display:inline-block; padding:8px 16px; background:#0097a9; color:white; border-radius:4px; text-decoration:none; font-size:14px; font-weight:500;'>View Details</a>`;
-      }
-
-      popupHtml += `</div>`;
-
-      marker.bindPopup(popupHtml, {
-        className: "custom-popup",
-        closeButton: false,
-      });
-
-      placesLayer.addLayer(marker);
-    }
-
-    placesLayer.addTo(map);
-    console.log("Places layer added to map");
+    renderPlacesLayer(places);
   } catch (error) {
     console.error("Error loading places:", error);
   } finally {
@@ -179,7 +166,6 @@ const loadPlaces = async () => {
 
 // Change base layer
 const changeBaseLayer = (layerId) => {
-  console.log("changeBaseLayer called with:", layerId);
   const layer = baseLayers.find((l) => l.id === layerId);
 
   if (!layer || !map) {
@@ -187,11 +173,9 @@ const changeBaseLayer = (layerId) => {
   }
 
   if (currentBaseLayer) {
-    console.log("Removing current base layer");
     map.removeLayer(currentBaseLayer);
   }
 
-  console.log("Adding tile layer");
   currentBaseLayer = L.tileLayer(layer.url, {
     attribution: layer.attribution,
   }).addTo(map);
@@ -201,22 +185,15 @@ const changeBaseLayer = (layerId) => {
 
 // Initialize map
 const initMap = async () => {
-  console.log("initMap called");
   if (!mapContainer.value) {
     console.error("mapContainer is null");
     return;
   }
 
-  console.log("Initializing map...");
   // Initialize the map centered on downtown Whitehorse, Yukon (zoom 14 for street level)
   map = L.map(mapContainer.value).setView([60.7212, -135.0568], 14);
-  console.log("Map initialized:", map);
 
-  // Set initial base layer
-  console.log("Setting initial base layer");
   changeBaseLayer("esri-topo");
-
-  // Load places
   await loadPlaces();
 };
 
@@ -228,7 +205,15 @@ const cleanup = () => {
   }
   currentBaseLayer = null;
   placesLayer = null;
+  loadedPlaces = [];
 };
+
+// Rebuild marker popups when language toggles
+watch(isEnglish, () => {
+  if (loadedPlaces.length) {
+    renderPlacesLayer(loadedPlaces);
+  }
+});
 
 // Lifecycle hooks
 onMounted(async () => {
@@ -244,7 +229,7 @@ onUnmounted(() => {
 <style scoped>
 .place-map {
   width: 100%;
-  height: 100%;
+  height: calc(100vh - 70px);
   min-height: 300px;
   position: relative;
 }

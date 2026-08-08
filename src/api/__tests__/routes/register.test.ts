@@ -3,18 +3,25 @@ import "jest";
 import request from "supertest";
 import { PlaceController } from "../../controllers/place-controller";
 
-// Mock implementation for testing
+// Mock implementation for testing — shapes match YHIS register wire format
 class MockPlaceService {
   async getPlaces(page: number = 1) {
     return {
       data: [
         {
           id: 1,
-          name: "Sample Place",
-          description: "Sample description",
-          latitude: 60.72,
-          longitude: -135.05,
-          photos: [],
+          primaryName: "Sample Place",
+          fr_primaryName: "Lieu exemple",
+          yHSIId: "105D/11/001",
+          communityName: "Whitehorse",
+          fr_communityName: "Whitehorse",
+          latitude: "60.72",
+          longitude: "-135.05",
+          recognitionDate: "2000-01-01",
+          designations: "Territorial",
+          fr_designations: "Territorial",
+          ThumbFile: { type: "Buffer", data: [1, 2, 3] },
+          caption: null,
         },
       ],
       meta: {
@@ -27,30 +34,36 @@ class MockPlaceService {
   }
 
   async getPlaceDetails(id: string | number) {
-    if (parseInt(String(id)) === 999) return null;
+    if (parseInt(String(id)) === 999) return undefined;
     return {
       id: 1,
-      name: "Sample Place",
-      description: "Sample description",
-      latitude: 60.72,
-      longitude: -135.05,
-      photos: [],
+      primaryName: "Sample Place",
+      fr_primaryName: "Lieu exemple",
+      yHSIId: "105D/11/001",
+      communityName: "Whitehorse",
+      fr_communityName: "Whitehorse",
+      latitude: "60.72",
+      longitude: "-135.05",
+      recognitionDate: "2000-01-01",
+      designations: "Territorial",
+      fr_designations: "Territorial",
       placeDescriptionEn: "Sample description",
-      placeDescriptionFr: "FRENCH: Sample description",
+      placeDescriptionFr: "Description exemple",
     };
   }
 
   async getPlacePhotos(id: string | number) {
-    if (parseInt(String(id)) === 999) return { data: [], meta: {} };
+    if (parseInt(String(id)) === 999) return { data: [] };
     return {
       data: [
         {
           id: 1,
-          url: "sample-url",
+          rowId: "ABC-123",
+          placeId: 1,
+          originalFileName: "sample.jpg",
           ThumbFile: { data: [1, 2, 3], base64: "abc" },
         },
       ],
-      meta: {},
     };
   }
 
@@ -74,7 +87,6 @@ describe("Place Router", () => {
     const controller = new PlaceController(mockPlaceService as any);
     const testRouter = express.Router();
 
-    // Simple validation middleware for testing
     const validatePage = (
       req: express.Request,
       res: express.Response,
@@ -112,6 +124,9 @@ describe("Place Router", () => {
       expect(response.body.meta).toHaveProperty("page_size", 12);
       expect(response.body.meta).toHaveProperty("item_count", 100);
       expect(response.body.meta).toHaveProperty("page_count", 9);
+      expect(response.body.data[0]).toHaveProperty("primaryName");
+      expect(response.body.data[0]).toHaveProperty("yHSIId");
+      expect(response.body.data[0]).toHaveProperty("fr_primaryName");
     });
 
     it("should handle invalid page numbers", async () => {
@@ -126,14 +141,16 @@ describe("Place Router", () => {
   });
 
   describe("GET /:id", () => {
-    it("should return place details", async () => {
+    it("should return place details wrapped in data", async () => {
       const response = await request(app).get(`${BASE_URL}/1`);
 
       expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty("id");
-      expect(response.body).toHaveProperty("name");
-      expect(response.body).toHaveProperty("placeDescriptionEn");
-      expect(response.body).toHaveProperty("placeDescriptionFr");
+      expect(response.body).toHaveProperty("data");
+      expect(response.body.data).toHaveProperty("id", 1);
+      expect(response.body.data).toHaveProperty("primaryName", "Sample Place");
+      expect(response.body.data).toHaveProperty("fr_primaryName", "Lieu exemple");
+      expect(response.body.data).toHaveProperty("placeDescriptionEn");
+      expect(response.body.data).toHaveProperty("placeDescriptionFr");
     });
 
     it("should return 404 for non-existent place", async () => {
@@ -151,7 +168,8 @@ describe("Place Router", () => {
       expect(response.body).toHaveProperty("data");
       expect(response.body.data.length).toBeGreaterThan(0);
       expect(response.body.data[0]).toHaveProperty("id");
-      expect(response.body.data[0]).toHaveProperty("url");
+      expect(response.body.data[0]).toHaveProperty("ThumbFile");
+      expect(response.body.data[0].ThumbFile).toHaveProperty("data");
     });
 
     it("should return 404 for non-existent place", async () => {

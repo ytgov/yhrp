@@ -34,18 +34,34 @@ export interface ErrorResponse {
 export type RegisterPlacesResponse = PaginatedResponse<RegisterPlace>;
 
 /**
- * Type for a single register place response
+ * Type for a single register place response ({ data: place })
  */
 export type RegisterPlaceResponse = SingleItemResponse<RegisterPlace>;
 
 /**
- * Type for the photos list response
+ * Photo record from YHIS register photos endpoint.
+ * Extra YHIS fields may be present; we type the ones the app uses.
  */
-export interface Photo {
+export interface RegisterPhoto {
   id: number;
-  url: string;
-  description?: string;
-  dateTaken?: string;
+  rowId?: string;
+  placeId?: number;
+  originalFileName?: string;
+  featureName?: string;
+  communityName?: string;
+  caption?: string | null;
+  isYRHPCoverImage?: boolean;
+  ThumbFile?: {
+    type?: string;
+    data?: number[];
+    base64?: string;
+  } | null;
 }
 
-export type PhotosResponse = SingleItemResponse<Photo[]>;
+/**
+ * Photos list response from our proxy / YHIS
+ */
+export type PhotosResponse = {
+  data: RegisterPhoto[];
+  meta?: Record<string, unknown>;
+};
