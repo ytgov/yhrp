@@ -37,6 +37,10 @@ date,Date,Date
 loading,Loading,Chargement
 noPhotosAvailable,No photos available,Aucune photo disponible
 noPlacesFound,No places found,Aucun lieu trouvé
+sortBy,Sort by,Trier par
+sortAlphabetical,Alphabetical,Alphabétique
+sortCommunity,Community,Communauté
+sortDesignation,Designation type,Type de désignation
 # HOME PAGE CONTENT
 heroText,"Historic places in the Yukon are a tangible record of the people, events and activities that have shaped our way of life and our environment.","Les lieux patrimoniaux du Yukon sont un témoignage tangible des personnes, des événements et des activités qui ont façonné notre mode de vie et notre environnement."
 heroSubtext1,"Our historic places represent the technologies, designs and ideas that are the framework of our society and the basis for our future.","Nos lieux patrimoniaux représentent les technologies, les designs et les idées qui constituent le cadre de notre société et la base de notre avenir."
