@@ -6,6 +6,10 @@ map,Map,Carte
 historicPlaces,Historic Places,Lieux patrimoniaux
 places,Places,Lieux
 contactUs,Contact Us,Contactez-nous
+# CONTACT PAGE
+contactIntro,"For questions about the Yukon Register of Historic Places, contact Historic Sites.","Pour toute question concernant le Répertoire des lieux patrimoniaux du Yukon, communiquez avec les Lieux historiques."
+contactEmail,Email,Courriel
+contactPhone,Phone,Téléphone
 # ACTIONS & BUTTONS
 viewPlace,View Place,Voir le lieu
 viewDetails,View Details,Voir les détails
