@@ -10,6 +10,11 @@ registerRouter.get("/", (req: Request, res: Response) => {
   placeController.getPlaces(req, res);
 });
 
+// POST /api/register/search — must be registered before /:id
+registerRouter.post("/search", (req: Request, res: Response) => {
+  placeController.searchPlaces(req, res);
+});
+
 // GET /api/register/:id
 registerRouter.get("/:id", (req: Request, res: Response) => {
   placeController.getPlaceDetails(req, res);

@@ -9,6 +9,18 @@
             </h1>
             <div class="places-sort-controls">
               <div class="places-sort-control">
+                <v-text-field
+                  v-model="searchQuery"
+                  :label="t(translations.searchPlaces)"
+                  :placeholder="t(translations.searchPlaceholder)"
+                  prepend-inner-icon="mdi-magnify"
+                  density="compact"
+                  clearable
+                  hide-details
+                  color="primary"
+                />
+              </div>
+              <div class="places-sort-control">
                 <v-select
                   v-model="sortBy"
                   :items="sortOptions"
@@ -49,7 +61,9 @@
       </v-row>
       <v-row v-else-if="placesList.length === 0">
         <v-col cols="12" class="text-center">
-          <v-alert type="info" class="mt-4">{{ t(translations.noPlacesFound) }}</v-alert>
+          <v-alert type="info" class="mt-4">{{
+            t(translations.noPlacesFound)
+          }}</v-alert>
         </v-col>
       </v-row>
       <v-row v-else>
@@ -88,11 +102,12 @@
 <script setup>
 import { useLanguage, translations } from "@/composables/useLanguage";
 import PlaceCard from "@/modules/places/components/PlaceCard.vue";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import { fetchAllPlaces } from "../services/placesApi";
+import { fetchAllPlaces, searchAllPlaces } from "../services/placesApi";
 
 const PAGE_SIZE = 12;
+const SEARCH_DEBOUNCE_MS = 300;
 
 const { t, isEnglish } = useLanguage();
 
@@ -100,10 +115,15 @@ const router = useRouter();
 
 const page = ref(1);
 const allPlaces = ref([]);
+const searchResults = ref(null);
 const loading = ref(false);
 const error = ref(null);
 const sortBy = ref("name");
 const filterValue = ref("");
+const searchQuery = ref("");
+const activeQuery = ref("");
+
+let searchDebounceTimer = null;
 
 const sortOptions = computed(() => [
   { title: t(translations.sortAlphabetical), value: "name" },
@@ -121,6 +141,10 @@ const filterLabel = computed(() =>
     : t(translations.filterDesignation)
 );
 
+const sourcePlaces = computed(() =>
+  searchResults.value !== null ? searchResults.value : allPlaces.value
+);
+
 const uniqueSortedOptions = (entries, preferEnglish) => {
   const locale = preferEnglish ? "en" : "fr";
   return [...entries.entries()]
@@ -134,13 +158,13 @@ const filterOptions = computed(() => {
   const entries = new Map();
 
   if (sortBy.value === "community") {
-    for (const place of allPlaces.value) {
+    for (const place of sourcePlaces.value) {
       const value = place.communityName || place.localizedLocation(true);
       if (!value || entries.has(value)) continue;
       entries.set(value, place.localizedLocation(preferEnglish) || value);
     }
   } else if (sortBy.value === "designation") {
-    for (const place of allPlaces.value) {
+    for (const place of sourcePlaces.value) {
       const value =
         place.designations?.[0]?.level || place.localizedDesignation(true);
       if (!value || entries.has(value)) continue;
@@ -152,7 +176,7 @@ const filterOptions = computed(() => {
 });
 
 const filteredPlaces = computed(() => {
-  const places = allPlaces.value;
+  const places = sourcePlaces.value;
   if (!filterValue.value || !showFilter.value) return places;
 
   if (sortBy.value === "community") {
@@ -246,6 +270,28 @@ const getDataFromApi = async () => {
   error.value = null;
   try {
     allPlaces.value = await fetchAllPlaces();
+    if (activeQuery.value) {
+      searchResults.value = await searchAllPlaces(activeQuery.value);
+    } else {
+      searchResults.value = null;
+    }
+  } catch (err) {
+    error.value = err.message;
+  } finally {
+    loading.value = false;
+  }
+};
+
+const runSearch = async (query) => {
+  loading.value = true;
+  error.value = null;
+  page.value = 1;
+  try {
+    if (!query) {
+      searchResults.value = null;
+      return;
+    }
+    searchResults.value = await searchAllPlaces(query);
   } catch (err) {
     error.value = err.message;
   } finally {
@@ -268,8 +314,22 @@ watch(numberOfPages, (pages) => {
   }
 });
 
+watch(searchQuery, (value) => {
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => {
+    const trimmed = (value ?? "").trim();
+    if (trimmed === activeQuery.value) return;
+    activeQuery.value = trimmed;
+    runSearch(trimmed);
+  }, SEARCH_DEBOUNCE_MS);
+});
+
 onMounted(() => {
   getDataFromApi();
+});
+
+onBeforeUnmount(() => {
+  clearTimeout(searchDebounceTimer);
 });
 </script>
 

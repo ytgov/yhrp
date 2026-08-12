@@ -88,12 +88,6 @@ See `data/mock/README.md` for detailed format specifications.
 
 ## Future Work
 
-- Complete backend API implementation
-- Add proper pagination handling
-- Implement search functionality
-- Add filtering options
 - Enhance image handling with proper backend integration
-- Add support for multiple languages
-- Implement proper data validation
 - Add unit tests for data transformation
 - Add integration tests for API calls
