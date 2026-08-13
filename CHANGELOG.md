@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Places list text search via YHIS `POST /api/register/search` (proxied and cached by our API)
 - Contact Us page with Historic Sites email (`historic.sites@yukon.ca`) and phone (`867-667-5386`)
 - Places list sorting by name, community, or designation type (client-side over full register)
 - Cultural History expansion panel on place detail (ready for YHIS `culturalHistoryEn`/`Fr`; not yet exposed by public register API)

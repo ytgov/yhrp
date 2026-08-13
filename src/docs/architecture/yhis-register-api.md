@@ -2,7 +2,7 @@
 
 This document captures what we know about the upstream **Yukon Heritage Information System (YHIS)** public register API that YHRP proxies. It reflects live checks against `https://yhis.gov.yk.ca` and the YHSI source in [ytgov/yhsi](https://github.com/ytgov/yhsi).
 
-**Last verified:** 2026-08-06
+**Last verified:** 2026-08-12
 
 ---
 
@@ -25,11 +25,12 @@ YHRP does **not** call YHIS from the browser. The Vue app talks to our Express A
 | Method | YHIS path | Purpose |
 |--------|-----------|---------|
 | `GET` | `/api/register?page={n}` | Paginated list of register places |
+| `POST` | `/api/register/search?page={n}` | Text search (`{ "query": "..." }` body) |
 | `GET` | `/api/register/{id}` | Single place with description fields |
 | `GET` | `/api/register/{id}/photos` | Photo metadata (incl. thumbnails) |
 | `GET` | `/api/register/{id}/photos/{photoId}` | Thumbnail image bytes (`image/jpg`) |
 
-There is **no** `GET /api/register/count` (returns 404). Item counts come from list `meta.item_count`.
+There is **no** `GET /api/register/count` (returns 404). Item counts come from list/search `meta.item_count`.
 
 ---
 
@@ -135,19 +136,26 @@ Photo list items include identifiers such as `rowId`, `id`, `placeId`, filenames
 
 ## Search
 
-**Not available on the public register API.**
+Public register text search is available:
 
-| Path / param | Result |
-|--------------|--------|
-| `GET /api/register/search` | 404 |
-| `?search=`, `?q=`, `?text=` on list | Ignored; same page results |
+```http
+POST /api/register/search?page=1
+Content-Type: application/json
 
-YHSI does expose authenticated search elsewhere (`POST /api/place/search`, role-gated — returns 401 without auth). That is an **internal** places API, not the public register. YHRP should not depend on it for citizen-facing search.
+{"query":"cabin"}
+```
 
-If product needs search, options are:
+| Item | Detail |
+|------|--------|
+| Auth | None (same public register mount) |
+| Query param | `page` (1-based; fixed page size 12) |
+| Body | `{ "query": string }` — omit or `""` returns the full register |
+| Match | Case-insensitive substring on primary name (EN/FR), secondary names, and place description (EN/FR) |
+| Response | Same `{ data, meta }` envelope as the list endpoint |
 
-1. Client- or proxy-side filter over cached register pages (small dataset today).
-2. Ask YHSI for a public register search endpoint later.
+YHRP proxies this as `POST /api/register/search` with the same 15‑minute cache (keyed by normalized query + page).
+
+Do not confuse with authenticated YHSI `POST /api/place/search` (role-gated internal API).
 
 ---
 
@@ -156,6 +164,9 @@ If product needs search, options are:
 ```
 Browser  →  GET /api/register?page=N     (our Express)
          →  GET {YHIS_API_URL}/api/register?page=N
+
+Browser  →  POST /api/register/search?page=N  body { query }
+         →  POST {YHIS_API_URL}/api/register/search?page=N
 
 Browser  →  GET /api/register/:id
          →  GET {YHIS_API_URL}/api/register/:id
@@ -193,10 +204,11 @@ Most TypeScript models and the Express detail response now match live `https://y
 
 | Call / assumption | Live YHIS register | Notes |
 |-------------------|--------------------|-------|
-| `GET /api/register/count` | **404** | Counts are only in list `meta.item_count` |
-| `GET /api/register/search` (or search query params) | **404** / ignored | No public register search |
+| `GET /api/register/count` | **404** | Counts are only in list/search `meta.item_count` |
+| `GET /api/register/search` | **404** | Use **`POST /api/register/search`** with `{ "query" }` body |
+| `?search=` / `?q=` / `?text=` on list | Ignored | Search is a separate POST endpoint |
 | `?skip=` / `?take=` | **Ignored** | Only `?page=` works; page size fixed at 12 |
-| `?page_size=` (frontend still sends it) | **Ignored** | Cannot change page size |
+| `?page_size=` (frontend still sends it on list) | **Ignored** | Cannot change page size |
 | `GET /api/register/{id}/photo` (singular) | **Not a valid route** | Use `/photos` list or `/photos/{photoId}` |
 
 ### Other YHIS APIs (not register)
@@ -211,10 +223,9 @@ Older mock data and some README examples still mention hosts such as `test.herit
 
 ## What We Do Not Have (Yet)
 
-- Public text search / filters (community, designation, etc.)
+- Filters by community, designation, etc. (beyond free-text search)
 - Configurable page size
 - A dedicated count endpoint
-- Reliable French content (placeholders in upstream)
 - Guaranteed stable field names beyond what register-router selects (`REGISTER_FIELDS` in YHSI)
 
 ---

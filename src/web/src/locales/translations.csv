@@ -17,6 +17,7 @@ viewMap,View Map,Voir la carte
 viewList,View List,Voir la liste
 search,Search,Rechercher
 searchPlaces,Search Places,Rechercher des lieux
+searchPlaceholder,"Search by name or description","Rechercher par nom ou description"
 print,Print,Imprimer
 # PAGE TITLES & HEADINGS
 listOfHistoricPlaces,List of Historic Places,Liste des lieux patrimoniaux
@@ -38,6 +39,7 @@ date,Date,Date
 loading,Loading,Chargement
 noPhotosAvailable,No photos available,Aucune photo disponible
 noPlacesFound,No places found,Aucun lieu trouvé
+# LIST CONTROLS
 sortBy,Sort by,Trier par
 sortAlphabetical,Alphabetical,Alphabétique
 sortCommunity,Community,Communauté
