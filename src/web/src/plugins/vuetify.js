@@ -24,7 +24,7 @@ export default createVuetify({
           anchor: "#00818f",
           yg_moss: "#7A9A01",
           yg_blue: "#0097a9",
-          yg_zinc: "#24405A",
+          yg_zinc: "#0B3442",
           yg_twilight: "#512A44",
           yg_lichen: "#DC4405",
           yg_sun: "#F2A900",
@@ -34,7 +34,7 @@ export default createVuetify({
         colors: {
           yg_moss: "#7A9A01",
           yg_blue: "#0097a9",
-          yg_zinc: "#24405A",
+          yg_zinc: "#0B3442",
           yg_twilight: "#512A44",
           yg_lichen: "#DC4405",
           yg_sun: "#F2A900",

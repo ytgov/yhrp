@@ -134,7 +134,6 @@ const footerLinks = computed(() => [
 .footer-link {
   color: rgba(255, 255, 255, 0.95);
   text-decoration: underline;
-  font-weight: 700;
   transition: color 0.2s ease;
 }
 
@@ -145,7 +144,6 @@ const footerLinks = computed(() => [
 .copyright-text {
   color: rgba(255, 255, 255, 0.9);
   font-size: 0.8125rem;
-  font-weight: 700;
 }
 
 @media (max-width: 960px) {

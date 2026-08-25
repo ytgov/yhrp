@@ -1,6 +1,15 @@
 <template>
   <v-container fluid class="pa-0">
-    <v-row gap="0" class="justify-center mt-10 pt-10">
+    <v-row v-if="carouselLoading" gap="0" class="justify-center mt-10 pt-10">
+      <v-col cols="12" md="8" class="pa-0 text-center">
+        <v-progress-circular indeterminate color="primary" />
+      </v-col>
+    </v-row>
+    <v-row
+      v-else-if="heroSlides.length"
+      gap="0"
+      class="justify-center mt-10 pt-10"
+    >
       <v-col cols="12" md="8" class="pa-0">
         <HeroCarousel :slides="heroSlides" />
       </v-col>
@@ -52,33 +61,62 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useLanguage, translations } from "@/composables/useLanguage";
-import places from "@/modules/places/data/places.json";
+import { fetchAllPlaces } from "@/modules/places/services/placesApi";
 import HeroCarousel from "../components/HeroCarousel.vue";
 
-const { t } = useLanguage();
+const { t, isEnglish } = useLanguage();
 
-function getRandomDistinctPlaces(placesList, count) {
+const carouselLoading = ref(true);
+const featuredPlaces = ref([]);
+
+const SLIDE_COUNT = 5;
+
+/**
+ * Pick up to `count` random places that have a photoUrl.
+ * @param {Array} placesList
+ * @param {number} count
+ */
+function getRandomPlacesWithPhotos(placesList, count) {
+  const withPhotos = placesList.filter((place) => place.photoUrl);
   const usedIndexes = new Set();
   const result = [];
-  while (result.length < count && usedIndexes.size < placesList.length) {
-    const idx = Math.floor(Math.random() * placesList.length);
-    const place = placesList[idx];
-    if (!usedIndexes.has(idx) && place.PlaceId && place.PrimaryName && place.Community) {
-      usedIndexes.add(idx);
-      result.push({
-        PlaceId: place.PlaceId,
-        PhotoURL: `http://register.yukonhistoricplaces.ca/Images/Places/${place.PlaceId}/1.jpg`,
-        PrimaryName: place.PrimaryName,
-        Community: place.Community,
-      });
-    }
+
+  while (result.length < count && usedIndexes.size < withPhotos.length) {
+    const idx = Math.floor(Math.random() * withPhotos.length);
+    if (usedIndexes.has(idx)) continue;
+    usedIndexes.add(idx);
+    result.push(withPhotos[idx]);
   }
+
   return result;
 }
 
-const heroSlides = getRandomDistinctPlaces(places.PlacesList, 5);
+const heroSlides = computed(() =>
+  featuredPlaces.value.map((place) => ({
+    PlaceId: place.placeId,
+    PhotoURL: place.photoUrl,
+    PrimaryName: place.localizedName(isEnglish.value),
+    Community: place.localizedLocation(isEnglish.value),
+  }))
+);
+
+const loadHeroSlides = async () => {
+  carouselLoading.value = true;
+  try {
+    const places = await fetchAllPlaces();
+    featuredPlaces.value = getRandomPlacesWithPhotos(places, SLIDE_COUNT);
+  } catch {
+    featuredPlaces.value = [];
+  } finally {
+    carouselLoading.value = false;
+  }
+};
+
+onMounted(() => {
+  loadHeroSlides();
+});
 
 const features = computed(() => [
   {
