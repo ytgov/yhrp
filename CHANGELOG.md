@@ -40,6 +40,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Footer disclaimer, copyright, and privacy links (and copyright line) use normal font weight instead of bold
+- Footer / `yg_zinc` theme color updated to `#0B3442` to match yukon.ca
+- Home hero carousel now rotates through places from the live register API (instead of static JSON and legacy image URLs), using each place's cover (or first) photo at full size
 - Emphasized home page intro as a bold central heading with continuous larger body text
 - Place detail: description under site name; gallery height aligned with map; photos use contain (less cropping); captions shown once; expansion panels open by default
 - Renamed "Character Definition" label to "Character-Defining Elements"
@@ -123,6 +126,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Blurry photos in the place gallery, fullscreen view, and home hero: these now load the full-size photo via `GET /api/register/:id/photos/:photoId`, showing the thumbnail while loading and falling back to it if the full-size photo fails
 - Fixed 404 error related to the import of `no_photo_base64`.
 - Fixed ESRI map loader initialization issues.
 - Fixed TypeScript compilation errors in API services.

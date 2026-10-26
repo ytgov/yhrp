@@ -191,7 +191,7 @@ Use these official Yukon Government colors:
 ```javascript
 primary: "#0097a9"    // yg_blue - primary actions, links
 yg_moss: "#7A9A01"    // green accent
-yg_zinc: "#24405A"    // dark blue
+yg_zinc: "#0B3442"    // dark blue (yukon.ca tiber)
 yg_twilight: "#512A44" // purple accent
 yg_lichen: "#DC4405"  // orange accent
 yg_sun: "#F2A900"     // yellow accent

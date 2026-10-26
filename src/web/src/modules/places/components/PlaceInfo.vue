@@ -152,7 +152,7 @@ export default {
 
 .content-section {
   padding: 24px;
-  background-color: rgb(36, 64, 90, 0.05); /* yg_zinc with opacity */
+  background-color: rgb(11, 52, 66, 0.05); /* yg_zinc with opacity */
   border-radius: 4px;
   height: 100%;
 }

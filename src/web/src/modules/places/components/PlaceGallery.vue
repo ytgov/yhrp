@@ -12,8 +12,10 @@
         v-for="photo in photos"
         :key="photo.id"
         :src="photo.imageUrl"
+        :lazy-src="photo.thumbUrl"
         class="cursor-pointer"
         @click="openFullscreen(photo)"
+        @error="fallBackToThumbnail(photo)"
       >
         <div v-if="photo.caption" class="photo-caption">
           {{ photo.caption }}
@@ -59,6 +61,8 @@
             v-for="photo in photos"
             :key="photo.id"
             :src="photo.imageUrl"
+            :lazy-src="photo.thumbUrl"
+            @error="fallBackToThumbnail(photo)"
           >
             <div v-if="photo.caption" class="photo-caption">
               {{ photo.caption }}
@@ -119,6 +123,13 @@ const loadPhotos = async () => {
 const handlePhotoChange = (index) => {
   if (photos.value[index]) {
     currentPhoto.value = photos.value[index];
+  }
+};
+
+// Full-size photo failed to load — show the embedded thumbnail instead
+const fallBackToThumbnail = (photo) => {
+  if (photo.thumbUrl && photo.imageUrl !== photo.thumbUrl) {
+    photo.imageUrl = photo.thumbUrl;
   }
 };
 
