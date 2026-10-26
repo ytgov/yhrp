@@ -50,6 +50,49 @@ export class PlaceService {
   }
 
   /**
+   * Search the public register. Proxies YHIS POST /api/register/search.
+   * Empty query returns the full register (same as getPlaces).
+   */
+  async searchPlaces(
+    query: string = "",
+    page: number = 1
+  ): Promise<RegisterPlacesResponse> {
+    const normalizedQuery = (query ?? "").trim();
+    const cacheKey = `places_search_${normalizedQuery.toLowerCase()}_page_${page}`;
+
+    const cachedData = cache.get<RegisterPlacesResponse>(cacheKey);
+    if (cachedData) {
+      console.log(`[Cache Hit] ${cacheKey}`);
+      return cachedData;
+    }
+    console.log(`[Cache Miss] ${cacheKey}`);
+
+    const url = `${BASE_URL}/search?page=${page}`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: normalizedQuery }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to search places: ${response.status} - ${errorText}`
+      );
+    }
+
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error(`Expected JSON response but got ${contentType}`);
+    }
+
+    const data = (await response.json()) as RegisterPlacesResponse;
+    cache.set(cacheKey, data);
+    console.log(`[Cache Set] ${cacheKey}`);
+    return data;
+  }
+
+  /**
    * Fetch a place by id. YHIS returns `{ data: place }`; we unwrap to the place.
    * Returns undefined when YHIS responds 404.
    */

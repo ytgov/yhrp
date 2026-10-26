@@ -33,6 +33,26 @@ class MockPlaceService {
     };
   }
 
+  async searchPlaces(query: string = "", page: number = 1) {
+    const all = await this.getPlaces(page);
+    const needle = (query ?? "").trim().toLowerCase();
+    if (!needle) {
+      return all;
+    }
+    const filtered = all.data.filter((place) =>
+      place.primaryName.toLowerCase().includes(needle)
+    );
+    return {
+      data: filtered,
+      meta: {
+        page,
+        page_size: 12,
+        item_count: filtered.length,
+        page_count: Math.max(1, Math.ceil(filtered.length / 12)),
+      },
+    };
+  }
+
   async getPlaceDetails(id: string | number) {
     if (parseInt(String(id)) === 999) return undefined;
     return {
@@ -102,7 +122,13 @@ describe("Place Router", () => {
       return;
     };
 
+    app.use(express.json());
     testRouter.get("/", validatePage, controller.getPlaces.bind(controller));
+    testRouter.post(
+      "/search",
+      validatePage,
+      controller.searchPlaces.bind(controller)
+    );
     testRouter.get("/:id", controller.getPlaceDetails.bind(controller));
     testRouter.get("/:id/photos", controller.getPlacePhotos.bind(controller));
     testRouter.get(
@@ -137,6 +163,44 @@ describe("Place Router", () => {
         "error",
         "Page must be a positive integer"
       );
+    });
+  });
+
+  describe("POST /search", () => {
+    it("should return matching places for a query", async () => {
+      const response = await request(app)
+        .post(`${BASE_URL}/search`)
+        .query({ page: 1 })
+        .send({ query: "sample" });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("data");
+      expect(response.body).toHaveProperty("meta");
+      expect(response.body.data).toHaveLength(1);
+      expect(response.body.data[0]).toHaveProperty("primaryName", "Sample Place");
+      expect(response.body.meta).toHaveProperty("item_count", 1);
+    });
+
+    it("should return the full list when query is empty", async () => {
+      const response = await request(app)
+        .post(`${BASE_URL}/search`)
+        .query({ page: 1 })
+        .send({ query: "" });
+
+      expect(response.status).toBe(200);
+      expect(response.body.data).toHaveLength(1);
+      expect(response.body.meta).toHaveProperty("item_count", 100);
+    });
+
+    it("should return no matches for an unknown term", async () => {
+      const response = await request(app)
+        .post(`${BASE_URL}/search`)
+        .query({ page: 1 })
+        .send({ query: "zzzz-not-found" });
+
+      expect(response.status).toBe(200);
+      expect(response.body.data).toHaveLength(0);
+      expect(response.body.meta).toHaveProperty("item_count", 0);
     });
   });
 

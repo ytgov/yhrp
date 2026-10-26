@@ -21,12 +21,15 @@
         <v-row>
           <v-col cols="12">
             <h1 class="text-h4 mb-2">{{ displayName }}</h1>
+            <p v-if="placeDescription" class="text-h6 font-weight-regular mb-4">
+              {{ placeDescription }}
+            </p>
           </v-col>
         </v-row>
 
         <v-row>
           <v-col cols="12" md="8">
-            <PlaceGallery :place-id="placeId" />
+            <PlaceGallery :place-id="placeId" :height="mapHeight" />
           </v-col>
           <v-col cols="12" md="4">
             <v-card color="grey-lighten-1" :height="mapHeight">
@@ -39,15 +42,9 @@
           </v-col>
         </v-row>
 
-        <v-row v-if="placeDescription">
+        <v-row class="mt-4">
           <v-col cols="12">
-            <p class="text-subtitle-1 mb-4">{{ placeDescription }}</p>
-          </v-col>
-        </v-row>
-
-        <v-row>
-          <v-col cols="12">
-            <v-expansion-panels multiple>
+            <v-expansion-panels v-model="openPanels" multiple>
               <v-expansion-panel v-for="panel in expansionPanels" :key="panel.title">
                 <v-expansion-panel-title class="bg-grey-lighten-4">
                   {{ panel.title }}
@@ -86,6 +83,7 @@ const { t, isEnglish } = useLanguage();
 const loading = ref(false);
 const error = ref(null);
 const placeData = ref(null);
+const openPanels = ref([]);
 
 const mapHeight = computed(() => (smAndDown.value ? 300 : 500));
 
@@ -118,10 +116,6 @@ const expansionPanels = computed(() => {
         : "",
     },
     {
-      title: t(translations.placeDescription),
-      content: getLocalizedField("placeDescriptionEn", "placeDescriptionFr"),
-    },
-    {
       title: t(translations.heritageValue),
       content: getLocalizedField("heritageValueEn", "heritageValueFr"),
     },
@@ -137,8 +131,20 @@ const expansionPanels = computed(() => {
       title: t(translations.descriptionOfBoundaries),
       content: getLocalizedField("descBoundEn", "descBoundFr"),
     },
+    {
+      title: t(translations.culturalHistory),
+      content: getLocalizedField("culturalHistoryEn", "culturalHistoryFr"),
+    },
   ].filter((p) => p.content);
 });
+
+watch(
+  expansionPanels,
+  (panels) => {
+    openPanels.value = panels.map((_, index) => index);
+  },
+  { immediate: true }
+);
 
 const fetchPlaceDetails = async () => {
   loading.value = true;

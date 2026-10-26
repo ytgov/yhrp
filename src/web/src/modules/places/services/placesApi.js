@@ -89,6 +89,92 @@ export const fetchPlaces = async (page = 1, pageSize = 12) => {
 };
 
 /**
+ * Search places via POST /api/register/search
+ * Matches primary names, secondary names, and place descriptions (EN/FR).
+ * Empty query returns the full register (same as fetchPlaces).
+ * @param {string} query - Search term
+ * @param {number} page - Page number (1-based)
+ * @returns {Promise<{places: Array<Place>, total: number, pageSize: number}>}
+ */
+export const searchPlaces = async (query = "", page = 1) => {
+  const normalizedQuery = (query ?? "").trim();
+
+  if (USE_MOCK_DATA) {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const pageSize = 12;
+    const needle = normalizedQuery.toLowerCase();
+    const filtered = needle
+      ? mockPlaces.filter((place) => {
+          const haystack = [
+            place.primaryName,
+            place.fr_primaryName,
+            place.placeDescription,
+            place.communityName,
+          ]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase();
+          return haystack.includes(needle);
+        })
+      : mockPlaces;
+    const start = (page - 1) * pageSize;
+    const paginatedData = filtered.slice(start, start + pageSize);
+    return {
+      places: paginatedData.map((place) => Place.fromMock(place)),
+      total: filtered.length,
+      pageSize,
+    };
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/search?page=${page}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: normalizedQuery }),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to search places");
+    }
+
+    const data = await response.json();
+    return {
+      places: data.data.map((place) => Place.fromApi(place)),
+      total: data.meta.item_count,
+      pageSize: data.meta.page_size,
+    };
+  } catch (error) {
+    console.error("Error searching places:", error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch every page of search results for a query.
+ * @param {string} query - Search term
+ * @returns {Promise<Array<Place>>}
+ */
+export const searchAllPlaces = async (query = "") => {
+  const normalizedQuery = (query ?? "").trim();
+  if (!normalizedQuery) {
+    return fetchAllPlaces();
+  }
+
+  const places = [];
+  let page = 1;
+  let total = Infinity;
+
+  while (places.length < total) {
+    const response = await searchPlaces(normalizedQuery, page);
+    if (!response?.places?.length) break;
+    places.push(...response.places);
+    total = response.total;
+    page += 1;
+  }
+
+  return places;
+};
+
+/**
  * Fetch every register page (for map / full listings).
  * Each place includes list ThumbFile when YHIS provides it.
  * @returns {Promise<Array<Place>>}

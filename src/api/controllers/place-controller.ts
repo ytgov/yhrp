@@ -27,6 +27,24 @@ export class PlaceController {
     }
   }
 
+  async searchPlaces(
+    req: Request,
+    res: Response<RegisterPlacesResponse | ErrorResponse>
+  ) {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const query =
+        typeof req.body?.query === "string" ? req.body.query : "";
+      const response: RegisterPlacesResponse =
+        await this.placeService.searchPlaces(query, page);
+
+      res.json(response);
+    } catch (error) {
+      console.error("Error searching places:", error);
+      res.status(500).json({ error: "Failed to search places" });
+    }
+  }
+
   async getPlaceDetails(
     req: Request,
     res: Response<RegisterPlaceResponse | ErrorResponse>

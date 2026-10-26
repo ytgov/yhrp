@@ -7,23 +7,18 @@
     </v-row>
 
     <v-container>
-      <v-row gap="0" class="justify-center">
-        <v-col cols="12" md="8" class="pa-0">
-          <p class="text-h5 font-weight-light mb-2 text-yg_sun">
-            {{ t(translations.heroText) }}
-          </p>
-        </v-col>
-      </v-row>
-
       <v-row class="my-8">
         <v-col cols="12" md="8" class="mx-auto">
-          <p class="text-h6 font-weight-light mb-4">
+          <h2 class="text-h4 font-weight-bold mb-4 text-yg_sun">
+            {{ t(translations.heroText) }}
+          </h2>
+          <p class="text-h6 font-weight-regular mb-4">
             {{ t(translations.heroSubtext1) }}
           </p>
-          <p class="text-body-1">
+          <p class="text-h6 font-weight-regular mb-4">
             {{ t(translations.heroSubtext2) }}
           </p>
-          <p class="text-body-1 mt-4">
+          <p class="text-h6 font-weight-regular">
             {{ t(translations.heroSubtext3) }}
           </p>
         </v-col>

@@ -1,3 +1,4 @@
+import contactRoutes from "@/modules/contact/router";
 import homeRoutes from "@/modules/home/router";
 import mapRoutes from "@/modules/map/router";
 import placesRoutes from "@/modules/places/router";
@@ -7,7 +8,7 @@ const routes = [
   {
     path: "/",
     component: () => import("@/layouts/Blank.vue"),
-    children: [...homeRoutes, ...mapRoutes, ...placesRoutes],
+    children: [...homeRoutes, ...mapRoutes, ...placesRoutes, ...contactRoutes],
   },
   {
     path: "/:pathMatch(.*)*",

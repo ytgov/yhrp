@@ -46,6 +46,8 @@ export class Place {
     this.descBoundFr = data.descBoundFr || "";
     this.additionalInfoEn = data.additionalInfoEn || "";
     this.additionalInfoFr = data.additionalInfoFr || "";
+    this.culturalHistoryEn = data.culturalHistoryEn || "";
+    this.culturalHistoryFr = data.culturalHistoryFr || "";
   }
 
   /**
@@ -174,7 +176,7 @@ export class Place {
    * @private
    */
   _parseCulturalHistory(data) {
-    return data.heritageValueEn || "";
+    return data.culturalHistoryEn || data.culturalHistory || "";
   }
 
   /**
@@ -211,6 +213,9 @@ export class Place {
    * @static
    */
   static fromMock(data) {
+    const characterItems =
+      data.heritageValues?.[0]?.items || data.heritageValues?.[0]?.content || [];
+
     return new Place({
       id: data.placeId,
       primaryName: data.name,
@@ -223,8 +228,10 @@ export class Place {
       designations: data.designations?.[0]?.level,
       fr_designations: data.designations?.[0]?.levelFr || "",
       recognitionDate: data.designations?.[0]?.date,
-      heritageValueEn: data.culturalHistory,
-      characterDefEn: data.heritageValues?.[0]?.items?.join("\n"),
+      heritageValueEn: data.heritageValue || "",
+      characterDefEn: characterItems.join("\n"),
+      culturalHistoryEn: data.culturalHistory || "",
+      culturalHistoryFr: data.culturalHistoryFr || "",
       yHSIId: data.yhsiId,
       ThumbFile: data.ThumbFile,
     });
