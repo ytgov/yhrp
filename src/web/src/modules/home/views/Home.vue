@@ -63,7 +63,10 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import { useLanguage, translations } from "@/composables/useLanguage";
-import { fetchAllPlaces } from "@/modules/places/services/placesApi";
+import {
+  fetchAllPlaces,
+  fetchPlacePhotos,
+} from "@/modules/places/services/placesApi";
 import HeroCarousel from "../components/HeroCarousel.vue";
 
 const { t, isEnglish } = useLanguage();
@@ -93,10 +96,30 @@ function getRandomPlacesWithPhotos(placesList, count) {
   return result;
 }
 
+/**
+ * Resolve a full-size hero photo for a place: the register cover image when
+ * flagged, otherwise the first photo. Falls back to the list thumbnail.
+ * @param {Object} place
+ */
+async function withHeroPhoto(place) {
+  try {
+    const photos = await fetchPlacePhotos(place.placeId);
+    const photo = photos.find((p) => p.isYRHPCoverImage) || photos[0];
+    return {
+      place,
+      photoUrl: photo?.imageUrl || place.photoUrl,
+      thumbUrl: photo?.thumbUrl || place.photoUrl,
+    };
+  } catch {
+    return { place, photoUrl: place.photoUrl, thumbUrl: place.photoUrl };
+  }
+}
+
 const heroSlides = computed(() =>
-  featuredPlaces.value.map((place) => ({
+  featuredPlaces.value.map(({ place, photoUrl, thumbUrl }) => ({
     PlaceId: place.placeId,
-    PhotoURL: place.photoUrl,
+    PhotoURL: photoUrl,
+    ThumbURL: thumbUrl,
     PrimaryName: place.localizedName(isEnglish.value),
     Community: place.localizedLocation(isEnglish.value),
   }))
@@ -106,7 +129,9 @@ const loadHeroSlides = async () => {
   carouselLoading.value = true;
   try {
     const places = await fetchAllPlaces();
-    featuredPlaces.value = getRandomPlacesWithPhotos(places, SLIDE_COUNT);
+    featuredPlaces.value = await Promise.all(
+      getRandomPlacesWithPhotos(places, SLIDE_COUNT).map(withHeroPhoto)
+    );
   } catch {
     featuredPlaces.value = [];
   } finally {

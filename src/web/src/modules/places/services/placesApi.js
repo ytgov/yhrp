@@ -46,6 +46,20 @@ const bufferToBase64 = (buffer) => {
 };
 
 /**
+ * Full-size photo URL served by our API proxy (GET /:id/photos/:photoId).
+ * YHIS photo records carry a numeric `id` and a GUID `rowId`; the legacy
+ * register photo URLs used the GUID, so prefer it.
+ * NOTE: not yet verified against live YHIS — callers fall back to the thumbnail.
+ * @param {number|string} placeId
+ * @param {Object} photo - Photo record from the photos endpoint
+ * @returns {string} URL, or "" when the photo has no identifier
+ */
+export const photoFileUrl = (placeId, photo) => {
+  const photoId = photo?.rowId ?? photo?.id;
+  return photoId == null ? "" : `${API_BASE_URL}/${placeId}/photos/${photoId}`;
+};
+
+/**
  * Fetch a list of places with pagination
  * @param {number} page - Page number (1-based)
  * @param {number} pageSize - Number of items per page
@@ -241,11 +255,15 @@ export const fetchPlacePhotos = async (id) => {
     }
     const data = await response.json();
 
-    // Convert buffer data to base64 URLs and preserve all fields
-    return (data.data || []).map((photo) => ({
-      ...photo, // Preserve all original fields
-      imageUrl: bufferToBase64(photo.ThumbFile?.data),
-    }));
+    // Full-size image for display, embedded thumbnail as placeholder/fallback
+    return (data.data || []).map((photo) => {
+      const thumbUrl = bufferToBase64(photo.ThumbFile?.data);
+      return {
+        ...photo, // Preserve all original fields
+        thumbUrl,
+        imageUrl: photoFileUrl(id, photo) || thumbUrl,
+      };
+    });
   } catch (error) {
     console.error(`Error fetching photos for place ${id}:`, error);
     throw error;

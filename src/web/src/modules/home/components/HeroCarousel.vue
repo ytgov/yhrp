@@ -6,7 +6,13 @@
       class="cursor-pointer"
       @click="navigateToPlace(slide.PlaceId)"
     >
-      <v-img :src="slide.PhotoURL" cover class="fill-height">
+      <v-img
+        :src="failedSlides.has(i) ? slide.ThumbURL : slide.PhotoURL"
+        :lazy-src="slide.ThumbURL"
+        cover
+        class="fill-height"
+        @error="failedSlides.add(i)"
+      >
         <div class="fill-height position-relative">
           <v-sheet class="position-absolute bottom-0 w-100 hero-caption pa-4">
             <div class="text-white text-shadow text-center text-h6">
@@ -23,6 +29,7 @@
 </template>
 
 <script setup>
+import { reactive } from "vue";
 import { useRouter } from "vue-router";
 
 defineProps({
@@ -34,6 +41,9 @@ defineProps({
 });
 
 const router = useRouter();
+
+// Slides whose full-size photo failed to load — shown with the thumbnail instead
+const failedSlides = reactive(new Set());
 
 const navigateToPlace = (placeId) => {
   router.push(`/places/view/${placeId}`);
