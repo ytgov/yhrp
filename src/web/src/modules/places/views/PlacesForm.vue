@@ -12,7 +12,7 @@
       <template v-else-if="error">
         <v-row>
           <v-col cols="12" class="text-center">
-            <v-alert type="error">{{ error }}</v-alert>
+            <v-alert type="error">{{ t(translations.placeLoadError) }}</v-alert>
           </v-col>
         </v-row>
       </template>
@@ -22,7 +22,7 @@
           <v-col cols="12">
             <h1 class="text-h4 mb-2">{{ displayName }}</h1>
             <p v-if="placeDescription" class="text-h6 font-weight-regular mb-4">
-              {{ placeDescription }}
+              <LinkifiedText :text="placeDescription" />
             </p>
           </v-col>
         </v-row>
@@ -54,7 +54,9 @@
                   {{ panel.title }}
                 </v-expansion-panel-title>
                 <v-expansion-panel-text>
-                  <div style="white-space: pre-line">{{ panel.content }}</div>
+                  <div style="white-space: pre-line">
+                    <LinkifiedText :text="panel.content" />
+                  </div>
                 </v-expansion-panel-text>
               </v-expansion-panel>
             </v-expansion-panels>
@@ -69,6 +71,7 @@
 import { computed, ref, watch } from "vue";
 import { useDisplay } from "vuetify";
 import { useLanguage, translations } from "@/composables/useLanguage";
+import LinkifiedText from "@/components/LinkifiedText.vue";
 import PlaceLocationMap from "@/modules/map/components/PlaceLocationMap.vue";
 import PlaceGallery from "../components/PlaceGallery.vue";
 import PlaceHeader from "../components/PlaceHeader.vue";
@@ -157,7 +160,7 @@ const fetchPlaceDetails = async () => {
     placeData.value = await fetchPlaceById(props.placeId);
   } catch (err) {
     console.error("Error fetching place details:", err);
-    error.value = "Failed to load place details. Please try again later.";
+    error.value = true;
   } finally {
     loading.value = false;
   }

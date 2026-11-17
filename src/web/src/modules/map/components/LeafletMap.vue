@@ -7,7 +7,7 @@
   >
     <div v-if="isLoading" class="loading-overlay">
       <v-progress-circular indeterminate color="primary" size="48" />
-      <span class="mt-2 text-body-2">Loading places...</span>
+      <span class="mt-2 text-body-2">{{ t(translations.loadingPlaces) }}</span>
     </div>
     <div class="layer-control">
       <v-btn
@@ -117,7 +117,7 @@ const renderPlacesLayer = (places) => {
     const { latitude, longitude } = coordinates;
 
     const title =
-      place.localizedName?.(isEnglish.value) || place.name || "Untitled Place";
+      place.localizedName?.(isEnglish.value) || place.name || t(translations.untitledPlace);
 
     const marker = L.marker([latitude, longitude], {
       icon: createTealPinMarker(),
