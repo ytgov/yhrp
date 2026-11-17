@@ -8,6 +8,9 @@ import { createWebHistory } from "vue-router";
 // Plugins
 import { registerPlugins } from "@/plugins";
 
+// Global styles (imported after Vuetify so they take precedence)
+import "@/styles/global.css";
+
 const router = createRouter(createWebHistory());
 
 const app = createApp(App);

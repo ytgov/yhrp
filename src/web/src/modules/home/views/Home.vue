@@ -9,9 +9,9 @@
     <v-container>
       <v-row class="my-8">
         <v-col cols="12" md="8" class="mx-auto">
-          <h2 class="text-h4 font-weight-bold mb-4 text-yg_sun">
+          <h1 class="text-h4 font-weight-bold mb-4">
             {{ t(translations.heroText) }}
-          </h2>
+          </h1>
           <p class="text-h6 font-weight-regular mb-4">
             {{ t(translations.heroSubtext1) }}
           </p>
@@ -28,13 +28,13 @@
         <v-col cols="12" md="8" class="mx-auto">
           <h2 class="text-h5 mb-4">{{ t(translations.exploreHistoricPlaces) }}</h2>
           <v-row>
-            <v-col v-for="feature in features" :key="feature.key" cols="12" md="4">
+            <v-col v-for="feature in features" :key="feature.key" cols="12" md="6">
               <v-card class="feature-card h-100" elevation="2">
                 <v-card-item>
                   <template #prepend>
                     <v-icon size="large" color="primary" :icon="feature.icon" />
                   </template>
-                  <v-card-title>{{ feature.title }}</v-card-title>
+                  <v-card-title tag="h3">{{ feature.title }}</v-card-title>
                 </v-card-item>
                 <v-card-text>{{ feature.description }}</v-card-text>
                 <template #actions>
@@ -92,17 +92,9 @@ const features = computed(() => [
   {
     key: "list",
     icon: "mdi-format-list-bulleted",
-    title: t(translations.listView),
-    description: t(translations.listViewDescription),
-    buttonText: t(translations.viewList),
-    route: "/places",
-  },
-  {
-    key: "search",
-    icon: "mdi-magnify",
-    title: t(translations.search),
-    description: t(translations.searchDescription),
-    buttonText: t(translations.searchPlaces),
+    title: t(translations.historicPlaces),
+    description: t(translations.historicPlacesListDescription),
+    buttonText: t(translations.searchTheList),
     route: "/places",
   },
 ]);

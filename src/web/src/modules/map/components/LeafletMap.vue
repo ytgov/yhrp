@@ -1,5 +1,10 @@
 <template>
-  <div class="place-map" ref="mapContainer">
+  <div
+    class="place-map"
+    ref="mapContainer"
+    role="region"
+    :aria-label="t(translations.mapOfHistoricPlaces)"
+  >
     <div v-if="isLoading" class="loading-overlay">
       <v-progress-circular indeterminate color="primary" size="48" />
       <span class="mt-2 text-body-2">Loading places...</span>
@@ -12,7 +17,9 @@
         :color="currentLayer === layer.id ? 'primary' : 'grey'"
         class="layer-btn"
         @click="changeBaseLayer(layer.id)"
-        :title="layer.name"
+        :title="t(layer.label)"
+        :aria-label="t(layer.label)"
+        :aria-pressed="currentLayer === layer.id"
       >
         <v-icon>{{ layer.icon }}</v-icon>
       </v-btn>
@@ -25,7 +32,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { fetchAllPlaces } from "../../places/services/placesApi";
-import { useLanguage } from "@/composables/useLanguage";
+import { useLanguage, translations } from "@/composables/useLanguage";
 import { createTealPinMarker } from "../utils/markerDefinitions";
 import "../utils/markerStyles.css";
 
@@ -33,7 +40,7 @@ import "../utils/markerStyles.css";
 const mapContainer = ref(null);
 const currentLayer = ref("esri-topo");
 const isLoading = ref(false);
-const { isEnglish } = useLanguage();
+const { isEnglish, t } = useLanguage();
 
 // Map instance refs
 let map = null;
@@ -45,21 +52,21 @@ let loadedPlaces = [];
 const baseLayers = [
   {
     id: "esri-topo",
-    name: "Topographic",
+    label: translations.layerTopographic,
     icon: "mdi-map",
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     attribution: "© OpenStreetMap contributors",
   },
   {
     id: "satellite",
-    name: "Satellite",
+    label: translations.layerSatellite,
     icon: "mdi-satellite",
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     attribution: "© Esri",
   },
   {
     id: "terrain",
-    name: "Terrain",
+    label: translations.layerTerrain,
     icon: "mdi-terrain",
     url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
     attribution: "© OpenTopoMap",
@@ -109,12 +116,16 @@ const renderPlacesLayer = (places) => {
 
     const { latitude, longitude } = coordinates;
 
-    const marker = L.marker([latitude, longitude], {
-      icon: createTealPinMarker(),
-    });
-
     const title =
       place.localizedName?.(isEnglish.value) || place.name || "Untitled Place";
+
+    const marker = L.marker([latitude, longitude], {
+      icon: createTealPinMarker(),
+      title,
+      alt: title,
+    });
+    // Give the marker an accessible name (divIcon markers have no image alt)
+    marker.on("add", () => marker.getElement()?.setAttribute("aria-label", title));
     const thumbnail = place.photoUrl || "";
     const placeId = place.id;
 
@@ -127,7 +138,7 @@ const renderPlacesLayer = (places) => {
     popupHtml += `<div style='font-size:18px; font-weight:600; margin-bottom:12px; color:#333;'>${title}</div>`;
 
     if (placeId) {
-      popupHtml += `<a href='/places/view/${placeId}' target='_blank' style='display:inline-block; padding:8px 16px; background:#0097a9; color:white; border-radius:4px; text-decoration:none; font-size:14px; font-weight:500;'>View Details</a>`;
+      popupHtml += `<a href='/places/view/${placeId}' target='_blank' style='display:inline-block; padding:8px 16px; background:#00616d; color:white; border-radius:4px; text-decoration:none; font-size:14px; font-weight:500;'>${t(translations.viewDetails)}</a>`;
     }
 
     popupHtml += `</div>`;

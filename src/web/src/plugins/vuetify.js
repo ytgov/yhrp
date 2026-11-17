@@ -19,15 +19,20 @@ export default createVuetify({
     themes: {
       light: {
         colors: {
-          primary: "#0097a9",
+          // Yukon.ca button colours (WCAG AA): guide.yukon.ca/en/content-and-design/online-design-patterns/button
+          primary: "#00616d",
+          "primary-darken-1": "#00454e",
           secondary: "#fff",
-          anchor: "#00818f",
+          // Yukon.ca link colour (active state)
+          anchor: "#005a65",
           yg_moss: "#7A9A01",
           yg_blue: "#0097a9",
           yg_zinc: "#24405A",
           yg_twilight: "#512A44",
           yg_lichen: "#DC4405",
           yg_sun: "#F2A900",
+          // Yukon.ca footer background ("tiber")
+          yg_tiber: "#0B3442",
         },
       },
       dark: {

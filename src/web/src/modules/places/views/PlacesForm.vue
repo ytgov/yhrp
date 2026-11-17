@@ -29,7 +29,11 @@
 
         <v-row>
           <v-col cols="12" md="8">
-            <PlaceGallery :place-id="placeId" :height="mapHeight" />
+            <PlaceGallery
+              :place-id="placeId"
+              :place-name="displayName"
+              :height="mapHeight"
+            />
           </v-col>
           <v-col cols="12" md="4">
             <v-card color="grey-lighten-1" :height="mapHeight">
