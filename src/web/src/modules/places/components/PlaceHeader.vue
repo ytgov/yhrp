@@ -5,7 +5,9 @@
         <v-col cols="auto">
           <v-breadcrumbs :items="breadcrumbItems" divider=">" class="pa-0">
             <template #item="{ item }">
-              <v-breadcrumbs-item v-if="item.to" :to="item.to" class="text-body-2">
+              <!-- `exact` so "Places" (/places) isn't marked as the current
+                   page when viewing /places/view/:id -->
+              <v-breadcrumbs-item v-if="item.to" :to="item.to" exact class="text-body-2">
                 {{ item.title }}
               </v-breadcrumbs-item>
               <v-breadcrumbs-item v-else class="text-body-2" aria-current="page">
