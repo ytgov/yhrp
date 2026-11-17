@@ -20,6 +20,7 @@
                 <v-text-field
                   id="places-search"
                   v-model="searchQuery"
+                  maxlength="200"
                   :placeholder="t(translations.searchPlaceholder)"
                   prepend-inner-icon="mdi-magnify"
                   density="compact"
@@ -71,7 +72,7 @@
       <v-row v-else-if="error">
         <v-col cols="12" class="text-center">
           <v-alert type="error" class="mt-4">
-            {{ error }}
+            {{ t(translations.placesLoadError) }}
           </v-alert>
         </v-col>
       </v-row>
@@ -271,7 +272,6 @@ const photoURL = (place) => {
   return place.photoUrl || "";
 };
 
-
 const getDataFromApi = async () => {
   loading.value = true;
   error.value = null;
@@ -282,8 +282,9 @@ const getDataFromApi = async () => {
     } else {
       searchResults.value = null;
     }
-  } catch (err) {
-    error.value = err.message;
+  } catch {
+    // Details are logged by placesApi; show a plain-language message.
+    error.value = true;
   } finally {
     loading.value = false;
   }
@@ -299,8 +300,9 @@ const runSearch = async (query) => {
       return;
     }
     searchResults.value = await searchAllPlaces(query);
-  } catch (err) {
-    error.value = err.message;
+  } catch {
+    // Details are logged by placesApi; show a plain-language message.
+    error.value = true;
   } finally {
     loading.value = false;
   }

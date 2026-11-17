@@ -7,8 +7,21 @@ import {
 import { RegisterPlace } from "../models/register-place.model";
 import { YHIS_API_URL } from "../config/app-config";
 
-// Cache configuration - items expire after 15 minutes
-const cache = new NodeCache({ stdTTL: 900 });
+// Cache configuration - items expire after 15 minutes. Key counts are capped
+// so unbounded input (search text, page numbers) can't grow memory forever.
+// Searches get their own cache so they can't crowd out place data.
+const cache = new NodeCache({ stdTTL: 900, maxKeys: 2000 });
+const searchCache = new NodeCache({ stdTTL: 900, maxKeys: 500 });
+
+/** Set a cache entry, skipping it (rather than throwing) when the cache is full. */
+function cacheSet<T>(store: NodeCache, key: string, value: T): void {
+  try {
+    store.set(key, value);
+    console.log(`[Cache Set] ${key}`);
+  } catch {
+    console.warn(`[Cache Full] skipped ${key}`);
+  }
+}
 
 const BASE_URL = `${YHIS_API_URL}/api/register`;
 
@@ -35,8 +48,7 @@ export class PlaceService {
     }
 
     const data = (await response.json()) as T;
-    cache.set(cacheKey, data);
-    console.log(`[Cache Set] ${cacheKey}`);
+    cacheSet(cache, cacheKey, data);
     return data;
   }
 
@@ -60,7 +72,7 @@ export class PlaceService {
     const normalizedQuery = (query ?? "").trim();
     const cacheKey = `places_search_${normalizedQuery.toLowerCase()}_page_${page}`;
 
-    const cachedData = cache.get<RegisterPlacesResponse>(cacheKey);
+    const cachedData = searchCache.get<RegisterPlacesResponse>(cacheKey);
     if (cachedData) {
       console.log(`[Cache Hit] ${cacheKey}`);
       return cachedData;
@@ -87,8 +99,7 @@ export class PlaceService {
     }
 
     const data = (await response.json()) as RegisterPlacesResponse;
-    cache.set(cacheKey, data);
-    console.log(`[Cache Set] ${cacheKey}`);
+    cacheSet(searchCache, cacheKey, data);
     return data;
   }
 
@@ -129,8 +140,7 @@ export class PlaceService {
       return undefined;
     }
 
-    cache.set(cacheKey, place);
-    console.log(`[Cache Set] ${cacheKey}`);
+    cacheSet(cache, cacheKey, place);
     return place;
   }
 
@@ -139,7 +149,7 @@ export class PlaceService {
   }
 
   async getPlacePhotos(id: string): Promise<PhotosResponse> {
-    const url = `${BASE_URL}/${id}/photos`;
+    const url = `${BASE_URL}/${encodeURIComponent(id)}/photos`;
     return this.fetchWithCache<PhotosResponse>(url, `place_photos_${id}`);
   }
 
@@ -147,7 +157,9 @@ export class PlaceService {
     id: string,
     photoId: string
   ): Promise<{ buffer: Buffer; contentType: string }> {
-    const url = `${BASE_URL}/${id}/photos/${photoId}`;
+    // The controller only passes numeric ids (see request-validation.ts);
+    // encoding is a second guard against "/" or "?" reaching the upstream URL.
+    const url = `${BASE_URL}/${encodeURIComponent(id)}/photos/${encodeURIComponent(photoId)}`;
     const cacheKey = `photo_${id}_${photoId}`;
 
     const cachedPhoto = cache.get<{ buffer: Buffer; contentType: string }>(
@@ -176,7 +188,7 @@ export class PlaceService {
       contentType,
     };
 
-    cache.set(cacheKey, photoData);
+    cacheSet(cache, cacheKey, photoData);
     return photoData;
   }
 }

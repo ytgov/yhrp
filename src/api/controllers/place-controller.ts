@@ -7,6 +7,13 @@ import {
   RegisterPlacesResponse,
 } from "../models/api-response.model";
 import { PlaceService } from "../services/place-service";
+import { MAX_QUERY_LENGTH, parseId, parsePage } from "./request-validation";
+
+// Upstream error details are logged on the server only; clients get a
+// generic message so YHIS responses are never echoed back.
+const INTERNAL_ERROR: ErrorResponse = { error: "Internal server error" };
+const INVALID_PAGE: ErrorResponse = { error: "Page must be a positive integer" };
+const INVALID_ID: ErrorResponse = { error: "Invalid id" };
 
 export class PlaceController {
   constructor(private placeService: PlaceService) {}
@@ -15,15 +22,19 @@ export class PlaceController {
     req: Request,
     res: Response<RegisterPlacesResponse | ErrorResponse>
   ) {
+    const page = parsePage(req.query.page);
+    if (page === undefined) {
+      return res.status(400).json(INVALID_PAGE);
+    }
+
     try {
-      const page = parseInt(req.query.page as string) || 1;
       const response: RegisterPlacesResponse =
         await this.placeService.getPlaces(page);
 
-      res.json(response);
+      return res.json(response);
     } catch (error) {
       console.error("Error fetching places:", error);
-      res.status(500).json({ error: "Failed to fetch places" });
+      return res.status(500).json({ error: "Failed to fetch places" });
     }
   }
 
@@ -31,17 +42,26 @@ export class PlaceController {
     req: Request,
     res: Response<RegisterPlacesResponse | ErrorResponse>
   ) {
+    const page = parsePage(req.query.page);
+    if (page === undefined) {
+      return res.status(400).json(INVALID_PAGE);
+    }
+
+    const query = typeof req.body?.query === "string" ? req.body.query : "";
+    if (query.length > MAX_QUERY_LENGTH) {
+      return res.status(400).json({
+        error: `Query must be ${MAX_QUERY_LENGTH} characters or fewer`,
+      });
+    }
+
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const query =
-        typeof req.body?.query === "string" ? req.body.query : "";
       const response: RegisterPlacesResponse =
         await this.placeService.searchPlaces(query, page);
 
-      res.json(response);
+      return res.json(response);
     } catch (error) {
       console.error("Error searching places:", error);
-      res.status(500).json({ error: "Failed to search places" });
+      return res.status(500).json({ error: "Failed to search places" });
     }
   }
 
@@ -49,8 +69,12 @@ export class PlaceController {
     req: Request,
     res: Response<RegisterPlaceResponse | ErrorResponse>
   ) {
+    const id = parseId(req.params.id);
+    if (!id) {
+      return res.status(400).json(INVALID_ID);
+    }
+
     try {
-      const { id } = req.params;
       const place = await this.placeService.getPlaceDetails(id);
 
       if (!place) {
@@ -61,10 +85,7 @@ export class PlaceController {
       return res.json({ data: place });
     } catch (error) {
       console.error("Error fetching place details:", error);
-      return res.status(500).json({
-        error: "Internal server error",
-        details: error instanceof Error ? error.message : undefined,
-      });
+      return res.status(500).json(INTERNAL_ERROR);
     }
   }
 
@@ -72,8 +93,12 @@ export class PlaceController {
     req: Request,
     res: Response<PhotosResponse | ErrorResponse>
   ) {
+    const id = parseId(req.params.id);
+    if (!id) {
+      return res.status(400).json(INVALID_ID);
+    }
+
     try {
-      const { id } = req.params;
       const place = await this.placeService.getPlaceDetails(id);
 
       if (!place) {
@@ -100,16 +125,18 @@ export class PlaceController {
       return res.json(payload);
     } catch (error) {
       console.error("Error fetching photos:", error);
-      return res.status(500).json({
-        error: "Internal server error",
-        details: error instanceof Error ? error.message : undefined,
-      });
+      return res.status(500).json(INTERNAL_ERROR);
     }
   }
 
   async getPhotoFile(req: Request, res: Response<Buffer | ErrorResponse>) {
+    const id = parseId(req.params.id);
+    const photoId = parseId(req.params.photoId);
+    if (!id || !photoId) {
+      return res.status(400).json(INVALID_ID);
+    }
+
     try {
-      const { id, photoId } = req.params;
       const place = await this.placeService.getPlaceDetails(id);
 
       if (!place) {
@@ -120,13 +147,18 @@ export class PlaceController {
         id,
         photoId
       );
+
+      // Only ever serve images from our origin, whatever YHIS returns.
+      if (!contentType.toLowerCase().startsWith("image/")) {
+        console.error(`Unexpected photo content type: ${contentType}`);
+        return res.status(502).json({ error: "Invalid photo response" });
+      }
+
+      res.setHeader("X-Content-Type-Options", "nosniff");
       return res.contentType(contentType).send(buffer);
     } catch (error) {
       console.error("Error fetching photo:", error);
-      return res.status(500).json({
-        error: "Internal server error",
-        details: error instanceof Error ? error.message : undefined,
-      });
+      return res.status(500).json(INTERNAL_ERROR);
     }
   }
 }

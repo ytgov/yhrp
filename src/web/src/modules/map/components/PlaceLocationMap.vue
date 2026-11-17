@@ -30,6 +30,7 @@ import { nextTick, onMounted, ref, watch } from "vue";
 import { createTealPinMarker } from "../utils/markerDefinitions";
 import "../utils/markerStyles.css";
 import { useLanguage, translations } from "@/composables/useLanguage";
+import { escapeHtml } from "@/utils/escapeHtml";
 
 export default {
   name: "PlaceLocationMap",
@@ -131,7 +132,7 @@ export default {
         // Give the marker an accessible name (divIcon markers have no image alt)
         marker.getElement()?.setAttribute("aria-label", props.placeName);
         marker.setPopupContent(
-          `<div class="popup-content">${props.placeName}</div>`
+          `<div class="popup-content">${escapeHtml(props.placeName)}</div>`
         );
         marker.openPopup();
       }

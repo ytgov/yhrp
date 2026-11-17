@@ -51,15 +51,24 @@
  */
 
 import { computed, ref, watch } from "vue";
+import translationStrings from "@/locales/translations.json";
 
 const STORAGE_KEY = "yhrp-language";
 const SUPPORTED_LANGUAGES = ["en", "fr"];
 
 const currentLanguage = ref(localStorage.getItem(STORAGE_KEY) || "en");
 
-watch(currentLanguage, (lang) => {
-  localStorage.setItem(STORAGE_KEY, lang);
-});
+// Keep <html lang> in sync so screen readers use the right pronunciation
+// (WCAG 3.1.1 Language of Page), and show the page title in that language.
+watch(
+  currentLanguage,
+  (lang) => {
+    localStorage.setItem(STORAGE_KEY, lang);
+    document.documentElement.lang = lang;
+    document.title = translationStrings.appName[lang] || translationStrings.appName.en;
+  },
+  { immediate: true }
+);
 
 /**
  * Composable for managing language state and translations
