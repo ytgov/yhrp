@@ -20,6 +20,7 @@
                 <v-text-field
                   id="places-search"
                   v-model="searchQuery"
+                  maxlength="200"
                   :placeholder="t(translations.searchPlaceholder)"
                   prepend-inner-icon="mdi-magnify"
                   density="compact"

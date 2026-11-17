@@ -55,6 +55,9 @@ class MockPlaceService {
 
   async getPlaceDetails(id: string | number) {
     if (parseInt(String(id)) === 999) return undefined;
+    if (parseInt(String(id)) === 500) {
+      throw new Error("Failed to fetch data: 403 - <html>upstream page</html>");
+    }
     return {
       id: 1,
       primaryName: "Sample Place",
@@ -87,8 +90,11 @@ class MockPlaceService {
     };
   }
 
-  async getPhoto(id: string | number) {
+  async getPhoto(id: string | number, photoId?: string | number) {
     if (parseInt(String(id)) === 999) throw new Error("Not found");
+    if (String(photoId) === "2") {
+      return { buffer: Buffer.from("<script>x</script>"), contentType: "text/html" };
+    }
     return {
       buffer: Buffer.from("sample-image-data"),
       contentType: "image/jpg",
@@ -255,6 +261,57 @@ describe("Place Router", () => {
       const response = await request(app).get(`${BASE_URL}/999/photos/1`);
 
       expect(response.status).toBe(404);
+    });
+  });
+  describe("input validation and error handling", () => {
+    it("rejects a non-numeric place id", async () => {
+      const response = await request(app).get(`${BASE_URL}/abc`);
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({ error: "Invalid id" });
+    });
+
+    it("rejects an id with trailing characters", async () => {
+      const response = await request(app).get(`${BASE_URL}/1abc/photos/1`);
+      expect(response.status).toBe(400);
+    });
+
+    it("rejects path traversal in the photo id", async () => {
+      const response = await request(app).get(
+        `${BASE_URL}/1/photos/..%2F..%2F..%2Fadmin`
+      );
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({ error: "Invalid id" });
+    });
+
+    it("refuses to serve a non-image photo response", async () => {
+      const response = await request(app).get(`${BASE_URL}/1/photos/2`);
+      expect(response.status).toBe(502);
+      expect(response.text).not.toContain("<script>");
+    });
+
+    it("sets nosniff on photo responses", async () => {
+      const response = await request(app).get(`${BASE_URL}/1/photos/1`);
+      expect(response.headers["x-content-type-options"]).toBe("nosniff");
+    });
+
+    it("does not return upstream error details to the client", async () => {
+      const response = await request(app).get(`${BASE_URL}/500`);
+      expect(response.status).toBe(500);
+      expect(response.body).toEqual({ error: "Internal server error" });
+      expect(response.text).not.toContain("upstream");
+    });
+
+    it("rejects search text longer than 200 characters", async () => {
+      const response = await request(app)
+        .post(`${BASE_URL}/search`)
+        .query({ page: 1 })
+        .send({ query: "a".repeat(201) });
+      expect(response.status).toBe(400);
+    });
+
+    it("rejects page numbers above the limit", async () => {
+      const response = await request(app).get(BASE_URL).query({ page: 1001 });
+      expect(response.status).toBe(400);
     });
   });
 });

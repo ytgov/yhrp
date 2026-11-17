@@ -33,6 +33,7 @@ import "leaflet/dist/leaflet.css";
 import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { fetchAllPlaces } from "../../places/services/placesApi";
 import { useLanguage, translations } from "@/composables/useLanguage";
+import { escapeHtml } from "@/utils/escapeHtml";
 import { createTealPinMarker } from "../utils/markerDefinitions";
 import "../utils/markerStyles.css";
 
@@ -129,16 +130,20 @@ const renderPlacesLayer = (places) => {
     const thumbnail = place.photoUrl || "";
     const placeId = place.id;
 
+    // Leaflet popups take an HTML string, so every value from the register
+    // is escaped before it goes in.
+    const safeTitle = escapeHtml(title);
+
     let popupHtml = `<div class='place-popup' style='text-align:center; max-width:600px; background-color: white; padding: 16px; border-radius: 4px;'>`;
 
     if (thumbnail) {
-      popupHtml += `<img src='${thumbnail}' alt='${title}' style='max-width:250px; border-radius:8px; margin-bottom:12px; display:block; margin-left:auto; margin-right:auto;' />`;
+      popupHtml += `<img src='${escapeHtml(thumbnail)}' alt='${safeTitle}' style='max-width:250px; border-radius:8px; margin-bottom:12px; display:block; margin-left:auto; margin-right:auto;' />`;
     }
 
-    popupHtml += `<div style='font-size:18px; font-weight:600; margin-bottom:12px; color:#333;'>${title}</div>`;
+    popupHtml += `<div style='font-size:18px; font-weight:600; margin-bottom:12px; color:#333;'>${safeTitle}</div>`;
 
     if (placeId) {
-      popupHtml += `<a href='/places/view/${placeId}' target='_blank' style='display:inline-block; padding:8px 16px; background:#00616d; color:white; border-radius:4px; text-decoration:none; font-size:14px; font-weight:500;'>${t(translations.viewDetails)}</a>`;
+      popupHtml += `<a href='/places/view/${encodeURIComponent(placeId)}' target='_blank' rel='noopener' style='display:inline-block; padding:8px 16px; background:#00616d; color:white; border-radius:4px; text-decoration:none; font-size:14px; font-weight:500;'>${escapeHtml(t(translations.viewDetails))}</a>`;
     }
 
     popupHtml += `</div>`;
