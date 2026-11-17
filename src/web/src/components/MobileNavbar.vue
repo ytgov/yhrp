@@ -23,6 +23,9 @@
       class="ml-1"
       :aria-label="t(translations.menu)"
     >
+      <!-- Vuetify ignores the `icon` prop when the button has slot content
+           (NavMenu), so the icon must be rendered explicitly here. -->
+      <v-icon>mdi-menu</v-icon>
       <NavMenu />
     </v-btn>
   </v-app-bar>
