@@ -6,18 +6,23 @@
 
     <v-spacer />
 
-    <v-btn
-      variant="tonal"
-      size="x-small"
-      color="primary"
-      class="lang-btn"
+    <button
+      type="button"
+      class="yg-link lang-link text-body-2 font-weight-medium px-2"
+      :lang="isEnglish ? 'fr' : 'en'"
+      :aria-label="isEnglish ? 'Français' : 'English'"
       @click="toggleLanguage"
     >
       {{ isEnglish ? "FR" : "EN" }}
-    </v-btn>
+    </button>
 
-    <v-btn variant="text" color="primary" icon="mdi-menu" class="ml-1">
-      <v-icon>mdi-menu</v-icon>
+    <v-btn
+      variant="text"
+      color="primary"
+      icon="mdi-menu"
+      class="ml-1"
+      :aria-label="t(translations.menu)"
+    >
       <NavMenu />
     </v-btn>
   </v-app-bar>
@@ -54,8 +59,12 @@ const { isEnglish, toggleLanguage, t } = useLanguage();
   text-overflow: ellipsis;
 }
 
-.lang-btn {
-  min-width: 36px !important;
+.lang-link {
+  min-width: 36px;
+  min-height: 36px;
   flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 </style>

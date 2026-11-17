@@ -1,13 +1,14 @@
 <template>
-  <v-card elevation="2" class="place-card h-100" hover @click="$emit('click')">
-    <v-img :src="imageUrl" aspect-ratio="1" cover class="bg-grey-lighten-2">
+  <v-card :to="to" elevation="2" class="place-card h-100" hover>
+    <v-img :src="imageUrl" :alt="title" aspect-ratio="1" cover class="bg-grey-lighten-2">
       <template #placeholder>
         <div class="d-flex align-center justify-center fill-height">
           <v-progress-circular indeterminate color="grey-lighten-1" />
         </div>
       </template>
-      <div class="hover-overlay">
-        <v-btn color="white" variant="flat">{{ t(translations.viewPlace) }}</v-btn>
+      <!-- Visual hint only: the whole card is the link. -->
+      <div class="hover-overlay" aria-hidden="true">
+        <span class="hover-label">{{ t(translations.viewPlace) }}</span>
       </div>
     </v-img>
 
@@ -37,24 +38,17 @@ defineProps({
     type: String,
     default: "",
   },
+  to: {
+    type: [String, Object],
+    required: true,
+  },
 });
-
-defineEmits(["click"]);
 </script>
 
 <style scoped>
-.place-card {
-  cursor: pointer;
-}
-
 .hover-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background: rgba(0, 0, 0, 0.5);
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
@@ -63,7 +57,16 @@ defineEmits(["click"]);
   justify-content: center;
 }
 
-.place-card:hover .hover-overlay {
+.hover-label {
+  background: #ffffff;
+  color: #00616d;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-weight: 500;
+}
+
+.place-card:hover .hover-overlay,
+.place-card:focus-visible .hover-overlay {
   opacity: 1;
 }
 </style>

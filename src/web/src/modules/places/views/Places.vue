@@ -7,11 +7,19 @@
             <h1 class="text-h4 mb-0">
               {{ t(translations.listOfHistoricPlaces) }} {{ photoCountText }}
             </h1>
+            <!--
+              Labels sit above each control as real <label for> elements.
+              Vuetify's floating `label` prop renders an extra, unassociated
+              <label> that accessibility checkers flag as orphaned.
+            -->
             <div class="places-sort-controls">
               <div class="places-sort-control">
+                <label id="places-search-label" for="places-search" class="control-label">
+                  {{ t(translations.searchPlaces) }}
+                </label>
                 <v-text-field
+                  id="places-search"
                   v-model="searchQuery"
-                  :label="t(translations.searchPlaces)"
                   :placeholder="t(translations.searchPlaceholder)"
                   prepend-inner-icon="mdi-magnify"
                   density="compact"
@@ -21,19 +29,27 @@
                 />
               </div>
               <div class="places-sort-control">
+                <label id="places-sort-label" for="places-sort" class="control-label">
+                  {{ t(translations.sortBy) }}
+                </label>
                 <v-select
+                  id="places-sort"
                   v-model="sortBy"
                   :items="sortOptions"
-                  :label="t(translations.sortBy)"
+                  aria-labelledby="places-sort-label"
                   density="compact"
                   hide-details
                 />
               </div>
               <div v-if="showFilter" class="places-sort-control">
+                <label id="places-filter-label" for="places-filter" class="control-label">
+                  {{ filterLabel }}
+                </label>
                 <v-select
+                  id="places-filter"
                   v-model="filterValue"
                   :items="filterOptions"
-                  :label="filterLabel"
+                  aria-labelledby="places-filter-label"
                   density="compact"
                   hide-details
                 />
@@ -79,7 +95,7 @@
             :image-url="photoURL(item)"
             :title="item.localizedName(isEnglish)"
             :subtitle="item.localizedLocation(isEnglish)"
-            @click="handleClick(item)"
+            :to="{ name: 'placeView', params: { placeId: item.placeId } }"
           />
         </v-col>
       </v-row>
@@ -102,16 +118,13 @@
 <script setup>
 import { useLanguage, translations } from "@/composables/useLanguage";
 import PlaceCard from "@/modules/places/components/PlaceCard.vue";
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { useRouter } from "vue-router";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { fetchAllPlaces, searchAllPlaces } from "../services/placesApi";
 
 const PAGE_SIZE = 12;
 const SEARCH_DEBOUNCE_MS = 300;
 
 const { t, isEnglish } = useLanguage();
-
-const router = useRouter();
 
 const page = ref(1);
 const allPlaces = ref([]);
@@ -258,12 +271,6 @@ const photoURL = (place) => {
   return place.photoUrl || "";
 };
 
-const handleClick = (place) => {
-  router.push({
-    name: "placeView",
-    params: { placeId: place.placeId },
-  });
-};
 
 const getDataFromApi = async () => {
   loading.value = true;
@@ -324,8 +331,27 @@ watch(searchQuery, (value) => {
   }, SEARCH_DEBOUNCE_MS);
 });
 
+// Vuetify's v-select puts role="combobox" on its wrapper div as well as on
+// the input, but only gives the input a name. Point the wrapper at the same
+// visible label so it is not reported as an unlabelled form control.
+const labelSelectWrappers = async () => {
+  await nextTick();
+  for (const [selectId, labelId] of [
+    ["places-sort", "places-sort-label"],
+    ["places-filter", "places-filter-label"],
+  ]) {
+    document
+      .getElementById(selectId)
+      ?.closest(".v-field")
+      ?.setAttribute("aria-labelledby", labelId);
+  }
+};
+
+watch(showFilter, labelSelectWrappers);
+
 onMounted(() => {
   getDataFromApi();
+  labelSelectWrappers();
 });
 
 onBeforeUnmount(() => {
@@ -355,5 +381,12 @@ onBeforeUnmount(() => {
 
 .places-sort-control {
   width: 100%;
+}
+
+.control-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <footer class="app-footer">
-    <v-footer color="yg_zinc" class="pa-0 footer-wrapper">
+    <v-footer color="yg_tiber"class="pa-0 footer-wrapper">
       <v-container fluid class="pa-0">
         <v-row no-gutters align="stretch" class="footer-row">
           <v-col cols="12" md="6" class="footer-left pa-6">
@@ -24,9 +24,6 @@
             </div>
           </v-col>
           <v-col cols="12" md="6" class="footer-right d-flex flex-column">
-            <div class="aurora-container flex-grow-1">
-              <img :src="auroraSvg" alt="" aria-hidden="true" class="aurora-img" />
-            </div>
             <div class="copyright-text pa-4 text-right">
               © {{ currentYear }} {{ t(translations.governmentOfYukon) }}
             </div>
@@ -41,7 +38,6 @@
 import { computed } from "vue";
 import { useLanguage, translations } from "@/composables/useLanguage";
 import logoWhiteSvg from "@/assets/Logo White.svg";
-import auroraSvg from "@/assets/Aurora-main.svg";
 
 const { t, isEnglish } = useLanguage();
 
@@ -107,22 +103,6 @@ const footerLinks = computed(() => [
   overflow: visible;
 }
 
-.aurora-container {
-  position: relative;
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.aurora-img {
-  position: relative;
-  transform: translateX(60%);
-  height: auto;
-  max-height: 140px;
-  width: auto;
-  object-fit: contain;
-}
-
 .footer-links {
   display: flex;
   flex-direction: column;
@@ -172,21 +152,10 @@ const footerLinks = computed(() => [
   }
   
   .footer-right {
-    min-height: 120px;
     align-items: center;
     padding-right: 0;
   }
-  
-  .aurora-container {
-    justify-content: center;
-    overflow: hidden;
-  }
-  
-  .aurora-img {
-    max-height: 100px;
-    transform: translateX(30%);
-  }
-  
+
   .copyright-text {
     text-align: center;
     padding-right: 0;
@@ -200,10 +169,6 @@ const footerLinks = computed(() => [
   
   .footer-link {
     font-size: 1rem;
-  }
-  
-  .aurora-img {
-    max-height: 80px;
   }
 }
 </style>

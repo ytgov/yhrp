@@ -5,11 +5,10 @@
         <v-col cols="auto">
           <v-breadcrumbs :items="breadcrumbItems" divider=">" class="pa-0">
             <template #item="{ item }">
-              <v-breadcrumbs-item
-                :to="item.to"
-                :disabled="item.disabled"
-                class="text-body-2 text-grey-darken-1"
-              >
+              <v-breadcrumbs-item v-if="item.to" :to="item.to" class="text-body-2">
+                {{ item.title }}
+              </v-breadcrumbs-item>
+              <v-breadcrumbs-item v-else class="text-body-2" aria-current="page">
                 {{ item.title }}
               </v-breadcrumbs-item>
             </template>
@@ -42,9 +41,9 @@ const props = defineProps({
 defineEmits(["print"]);
 
 const breadcrumbItems = computed(() => [
-  { title: t(translations.home), disabled: false, to: "/" },
-  { title: t(translations.places), disabled: false, to: "/places" },
-  { title: props.placeName, disabled: true },
+  { title: t(translations.home), to: "/" },
+  { title: t(translations.places), to: "/places" },
+  { title: props.placeName },
 ]);
 </script>
 

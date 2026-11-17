@@ -3,7 +3,7 @@
     <v-list>
       <v-list-item to="/" prepend-icon="mdi-home" :title="t(translations.home)" />
       <v-list-item to="/map" prepend-icon="mdi-map-outline" :title="t(translations.map)" />
-      <v-list-item to="/places" prepend-icon="mdi-information-outline" :title="t(translations.historicPlaces)" />
+      <v-list-item to="/places" prepend-icon="mdi-format-list-bulleted" :title="t(translations.historicPlaces)" />
       <v-divider />
       <v-list-item
         to="/contact"

@@ -12,6 +12,7 @@
         v-for="photo in photos"
         :key="photo.id"
         :src="photo.imageUrl"
+        :alt="photoAlt(photo)"
         class="cursor-pointer"
         @click="openFullscreen(photo)"
       >
@@ -43,7 +44,11 @@
     <v-dialog v-model="fullscreen" fullscreen>
       <v-card>
         <v-toolbar color="primary">
-          <v-btn icon="mdi-close" @click="fullscreen = false" />
+          <v-btn
+            icon="mdi-close"
+            :aria-label="t(translations.close)"
+            @click="fullscreen = false"
+          />
           <v-toolbar-title>{{ t(translations.photoGallery) }}</v-toolbar-title>
         </v-toolbar>
 
@@ -59,6 +64,7 @@
             v-for="photo in photos"
             :key="photo.id"
             :src="photo.imageUrl"
+            :alt="photoAlt(photo)"
           >
             <div v-if="photo.caption" class="photo-caption">
               {{ photo.caption }}
@@ -86,7 +92,14 @@ const props = defineProps({
     type: [Number, String],
     default: 400,
   },
+  placeName: {
+    type: String,
+    default: "",
+  },
 });
+
+// Alt text: the photo caption when there is one, otherwise the place name.
+const photoAlt = (photo) => photo.caption?.trim() || props.placeName;
 
 const photos = ref([]);
 const loading = ref(true);
