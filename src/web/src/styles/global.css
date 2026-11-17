@@ -1,0 +1,48 @@
+/*
+ * Global Yukon.ca design system overrides.
+ *
+ * Vuetify 4 ships its styles in CSS cascade layers, so these unlayered rules
+ * win over Vuetify without needing !important. Selectors are wrapped in
+ * :where() to keep specificity low, so component styles can still override.
+ */
+
+:root {
+  /* guide.yukon.ca/en/content-and-design/brand-standards/colour-and-palettes-digital-services */
+  --yg-link: #005a65;
+  --yg-link-visited: #643f5d;
+  --yg-link-hover: #008392;
+  --yg-button-hover: #00454e;
+}
+
+/* Links: Yukon.ca colours, always underlined. Buttons, cards and menu items
+   rendered as <a> keep their own styling. */
+:where(.v-main a:not(.v-btn, .v-card, .v-list-item)),
+.yg-link {
+  color: var(--yg-link);
+  text-decoration: underline;
+}
+
+:where(.v-main a:not(.v-btn, .v-card, .v-list-item)):visited {
+  color: var(--yg-link-visited);
+}
+
+:where(.v-main a:not(.v-btn, .v-card, .v-list-item)):hover,
+.yg-link:hover {
+  color: var(--yg-link-hover);
+}
+
+/* Primary button hover state: Yukon.ca darkens the fill instead of using
+   Vuetify's light overlay. */
+.v-btn.bg-primary:hover {
+  background-color: var(--yg-button-hover) !important;
+}
+
+.v-btn.bg-primary:hover > .v-btn__overlay {
+  opacity: 0;
+}
+
+/* Cards rendered as links should not look like text links. */
+a.v-card {
+  color: inherit;
+  text-decoration: none;
+}

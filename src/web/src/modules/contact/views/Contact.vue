@@ -13,7 +13,7 @@
                 {{ t(translations.contactEmail) }}
               </div>
               <a
-                class="text-body-1 text-primary"
+                class="text-body-1"
                 href="mailto:historic.sites@yukon.ca"
               >
                 historic.sites@yukon.ca
@@ -27,7 +27,7 @@
               <div class="text-subtitle-2 text-grey-darken-1">
                 {{ t(translations.contactPhone) }}
               </div>
-              <a class="text-body-1 text-primary" href="tel:+18676675386">
+              <a class="text-body-1" href="tel:+18676675386">
                 867-667-5386
               </a>
             </div>

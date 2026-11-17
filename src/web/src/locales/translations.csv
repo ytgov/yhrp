@@ -3,7 +3,9 @@ key,en,fr
 appName,Yukon Register of Historic Places,Répertoire des lieux patrimoniaux du Yukon
 home,Home,Accueil
 map,Map,Carte
-historicPlaces,Historic Places,Lieux patrimoniaux
+historicPlaces,List of historic places,Liste des lieux patrimoniaux
+menu,Menu,Menu
+close,Close,Fermer
 places,Places,Lieux
 contactUs,Contact Us,Contactez-nous
 # CONTACT PAGE
@@ -14,15 +16,13 @@ contactPhone,Phone,Téléphone
 viewPlace,View Place,Voir le lieu
 viewDetails,View Details,Voir les détails
 viewMap,View Map,Voir la carte
-viewList,View List,Voir la liste
-search,Search,Rechercher
+searchTheList,Search the list,Rechercher dans la liste
 searchPlaces,Search Places,Rechercher des lieux
 searchPlaceholder,"Search by name or description","Rechercher par nom ou description"
 print,Print,Imprimer
 # PAGE TITLES & HEADINGS
 listOfHistoricPlaces,List of Historic Places,Liste des lieux patrimoniaux
 mapView,Map View,Vue carte
-listView,List View,Vue liste
 exploreHistoricPlaces,Explore Historic Places,Explorez les lieux patrimoniaux
 photoGallery,Photo Gallery,Galerie photos
 # PLACE DETAIL SECTIONS
@@ -53,8 +53,13 @@ heroSubtext1,"Our historic places represent the technologies, designs and ideas 
 heroSubtext2,"Many places are landmarks within a community, are associated with remarkable people or historical events, or are places that have cultural, social, scientific or architectural significance.","De nombreux lieux sont des points de repère au sein d'une communauté, sont associés à des personnes remarquables ou à des événements historiques, ou sont des lieux qui ont une importance culturelle, sociale, scientifique ou architecturale."
 heroSubtext3,"The Register is an online resource of Yukon's historic places that have been designated as historically significant on a municipal, territorial or national level. You can explore Yukon's history by searching our website for historic places by location on a map, in a list or via name.","Le Répertoire est une ressource en ligne des lieux patrimoniaux du Yukon qui ont été désignés comme historiquement significatifs à l'échelle municipale, territoriale ou nationale. Vous pouvez explorer l'histoire du Yukon en recherchant des lieux patrimoniaux par emplacement sur une carte, dans une liste ou par nom."
 mapViewDescription,"Explore historic places on an interactive map. Find locations near you and discover their historical significance.","Explorez les lieux patrimoniaux sur une carte interactive. Trouvez des emplacements près de chez vous et découvrez leur importance historique."
-listViewDescription,"Browse through our comprehensive list of historic places. Filter and search to find specific locations or types of sites.","Parcourez notre liste complète de lieux patrimoniaux. Filtrez et recherchez pour trouver des emplacements spécifiques ou des types de sites."
-searchDescription,"Search for specific historic places by name, location, or historical significance.","Recherchez des lieux patrimoniaux spécifiques par nom, emplacement ou importance historique."
+historicPlacesListDescription,"Browse or search the list of historic places by name, community or type of site.","Parcourez la liste des lieux patrimoniaux ou faites une recherche par nom, collectivité ou type de site."
+# MAP
+mapOfHistoricPlaces,Map of historic places,Carte des lieux patrimoniaux
+locationMap,Location map,Carte de l'emplacement
+layerTopographic,Topographic map,Carte topographique
+layerSatellite,Satellite imagery,Imagerie satellite
+layerTerrain,Terrain map,Carte du relief
 # FOOTER
 copyright,Copyright,Droit d'auteur
 disclaimer,Disclaimer,Avis de non-responsabilité

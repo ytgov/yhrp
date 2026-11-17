@@ -11,16 +11,22 @@
     <v-spacer />
 
     <div class="d-flex align-center">
-      <v-btn
-        variant="text"
-        class="text-subtitle-1 font-weight-medium"
+      <button
+        type="button"
+        class="yg-link lang-link text-subtitle-1 font-weight-medium px-4"
+        :lang="isEnglish ? 'fr' : 'en'"
         @click="toggleLanguage"
       >
         {{ isEnglish ? "Français" : "English" }}
-      </v-btn>
+      </button>
       <v-divider class="mx-2" vertical inset />
 
-      <v-btn variant="text" size="large" color="primary">
+      <v-btn
+        variant="text"
+        size="large"
+        color="primary"
+        :aria-label="t(translations.menu)"
+      >
         <v-icon size="30">mdi-menu</v-icon>
         <NavMenu />
       </v-btn>
@@ -43,5 +49,11 @@ const { isEnglish, toggleLanguage, t } = useLanguage();
 
 .border-b-yg_sun {
   border-bottom: 3px solid #f3b228 !important;
+}
+
+.lang-link {
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 </style>

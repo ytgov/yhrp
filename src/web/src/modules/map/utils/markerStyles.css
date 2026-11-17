@@ -13,7 +13,7 @@
   width: 25px;
   height: 25px;
   border-radius: 50% 50% 50% 0;
-  background: #0097a9;
+  background: #00616d;
   position: absolute;
   transform: rotate(-45deg);
   left: 50%;
@@ -69,8 +69,8 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: #0097a9;
-  border: 3px solid #007a8a;
+  background: #00616d;
+  border: 3px solid #00454e;
   position: relative;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }

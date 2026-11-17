@@ -1,5 +1,10 @@
 <template>
-  <div class="place-map" ref="mapContainer">
+  <div
+    class="place-map"
+    ref="mapContainer"
+    role="region"
+    :aria-label="placeName ? `${t(translations.locationMap)}: ${placeName}` : t(translations.locationMap)"
+  >
     <div class="layer-control">
       <v-btn
         v-for="layer in baseLayers"
@@ -8,7 +13,9 @@
         :color="currentLayer === layer.id ? 'primary' : 'grey'"
         class="layer-btn"
         @click="changeBaseLayer(layer.id)"
-        :title="layer.name"
+        :title="t(layer.label)"
+        :aria-label="t(layer.label)"
+        :aria-pressed="currentLayer === layer.id"
       >
         <v-icon>{{ layer.icon }}</v-icon>
       </v-btn>
@@ -22,6 +29,7 @@ import "leaflet/dist/leaflet.css";
 import { nextTick, onMounted, ref, watch } from "vue";
 import { createTealPinMarker } from "../utils/markerDefinitions";
 import "../utils/markerStyles.css";
+import { useLanguage, translations } from "@/composables/useLanguage";
 
 export default {
   name: "PlaceLocationMap",
@@ -45,25 +53,26 @@ export default {
     let marker = null;
     let currentBaseLayer = null;
     const currentLayer = ref("topo");
+    const { t } = useLanguage();
 
     const baseLayers = [
       {
         id: "topo",
-        name: "Topographic",
+        label: translations.layerTopographic,
         icon: "mdi-map",
         url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         attribution: "© OpenStreetMap contributors",
       },
       {
         id: "satellite",
-        name: "Satellite",
+        label: translations.layerSatellite,
         icon: "mdi-satellite",
         url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
         attribution: "© Esri",
       },
       {
         id: "terrain",
-        name: "Terrain",
+        label: translations.layerTerrain,
         icon: "mdi-terrain",
         url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
         attribution: "© OpenTopoMap",
@@ -95,6 +104,8 @@ export default {
 
       marker = L.marker([props.latitude, props.longitude], {
         icon: createTealPinMarker(),
+        title: props.placeName,
+        alt: props.placeName,
       })
         .addTo(map)
         .bindPopup("", {
@@ -117,6 +128,8 @@ export default {
     const updatePopupContent = async () => {
       if (marker) {
         await nextTick();
+        // Give the marker an accessible name (divIcon markers have no image alt)
+        marker.getElement()?.setAttribute("aria-label", props.placeName);
         marker.setPopupContent(
           `<div class="popup-content">${props.placeName}</div>`
         );
@@ -154,6 +167,8 @@ export default {
       baseLayers,
       currentLayer,
       changeBaseLayer,
+      t,
+      translations,
     };
   },
 };
@@ -193,14 +208,14 @@ export default {
 
 /* Popup Styles for PlaceLocationMap */
 :deep(.custom-popup .leaflet-popup-content-wrapper) {
-  background: #0097a9;
+  background: #00616d;
   color: white;
   border-radius: 4px;
   padding: 8px 12px;
 }
 
 :deep(.custom-popup .leaflet-popup-tip) {
-  background: #0097a9;
+  background: #00616d;
 }
 
 :deep(.custom-popup .leaflet-popup-content) {
